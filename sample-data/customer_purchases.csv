@@ -1,0 +1,21 @@
+customer_id,name,email,purchase_date,amount,product
+C-1001,Rahul Sharma,rahul@example.com,2026-09-20,12500,Premium Plan
+C-1001,Rahul Sharma,rahul@example.com,2026-09-12,9800,Analytics Add-on
+C-1001,Rahul Sharma,rahul@example.com,2026-08-30,11200,Loyalty Pack
+C-1001,Rahul Sharma,rahul@example.com,2026-08-15,15500,Premium Plan
+C-1001,Rahul Sharma,rahul@example.com,2026-07-25,13800,Insights Pack
+C-1002,Priya Mehta,priya@example.com,2026-09-18,6200,Standard Plan
+C-1002,Priya Mehta,priya@example.com,2026-09-02,5400,Reports Add-on
+C-1002,Priya Mehta,priya@example.com,2026-08-16,7100,Standard Plan
+C-1002,Priya Mehta,priya@example.com,2026-07-29,6800,Insights Pack
+C-1003,Aman Verma,aman@example.com,2026-09-21,3200,Starter Plan
+C-1003,Aman Verma,aman@example.com,2026-09-05,2800,Starter Plan
+C-1004,Neha Kapoor,neha@example.com,2026-09-23,4500,Welcome Pack
+C-1005,Arjun Malhotra,arjun@example.com,2026-07-05,7600,Standard Plan
+C-1005,Arjun Malhotra,arjun@example.com,2026-06-28,6900,Reports Add-on
+C-1005,Arjun Malhotra,arjun@example.com,2026-06-12,8200,Standard Plan
+C-1006,Sneha Iyer,sneha@example.com,2026-04-20,5400,Starter Plan
+C-1006,Sneha Iyer,sneha@example.com,2026-03-11,6100,Reports Add-on
+C-1007,Rohan Khanna,rohan@example.com,2026-09-10,3900,Starter Plan
+C-1007,Rohan Khanna,rohan@example.com,2026-08-05,4200,Starter Plan
+C-1007,Rohan Khanna,rohan@example.com,2026-07-01,4600,Reports Add-on
