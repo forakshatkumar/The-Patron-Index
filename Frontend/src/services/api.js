@@ -14,7 +14,7 @@ async function request(path, options = {}) {
   if (token) headers.Authorization = `Bearer ${token}`
 
   const response = await fetch(`${API_URL}${path}`, { ...options, headers })
-  let data = {}
+  let data
   try {
     data = await response.json()
   } catch {

@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import logoImg from '../assets/logo.png'
 
 function Sidebar () {
   const navigate = useNavigate()
@@ -21,7 +22,7 @@ function Sidebar () {
   return (
     <aside className='sidebar'>
       <NavLink to='/dashboard' className='sidebar-brand'>
-        <div className='brand-logo'>P</div>
+        <img src={logoImg} alt='The Patron Index' className='brand-logo-img' />
         <div><h2>The Patron Index</h2><span>Customer Intelligence</span></div>
       </NavLink>
       <div className='sidebar-section-label'>WORKSPACE</div>

@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #0B0F14;
+  --surface: #121820;
+  --surface-elevated: #18222E;
+  --border: #222B36;
+  --border-light: #2E3B4B;
+  --text: #E8EEF5;
+  --muted: #8A98A8;
+  --accent: #4F8CFF;
+  --accent-2: #7C5CFF;
+  --accent-glow: rgba(79, 140, 255, 0.25);
+
+  /* Segment colours specified in design system */
+  --vip: #F5B83D;
+  --loyal: #3DD6A0;
+  --regular: #4F8CFF;
+  --new: #7C5CFF;
+  --occasional: #8A98A8;
+  --at-risk: #FF9F43;
+  --inactive: #FF5D6C;
+
+  /* Typography scale */
+  --font-display: 'Fraunces', serif;
+  --font-body: 'Inter', sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

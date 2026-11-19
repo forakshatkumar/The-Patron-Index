@@ -1,6 +1,7 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
+import Landing from './pages/Landing'
 import Dashboard from './pages/Dashboard'
 import Customers from './pages/Customers'
 import CustomerProfile from './pages/CustomerProfile'
@@ -17,10 +18,10 @@ import NotFound from './pages/NotFound'
 function App () {
   return (
     <Routes>
+      <Route path='/' element={<Landing />} />
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Register />} />
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route index element={<Navigate to='/dashboard' replace />} />
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/customers' element={<Customers />} />
         <Route path='/customers/:id' element={<CustomerProfile />} />

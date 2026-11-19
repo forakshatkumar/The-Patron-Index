@@ -63,7 +63,7 @@ function Dashboard () {
 
       <div className='stats-grid'>
         <StatCard title='Total Customers' value={Number(stats.totalCustomers || 0).toLocaleString()} change='Live' description={summary ? 'from database' : 'demo data'} icon='◉' />
-        <StatCard title='Active Customers' value={Number(stats.activeCustomers ?? demoStats.activeCustomers).toLocaleString()} change='Current' description='active customers' icon='✓' />
+        <StatCard title='Active Customers' value={Number(stats.activeCustomers ?? demoStats.activeCustomers).toLocaleString()} change='Current' description='active customers' icon='●' />
         <StatCard title='High-Value Customers' value={Number(stats.highValueCustomers ?? demoStats.highValueCustomers).toLocaleString()} change='VIP + Loyal' description='priority segment' icon='★' />
         <StatCard title='Total Revenue' value={`₹${(Number(stats.totalRevenue ?? demoStats.totalRevenue) / 100000).toFixed(1)}L`} change='Tracked' description='customer value' icon='₹' />
       </div>

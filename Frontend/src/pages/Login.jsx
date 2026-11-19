@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import logoImg from '../assets/logo.png'
 
 function Login () {
   const { login, enterDemo } = useAuth()
@@ -33,7 +34,9 @@ function Login () {
   return (
     <div className='auth-page'>
       <div className='auth-card'>
-        <div className='auth-brand'><div className='brand-logo'>P</div><div><h1>The Patron Index</h1><p>Customer Intelligence Platform</p></div></div>
+        <Link to='/' className='auth-brand-link' aria-label='The Patron Index Home'>
+          <div className='auth-brand'><img src={logoImg} alt='The Patron Index' className='brand-logo-img' /><div><h1>The Patron Index</h1><p>Customer Intelligence Platform</p></div></div>
+        </Link>
         <h2>Welcome back</h2>
         <p className='muted-text'>Sign in to access your business dashboard.</p>
         <form className='auth-form' onSubmit={submit}>
