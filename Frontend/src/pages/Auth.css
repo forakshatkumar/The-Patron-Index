@@ -218,34 +218,6 @@
   border-color: #b74848;
 }
 
-.password-field {
-  position: relative;
-}
-
-.password-field input {
-  padding-right: 65px;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 4px;
-  bottom: 4px;
-  min-height: 41px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 6px;
-  background: #eff6fc;
-  color: #1c5588;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.password-toggle:hover {
-  background: #dbeafe;
-}
-
 .account-hint,
 .account-error {
   display: block;
@@ -342,3 +314,4 @@
     transition: none;
   }
 }
+

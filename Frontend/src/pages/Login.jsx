@@ -10,7 +10,6 @@ function Login () {
   const location = useLocation()
   const [email, setEmail] = useState(() => location.state?.email || '')
   const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(() =>
     location.state?.registered ? 'Account created successfully! Please sign in below.' : ''
@@ -98,28 +97,16 @@ function Login () {
 
           <div className='account-field'>
             <label htmlFor='account-password'>Password</label>
-            <div className='password-field'>
-              <input
-                id='account-password'
-                type={showPassword ? 'text' : 'password'}
-                autoComplete='current-password'
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder='••••••••'
-                required
-                aria-invalid={Boolean(error)}
-              />
-              <button
-                type='button'
-                className='password-toggle'
-                onClick={() => setShowPassword(prev => !prev)}
-                aria-controls='account-password'
-                aria-pressed={showPassword}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
+            <input
+              id='account-password'
+              type='password'
+              autoComplete='current-password'
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder='••••••••'
+              required
+              aria-invalid={Boolean(error)}
+            />
           </div>
 
           {error && <span className='account-error' role='alert'>{error}</span>}

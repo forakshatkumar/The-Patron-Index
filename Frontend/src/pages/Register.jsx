@@ -7,7 +7,6 @@ import './Auth.css'
 function Register () {
   const navigate = useNavigate()
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'analyst' })
-  const [showPassword, setShowPassword] = useState(false)
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -111,28 +110,16 @@ function Register () {
 
           <div className='account-field'>
             <label htmlFor='account-password'>Password</label>
-            <div className='password-field'>
-              <input
-                id='account-password'
-                type={showPassword ? 'text' : 'password'}
-                autoComplete='new-password'
-                minLength={6}
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-                placeholder='••••••••'
-                required
-              />
-              <button
-                type='button'
-                className='password-toggle'
-                onClick={() => setShowPassword(prev => !prev)}
-                aria-controls='account-password'
-                aria-pressed={showPassword}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
+            <input
+              id='account-password'
+              type='password'
+              autoComplete='new-password'
+              minLength={6}
+              value={form.password}
+              onChange={e => setForm({ ...form, password: e.target.value })}
+              placeholder='••••••••'
+              required
+            />
             <span className='account-hint'>Use at least 6 characters.</span>
           </div>
 
