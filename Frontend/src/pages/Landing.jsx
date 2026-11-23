@@ -11,7 +11,8 @@ import {
   Award,
   LayoutDashboard,
   PieChart,
-  Lightbulb
+  Lightbulb,
+  TrendingUp
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import './Landing.css'
@@ -154,8 +155,8 @@ export default function Landing () {
       if (!stepsContainerRef.current) return
       const rect = stepsContainerRef.current.getBoundingClientRect()
       const windowHeight = window.innerHeight
-      const startOffset = windowHeight * 0.72
-      const endOffset = windowHeight * 0.28
+      const startOffset = windowHeight * 0.75
+      const endOffset = windowHeight * 0.25
       const totalDistance = rect.height + (startOffset - endOffset)
       const currentScroll = startOffset - rect.top
       const progress = Math.min(Math.max(currentScroll / totalDistance, 0), 1)
@@ -407,7 +408,7 @@ export default function Landing () {
             </div>
             <div className='benefit'>
               <div className='benefit-icon-wrap' aria-hidden='true'>
-                <Lightbulb />
+                <TrendingUp />
               </div>
               <span>Make smarter business<br />decisions</span>
             </div>
@@ -488,8 +489,8 @@ export default function Landing () {
               />
             </div>
 
-            <article className={`step ${timelineProgress >= 0.10 ? 'active-step' : ''}`}>
-              <div className={`step-node ${timelineProgress >= 0.10 ? 'reached' : ''}`} aria-hidden='true'>
+            <article className={`step ${timelineProgress >= 0.05 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.05 ? 'reached' : ''}`} aria-hidden='true'>
                 <span className='node-pulse-ring' />
                 <span className='node-inner-dot' />
               </div>
@@ -497,11 +498,11 @@ export default function Landing () {
                 <UploadCloud />
               </div>
               <h3>1. Upload Your Data</h3>
-              <p>Drag and drop your<br />business CSV file</p>
+              <p>Drag and drop your business CSV file</p>
             </article>
 
-            <article className={`step ${timelineProgress >= 0.36 ? 'active-step' : ''}`}>
-              <div className={`step-node ${timelineProgress >= 0.36 ? 'reached' : ''}`} aria-hidden='true'>
+            <article className={`step ${timelineProgress >= 0.28 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.28 ? 'reached' : ''}`} aria-hidden='true'>
                 <span className='node-pulse-ring' />
                 <span className='node-inner-dot' />
               </div>
@@ -509,11 +510,11 @@ export default function Landing () {
                 <ShieldCheck />
               </div>
               <h3>2. Validate &amp; Clean</h3>
-              <p>Our platform checks<br />for errors and inconsistencies</p>
+              <p>Our platform checks for errors and inconsistencies</p>
             </article>
 
-            <article className={`step ${timelineProgress >= 0.65 ? 'active-step' : ''}`}>
-              <div className={`step-node ${timelineProgress >= 0.65 ? 'reached' : ''}`} aria-hidden='true'>
+            <article className={`step ${timelineProgress >= 0.52 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.52 ? 'reached' : ''}`} aria-hidden='true'>
                 <span className='node-pulse-ring' />
                 <span className='node-inner-dot' />
               </div>
@@ -521,19 +522,19 @@ export default function Landing () {
                 <BarChart2 />
               </div>
               <h3>3. Analyse Customers</h3>
-              <p>Discover segments like<br />loyal, high-value or at-risk</p>
+              <p>Discover segments like loyal, high-value or at-risk</p>
             </article>
 
-            <article className={`step ${timelineProgress >= 0.90 ? 'active-step' : ''}`}>
-              <div className={`step-node ${timelineProgress >= 0.90 ? 'reached' : ''}`} aria-hidden='true'>
+            <article className={`step ${timelineProgress >= 0.74 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.74 ? 'reached' : ''}`} aria-hidden='true'>
                 <span className='node-pulse-ring' />
                 <span className='node-inner-dot' />
               </div>
               <div className='step-icon-box' aria-hidden='true'>
-                <Sparkles />
+                <Lightbulb />
               </div>
               <h3>4. Get Actionable Insights</h3>
-              <p>Receive easy-to-understand<br />recommendations</p>
+              <p>Receive easy-to-understand recommendations</p>
             </article>
           </div>
         </section>

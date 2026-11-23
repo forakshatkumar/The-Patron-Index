@@ -789,19 +789,27 @@
   grid-row: 1 / 3;
   align-self: center;
   flex-shrink: 0;
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-.patron-landing-page .step.active-step .step-icon-box {
+.patron-landing-page .step.active-step .step-icon-box,
+.patron-landing-page .step:hover .step-icon-box {
   background: #0866f5;
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(8, 102, 245, 0.25);
+  box-shadow: 0 4px 14px rgba(8, 102, 245, 0.28);
 }
 
 .patron-landing-page .step-icon-box svg {
   width: 26px;
   height: 26px;
+  stroke: currentColor;
   stroke-width: 2.2px;
+  transition: stroke 0.3s ease;
+}
+
+.patron-landing-page .step.active-step .step-icon-box svg,
+.patron-landing-page .step:hover .step-icon-box svg {
+  stroke: #ffffff;
 }
 
 .patron-landing-page .step h3 {
