@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+const API_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api')
 
 export const getToken = () => localStorage.getItem('patron_token')
 export const saveToken = token => localStorage.setItem('patron_token', token)

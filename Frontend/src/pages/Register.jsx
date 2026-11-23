@@ -19,8 +19,12 @@ function Register () {
     setError('')
     setLoading(true)
     try {
-      await registerUser(form)
-      navigate('/login', { replace: true })
+      await registerUser({
+        ...form,
+        email: form.email.trim().toLowerCase(),
+        name: form.name.trim()
+      })
+      navigate('/login', { replace: true, state: { email: form.email.trim(), registered: true } })
     } catch (err) {
       setError(err.message)
     } finally {
