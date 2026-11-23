@@ -22,15 +22,15 @@ export default function Landing () {
   }
 
   return (
-    <div className='min-h-screen bg-white text-slate-800 font-sans selection:bg-[#0066FF]/20 selection:text-[#0B2545]'>
+    <div className='min-h-screen bg-white text-[#344563] font-sans selection:bg-[#0866F5]/20 selection:text-[#0B2345] overflow-x-hidden'>
       {/* 1. Header / Navbar with Logo & Links */}
       <Navbar onOpenDemo={handleOpenDemo} />
 
       <main id='main-content'>
-        {/* 2. Hero Section: "The Patron Index - Where Buyers Become Insight" + Customer Overview card */}
+        {/* 2. Hero Section: Two-Column with Customer Overview */}
         <HeroSection onOpenDemo={handleOpenDemo} />
 
-        {/* 3. About Section: "Understand your customers. Grow your business." + Laptop Preview */}
+        {/* 3. About Section with Laptop Visualization */}
         <AboutSection onOpenDemo={handleOpenDemo} />
 
         {/* 4. How It Works: 4 Simple Steps */}
@@ -42,11 +42,11 @@ export default function Landing () {
         {/* 6. What Our Users Say: 3 Testimonial Cards */}
         <TestimonialsSection />
 
-        {/* 7. Pre-Footer Banner: "Ready to unlock the power of your customer data?" */}
+        {/* 7. Pre-Footer Banner */}
         <PreFooterBanner />
       </main>
 
-      {/* 8. Footer: Brand, Links, Socials, Legal Compliance */}
+      {/* 8. Footer */}
       <Footer onOpenPolicy={(policy) => setActiveModal(policy)} />
 
       {/* 9. Accessible Legal Modals (Privacy, Terms, Cookies, Data Deletion) */}

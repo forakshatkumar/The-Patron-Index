@@ -1,58 +1,92 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0B0F14;
-  --surface: #121820;
-  --surface-elevated: #18222E;
-  --border: #222B36;
-  --border-light: #2E3B4B;
-  --text: #E8EEF5;
-  --muted: #8A98A8;
-  --accent: #0066FF;
-  --accent-2: #0B2545;
-  --accent-glow: rgba(0, 102, 255, 0.2);
+  /* Exact brand palette from user specification */
+  --color-primary-navy: #0B2345;
+  --color-secondary-navy: #102F59;
+  --color-electric-blue: #0866F5;
+  --color-electric-blue-hover: #0654CC;
+  --color-light-blue: #EFF5FF;
+  --color-light-blue-tint: #F3F7FD;
+  --color-bg: #F7F9FC;
+  --color-white: #FFFFFF;
+  --color-body-text: #344563;
+  --color-muted-text: #8190A5;
+  --color-success-green: #00B884;
+  --color-border: #E5EBF3;
 
-  /* New Light Palette matching the uploaded mockup */
-  --patron-navy: #0B2545;
-  --patron-navy-dark: #071A31;
-  --patron-blue: #0066FF;
-  --patron-blue-hover: #0052CC;
-  --patron-blue-light: #EEF4FC;
-  --patron-blue-tint: #F3F7FD;
-  --patron-bg: #F8FAFD;
-  --patron-card: #FFFFFF;
-  --patron-card-border: #E2E8F0;
-  --patron-text-main: #0B2545;
-  --patron-text-body: #475569;
-  --patron-text-muted: #64748B;
-
-  /* Segment colours */
-  --vip: #F5B83D;
-  --loyal: #3DD6A0;
-  --regular: #0066FF;
-  --new: #7C5CFF;
-  --occasional: #8A98A8;
-  --at-risk: #FF9F43;
-  --inactive: #FF5D6C;
+  /* Customer segment colors */
+  --color-seg-vip: #0B2345;
+  --color-seg-loyal: #0866F5;
+  --color-seg-regular: #00B8D9;
+  --color-seg-atrisk: #FFAB00;
+  --color-seg-inactive: #8190A5;
 
   /* Typography scale */
   --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 html {
   scroll-behavior: smooth;
+  text-size-adjust: 100%;
 }
 
+body {
+  margin: 0;
+  width: 100%;
+  overflow-x: hidden;
+  font-family: var(--font-body);
+  color: var(--color-body-text);
+  background-color: var(--color-white);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Global Consistent Container System */
+.patron-container {
+  width: min(100% - 48px, 1240px);
+  margin-inline: auto;
+}
+
+@media (max-width: 640px) {
+  .patron-container {
+    width: min(100% - 32px, 1240px);
+  }
+}
+
+/* Typography Utility Classes */
 .font-display {
   font-family: var(--font-display);
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+.hero-title-clamp {
+  font-size: clamp(2.5rem, 5.2vw, 4.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+.section-title-clamp {
+  font-size: clamp(1.875rem, 3.5vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+/* Responsive Two-Column Hero Grid */
+.hero-two-col-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: 48px;
+}
+
+@media (max-width: 1024px) {
+  .hero-two-col-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
 }
