@@ -633,13 +633,27 @@
 
 .patron-landing-page .benefit {
   display: flex;
-  gap: 12px;
+  gap: 14px;
   align-items: center;
 }
 
-.patron-landing-page .benefit img {
+.patron-landing-page .benefit-icon-wrap {
   width: 44px;
-  flex: none;
+  height: 44px;
+  border-radius: 50%;
+  background: #eff6ff;
+  color: #0866f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(8, 102, 245, 0.08);
+}
+
+.patron-landing-page .benefit-icon-wrap svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 2.2px;
 }
 
 .patron-landing-page .center {
@@ -763,11 +777,31 @@
   grid-row: 4;
 }
 
-.patron-landing-page .step img {
-  width: 54px;
-  height: 54px;
-  grid-row: 1/3;
+.patron-landing-page .step-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: #f0f6ff;
+  color: #0866f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  grid-row: 1 / 3;
   align-self: center;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.patron-landing-page .step.active-step .step-icon-box {
+  background: #0866f5;
+  color: #ffffff;
+  box-shadow: 0 4px 14px rgba(8, 102, 245, 0.25);
+}
+
+.patron-landing-page .step-icon-box svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 2.2px;
 }
 
 .patron-landing-page .step h3 {
@@ -908,10 +942,28 @@
   transition: all 0.2s ease;
 }
 
-.patron-landing-page .feature-tab img {
+.patron-landing-page .feature-tab-icon-wrap {
   width: 32px;
   height: 32px;
-  border-radius: 6px;
+  border-radius: 8px;
+  background: #f0f6ff;
+  color: #0866f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.patron-landing-page .feature-tab[aria-selected="true"] .feature-tab-icon-wrap {
+  background: #0866f5;
+  color: #ffffff;
+}
+
+.patron-landing-page .feature-tab-icon-wrap svg {
+  width: 17px;
+  height: 17px;
+  stroke-width: 2.2px;
 }
 
 .patron-landing-page .feature-tab[aria-selected="true"] {
@@ -1013,19 +1065,29 @@
 .patron-landing-page .social {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
-.patron-landing-page .social img {
+.patron-landing-page .social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #475569;
+  transition: all 0.2s ease;
+}
+
+.patron-landing-page .social-link:hover {
+  background: #0866f5;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.patron-landing-page .social-link svg {
   display: block;
-  width: 22px;
-  height: 22px;
-  opacity: 0.85;
-  transition: opacity 0.2s;
-}
-
-.patron-landing-page .social img:hover {
-  opacity: 1;
 }
 
 .patron-landing-page .copyright {
