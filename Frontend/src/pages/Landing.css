@@ -138,21 +138,26 @@
   border-color: #0866f5;
 }
 
-/* Hero Section with wide layout */
+/* Hero Section - full viewport landing view */
 .patron-landing-page .hero {
   background: #ffffff;
   position: relative;
   overflow: hidden;
-  padding: 24px 0 64px;
+  min-height: calc(100vh - 80px);
+  min-height: calc(100dvh - 80px);
+  display: flex;
+  align-items: center;
+  padding: 30px 0 50px;
+  box-sizing: border-box;
 }
 
 .patron-landing-page .hero-grid {
-  min-height: 480px;
+  width: 100%;
   display: grid;
-  grid-template-columns: 1fr 1.18fr;
+  grid-template-columns: 1fr 1.25fr;
   align-items: center;
   gap: 56px;
-  padding: 20px 0 40px;
+  padding: 10px 0;
 }
 
 .patron-landing-page h1,
@@ -163,27 +168,27 @@
 }
 
 .patron-landing-page h1 {
-  font-size: clamp(38px, 4.5vw, 62px);
+  font-size: clamp(40px, 4.8vw, 64px);
   font-weight: 900;
   color: #0b2345;
-  line-height: 1.06;
+  line-height: 1.05;
   letter-spacing: -1.6px;
 }
 
 .patron-landing-page .tagline {
   font-weight: 800;
   color: #0866f5;
-  font-size: clamp(24px, 2.7vw, 38px);
+  font-size: clamp(26px, 2.9vw, 42px);
   letter-spacing: -0.8px;
-  margin: 6px 0 16px;
+  margin: 8px 0 18px;
   line-height: 1.15;
 }
 
 .patron-landing-page .hero-copy p:not(.tagline) {
-  max-width: 440px;
+  max-width: 480px;
   color: #4b5563;
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 16px;
+  line-height: 1.6;
 }
 
 .patron-landing-page .hero-buttons {
@@ -191,27 +196,31 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 14px;
-  margin-top: 32px;
+  margin-top: 36px;
 }
 
 .patron-landing-page .hero-buttons .btn {
-  min-height: 44px;
-  padding: 0 28px;
-  font-size: 13px;
-  font-weight: 600;
+  min-height: 48px;
+  padding: 0 34px;
+  font-size: 14px;
+  font-weight: 700;
   border-radius: 9999px;
+  letter-spacing: 0.2px;
 }
 
 .patron-landing-page .hero-buttons .btn:not(.outline) {
   background: #0b2345;
   border-color: #0b2345;
   color: #ffffff;
-  box-shadow: 0 4px 14px rgba(11, 35, 69, 0.16);
+  box-shadow: 0 6px 18px rgba(11, 35, 69, 0.2);
+  transition: all 0.2s ease;
 }
 
 .patron-landing-page .hero-buttons .btn:not(.outline):hover {
   background: #0866f5;
   border-color: #0866f5;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(8, 102, 245, 0.25);
 }
 
 .patron-landing-page .hero-buttons .btn.outline {
@@ -236,10 +245,10 @@
   content: "";
   position: absolute;
   z-index: -1;
-  width: 260px;
-  height: 260px;
-  right: -30px;
-  top: -35px;
+  width: 320px;
+  height: 320px;
+  right: -40px;
+  top: -45px;
   border-radius: 50%;
   background: #dbe8f7;
   opacity: 0.95;
@@ -249,10 +258,10 @@
   content: "";
   position: absolute;
   z-index: -1;
-  width: 210px;
-  height: 210px;
-  left: -40px;
-  bottom: -35px;
+  width: 260px;
+  height: 260px;
+  left: -50px;
+  bottom: -45px;
   border-radius: 50%;
   background: #cfe0f5;
   opacity: 0.9;
@@ -263,12 +272,12 @@
 }
 
 .patron-landing-page .panel {
-  padding: 22px 24px;
-  min-height: 330px;
+  padding: 26px 28px;
+  min-height: 360px;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 18px;
-  box-shadow: 0 20px 45px -12px rgba(11, 35, 69, 0.09);
+  border-radius: 20px;
+  box-shadow: 0 24px 50px -12px rgba(11, 35, 69, 0.1);
 }
 
 .patron-landing-page .panel-head {
@@ -294,18 +303,49 @@
 .patron-landing-page .stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
 }
 
 .patron-landing-page .stat {
   border: 1px solid #edf2f7;
-  border-radius: 10px;
-  padding: 12px 14px;
+  border-radius: 12px;
+  padding: 14px 16px;
   background: #fbfcfe;
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 72px;
+  gap: 12px;
+  min-height: 76px;
+}
+
+.patron-landing-page .stat-icon-wrap {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.patron-landing-page .stat-icon-wrap.user-stat {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.patron-landing-page .stat-icon-wrap.revenue-stat {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.patron-landing-page .stat-icon-wrap.active-stat {
+  background: #f0fdf4;
+  color: #16a34a;
+}
+
+.patron-landing-page .stat-icon-wrap svg {
+  width: 20px;
+  height: 20px;
+  stroke-width: 2.2px;
 }
 
 .patron-landing-page .stat img {
@@ -315,14 +355,14 @@
 }
 
 .patron-landing-page .stat div {
-  font-size: 10px;
+  font-size: 11px;
   color: #64748b;
   font-weight: 600;
 }
 
 .patron-landing-page .stat b {
   display: block;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 800;
   color: #0b2345;
   line-height: 1.2;

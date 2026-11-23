@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import { Users, IndianRupee, UserCheck } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import './Landing.css'
 
@@ -215,7 +216,7 @@ export default function Landing () {
               <p className='tagline'>Where Buyers Become Insight</p>
               <p>Turn your business data into powerful customer intelligence. Understand. Segment. Grow.</p>
               <div className='hero-buttons'>
-                <Link to='/register' className='btn'>Get Started Free &rarr;</Link>
+                <Link to='/register' className='btn'>Get Started Free</Link>
               </div>
             </div>
             <div className='dashboard'>
@@ -235,15 +236,21 @@ export default function Landing () {
                 </div>
                 <div className='stats'>
                   <div className='stat'>
-                    <img src='data:image/webp;base64,UklGRgICAABXRUJQVlA4IPYBAABwCgCdASofACAAPikQhkIhoQwCAAwBQlAE6ZQjtEapwCYztiDnuI+r+JPGzVEzJOOT+2bUSfxm1qPmK+2/qs/5P8s1DVzmCwc6s6gLFHH7tzhGJtJERbmQbrvEAAD+//7/e0lp/pU19RdCDAxe4X8SqWh8dVSlZMw4tSmlJWIa1BPppa7+1bvqLJicpH9zuxAdh4odJAKbU0lL1f3x+rl4EzMc3Nz+/+HlPIOevMOPBMvfPkEP3S5ZMGeAB1bU7ECNmdLawjhVy7/k8/y1P/n/xDhqcJgF9U5AGpYDXco68q1LeKcnRTzqZ7d6kAHve8+b8z7LYNhGC/1bP+HrJdJ/GD8Wr4/OwPgsXtGvOGh7qHiL+M4680p7AV/P9Ay//NooIh9d0kOWAdEz1Bm/mgd1vcCf/d+HHuv1bVjQPCDxSrJGb0fzbdmKny+jExOUr95lzkgEJ/zc65B5vJs/jAjHlDjmxTUZWLOIfhNahu+n/jj4ACbViIvsplxOJeyeRGKssNqhdvcPodAl9V4bjxT6AIKEauHKWj5aVQIZBH6+1j52Hi6u6P3eWW5ubh3mb70Vun3N10N9f7ogyv2wswrbCAkBdk4unxxJlH97RVjn5kzLSRWmyCWUs23JN6MdOZaeBbpNDB8p9dqN6rhZlNqP8TagAAAA==' alt='' />
+                    <div className='stat-icon-wrap user-stat'>
+                      <Users className='stat-icon' />
+                    </div>
                     <div>Total Customers<b>{currentOverview.metric}</b><small>{currentOverview.delta}</small></div>
                   </div>
                   <div className='stat'>
-                    <img src='data:image/webp;base64,UklGRtgBAABXRUJQVlA4IMwBAADQCQCdASofACAAPikQhkIhoQwGAgAMAUJaACdMzQ+MK61nCFbyOcdv+Lti/kQNQd4MHkweoNoa9lvVH/wX5eqGtVGCBFJvAAHgbK2WHXI5HpINJ2Lz1iAA/v//A3059ig8rYyv1UlwjnMlAiguVy1h9vIGVjHnY9mc97EyJ/F4tm5AaA/2HX4XhKg1dyPh8GwT+cyWUtBn0HY/wgBqixC/usIwmgn1/oYKIGj50DtRCuSz4fP/M7n/7fsewPbD/4ZkcsP+6zl8latEurbWvicnuYi8u2S/Q2YhplLKWWP5nb/3WVdpnVof85/8WG+c35M9rJ2+I4A5bdmeql1zGEdhtC/hgbq/5+ut50P0cnqZNRXZru+DbfkRi8fWN58XmOV/5TMR9ZFC5ixzwsCxH15quPLex1UKK/3Lg8O/IBT1UAft/+8aL6biELdd+MyfI/zNNlpPzfRygBAOci2+/7SnmcY6d8U3LdJ6SEG1iCyM1Wz0hFJKF/JFDkOkIoC222/y+6kGtOtkQ38UtplFgkcVHQe1Nj75m+hoKV1c4tRCBIwzq/2ixJpafzf+czkZVSLoiZHXczOdxmJ7ainzQ4ZW5PsP2HX/mJbQAAAA==' alt='' />
+                    <div className='stat-icon-wrap revenue-stat'>
+                      <IndianRupee className='stat-icon' />
+                    </div>
                     <div>Total Revenue<b>{currentOverview.revenue}</b><small>{currentOverview.revenueDelta}</small></div>
                   </div>
                   <div className='stat'>
-                    <img src='data:image/webp;base64,UklGRrYBAABXRUJQVlA4IKoBAAAQCQCdASofACAAPikQhUIhoQwGAwAMAUJZgCdMuN7WIK22MXmxm+PSKTiwFTAeo3nreffOoXQp8D9seXxMXfFXg8mhd6TXz38DtASBVmDLTAAA/v/+/3zsbbTXyY86LxrtHu2fUYIkn9XS94szQfsmL974S83/3dttJ4rWXAoUPsKExGz/NnyZdEa0zHjUpQnHKb9Vn8+qtZ/ncu/5yfFPsBs58y23N//dP/73SvfNsSOX+ErjjXslNTqiYuguQO40Jt/MhSt/8w/Spw09Z+/mrpBRKsW3V+BQt1Ny95EIuVrBMEycVsDc3Pk1QYdRAl5OROSbm+X2XTsD5/+f+6cz8n5+geLajSlEZ/o8KVPvvjar5S+j5sD+kSL7n9cLjQd+bYJMOndE3SS2Pfvyj/6x7/+6Z/xoRV2f+KgZFqu9P9DFiPoJyrA0deVhf0/6/e5PsbvGXFBkHG8uvR4JDMu4DhsP7sZdVw1fb+8ebNC8ho6zf5r6b9NzR8+/2smOSf21WZkA76loBfSt/dgw/0hNm3SpsTOm4Mv9uOFiEdiJeQX0U7V++slAAAA=' alt='' />
+                    <div className='stat-icon-wrap active-stat'>
+                      <UserCheck className='stat-icon' />
+                    </div>
                     <div>Active Customers<b>{currentOverview.active}</b><small>{currentOverview.activeDelta}</small></div>
                   </div>
                 </div>
