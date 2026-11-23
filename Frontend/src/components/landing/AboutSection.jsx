@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
-import { UploadCloud, BarChart2, Lightbulb, ArrowRight } from 'lucide-react'
+import { UploadCloud, BarChart2, Lightbulb } from 'lucide-react'
 import laptopPhoto from '../../assets/laptop-dashboard.jpg'
 
-export default function AboutSection ({ onOpenDemo }) {
+export default function AboutSection () {
   const points = [
     {
       icon: UploadCloud,
@@ -46,25 +46,6 @@ export default function AboutSection ({ onOpenDemo }) {
             <p className='text-slate-600 text-xs sm:text-sm leading-relaxed max-w-md'>
               The Patron Index helps you analyse your customer behaviour, identify valuable segments, and make data-driven decisions — all in a simple, secure and affordable platform.
             </p>
-
-            {/* Know More Pill Button */}
-            <div className='pt-2'>
-              <a
-                href='#features'
-                onClick={(e) => {
-                  e.preventDefault()
-                  if (onOpenDemo) onOpenDemo()
-                  else {
-                    const el = document.getElementById('features')
-                    if (el) el.scrollIntoView({ behavior: 'smooth' })
-                  }
-                }}
-                className='inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#0B2545] hover:bg-[#0066FF] transition-all shadow-xs cursor-pointer'
-              >
-                <span>Know More</span>
-                <ArrowRight className='w-3.5 h-3.5' />
-              </a>
-            </div>
           </motion.div>
 
           {/* MIDDLE PART: 3 Stacked Items with Soft Blue Circular Badges */}

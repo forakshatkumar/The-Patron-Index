@@ -54,13 +54,6 @@ export default function HeroSection () {
                 <span>Get Started Free</span>
                 <ArrowRight className='w-4 h-4' />
               </Link>
-
-              <a
-                href='#about'
-                className='inline-flex items-center px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:border-[#0066FF] hover:text-[#0066FF] transition-all'
-              >
-                Learn More
-              </a>
             </div>
           </div>
 

@@ -216,7 +216,6 @@ export default function Landing () {
               <p>Turn your business data into powerful customer intelligence. Understand. Segment. Grow.</p>
               <div className='hero-buttons'>
                 <Link to='/register' className='btn'>Get Started Free &rarr;</Link>
-                <a className='btn outline' href='#about'>Learn More</a>
               </div>
             </div>
             <div className='dashboard'>
@@ -368,7 +367,6 @@ export default function Landing () {
             <div className='eyebrow'>About The Patron Index</div>
             <h2>Understand your customers.<br />Grow your business.</h2>
             <p>The Patron Index helps you analyse your customer behaviour, identify valuable segments, and make data-driven decisions — all in a simple, secure and affordable platform.</p>
-            <a className='btn' href='#how'>Know More &rarr;</a>
           </div>
           <div className='benefits'>
             <div className='benefit'>
