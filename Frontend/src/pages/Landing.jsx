@@ -554,7 +554,7 @@ export default function Landing () {
         </section>
 
         {/* Call to Action Banner */}
-        <section className='cta center'>
+        <section className='cta center wrap'>
           <div>
             <h2>Ready to unlock the power of your customer data?</h2>
             <p>Join The Patron Index today and turn your data into growth.</p>
