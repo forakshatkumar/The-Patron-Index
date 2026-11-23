@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 import logoImg from '../assets/logo.png'
 import './Landing.css'
 
@@ -12,7 +13,14 @@ const previewData = {
     revenue: '₹8.4L',
     revenueDelta: '↑ 18%',
     active: '8,960',
-    activeDelta: '↑ 14%'
+    activeDelta: '↑ 14%',
+    segments: [
+      { name: 'High-Value', pct: 25, count: '3,120', color: '#0b2345' },
+      { name: 'Loyal', pct: 28, count: '3,494', color: '#0866f5' },
+      { name: 'Regular', pct: 18, count: '2,246', color: '#22b8f5' },
+      { name: 'At-Risk', pct: 17, count: '2,122', color: '#f59e0b' },
+      { name: 'Inactive', pct: 12, count: '1,498', color: '#8da2b5' }
+    ]
   },
   three: {
     values: [41, 55, 49, 68, 61, 80, 89],
@@ -22,7 +30,14 @@ const previewData = {
     revenue: '₹4.9L',
     revenueDelta: '↑ 11%',
     active: '5,240',
-    activeDelta: '↑ 8%'
+    activeDelta: '↑ 8%',
+    segments: [
+      { name: 'High-Value', pct: 29, count: '2,140', color: '#0b2345' },
+      { name: 'Loyal', pct: 27, count: '1,992', color: '#0866f5' },
+      { name: 'Regular', pct: 20, count: '1,476', color: '#22b8f5' },
+      { name: 'At-Risk', pct: 14, count: '1,033', color: '#f59e0b' },
+      { name: 'Inactive', pct: 10, count: '739', color: '#8da2b5' }
+    ]
   },
   customers: {
     values: [22, 35, 32, 56, 53, 68, 64, 87],
@@ -56,32 +71,23 @@ function generateSvgCurve (values) {
 }
 
 export default function Landing () {
+  const { isAuthenticated } = useAuth() || {}
   const [overviewRange, setOverviewRange] = useState('six')
   const [laptopMetric, setLaptopMetric] = useState('customers')
   const [selectedFeature, setSelectedFeature] = useState(0)
+  const [activeSegment, setActiveSegment] = useState(null)
+  const [donutLoaded, setDonutLoaded] = useState(false)
 
-  const [modalTitle, setModalTitle] = useState('')
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [emailInput, setEmailInput] = useState('')
-  const [statusMessage, setStatusMessage] = useState('')
+  useEffect(() => {
+    const timer = setTimeout(() => setDonutLoaded(true), 50)
+    return () => clearTimeout(timer)
+  }, [])
 
   const currentOverview = previewData[overviewRange]
   const currentOverviewCurve = generateSvgCurve(currentOverview.values)
 
   const currentLaptop = previewData[laptopMetric]
   const currentLaptopCurve = generateSvgCurve(currentLaptop.values)
-
-  const handleOpenAccountModal = (title) => {
-    setModalTitle(title)
-    setEmailInput('')
-    setStatusMessage('')
-    setIsModalOpen(true)
-  }
-
-  const handleModalSubmit = (e) => {
-    e.preventDefault()
-    setStatusMessage('This preview uses a demo account form. Use Login or Sign Up buttons for full access.')
-  }
 
   const featureList = [
     {
@@ -129,8 +135,14 @@ export default function Landing () {
           <a href='#reviews'>Reviews</a>
         </nav>
         <div className='actions'>
-          <button type='button' className='btn outline' onClick={() => handleOpenAccountModal('Login')}>Login</button>
-          <button type='button' className='btn' onClick={() => handleOpenAccountModal('Sign Up')}>Sign Up</button>
+          {isAuthenticated ? (
+            <Link to='/dashboard' className='btn'>Dashboard</Link>
+          ) : (
+            <>
+              <Link to='/login' className='btn outline'>Login</Link>
+              <Link to='/register' className='btn'>Sign Up</Link>
+            </>
+          )}
         </div>
       </header>
 
@@ -144,7 +156,11 @@ export default function Landing () {
               <p className='tagline'>Where Buyers Become Insight</p>
               <p>Turn your business data into powerful customer intelligence. Understand. Segment. Grow.</p>
               <div className='hero-buttons'>
-                <button type='button' className='btn' onClick={() => handleOpenAccountModal('Sign Up')}>Get Started Free &rarr;</button>
+                {isAuthenticated ? (
+                  <Link to='/dashboard' className='btn'>Go to Dashboard &rarr;</Link>
+                ) : (
+                  <Link to='/register' className='btn'>Get Started Free &rarr;</Link>
+                )}
                 <a className='btn outline' href='#about'>Learn More</a>
               </div>
             </div>
@@ -205,13 +221,83 @@ export default function Landing () {
                   <div className='segments'>
                     <h3>Customer Segments</h3>
                     <div className='segment-body'>
-                      <div className='donut' aria-hidden='true' />
+                      <div className='donut-container'>
+                        <svg
+                          className='donut-svg'
+                          viewBox='0 0 100 100'
+                          role='img'
+                          aria-label='Customer segments breakdown'
+                        >
+                          {(() => {
+                            const C = 238.761
+                            return currentOverview.segments.map((seg, idx) => {
+                              const cumulativePct = currentOverview.segments.slice(0, idx).reduce((acc, s) => acc + s.pct, 0)
+                              const length = (seg.pct / 100) * C
+                              const offset = -(cumulativePct / 100) * C
+                              const gap = 1.4
+                              const dashLen = Math.max(0, length - gap)
+                              const isActive = activeSegment === idx
+                              const isMuted = activeSegment !== null && !isActive
+
+                              return (
+                                <circle
+                                  key={seg.name}
+                                  className={`donut-slice ${isActive ? 'active' : ''} ${isMuted ? 'muted' : ''}`}
+                                  cx='50'
+                                  cy='50'
+                                  r='38'
+                                  stroke={seg.color}
+                                  strokeWidth={isActive ? '20' : '16'}
+                                  strokeDasharray={donutLoaded ? `${dashLen} ${C - dashLen}` : `0 ${C}`}
+                                  strokeDashoffset={donutLoaded ? offset : 0}
+                                  onMouseEnter={() => setActiveSegment(idx)}
+                                  onMouseLeave={() => setActiveSegment(null)}
+                                >
+                                  <title>{`${seg.name}: ${seg.pct}% (${seg.count} customers)`}</title>
+                                </circle>
+                              )
+                            })
+                          })()}
+                        </svg>
+                        <div className='donut-center-content' aria-hidden='true'>
+                          {activeSegment !== null ? (
+                            <>
+                              <span className='donut-center-pct'>
+                                {currentOverview.segments[activeSegment].pct}%
+                              </span>
+                              <span className='donut-center-name'>
+                                {currentOverview.segments[activeSegment].name}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className='donut-center-pct'>100%</span>
+                              <span className='donut-center-name'>Total</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
                       <ul className='legend'>
-                        <li><i style={{ '--dot': '#103d6d' }} />High-Value</li>
-                        <li><i style={{ '--dot': '#1b58a0' }} />Loyal</li>
-                        <li><i style={{ '--dot': '#2474c9' }} />Regular</li>
-                        <li><i style={{ '--dot': '#538ecd' }} />At-Risk</li>
-                        <li><i style={{ '--dot': '#77a8e0' }} />Inactive</li>
+                        {currentOverview.segments.map((seg, idx) => {
+                          const isActive = activeSegment === idx
+                          return (
+                            <li
+                              key={seg.name}
+                              className={isActive ? 'active' : ''}
+                              onMouseEnter={() => setActiveSegment(idx)}
+                              onMouseLeave={() => setActiveSegment(null)}
+                              role='button'
+                              tabIndex={0}
+                              aria-label={`${seg.name}: ${seg.pct}%`}
+                            >
+                              <span className='legend-label'>
+                                <i style={{ '--dot': seg.color, backgroundColor: seg.color }} />
+                                {seg.name}
+                              </span>
+                              <span className='legend-pct'>{seg.pct}%</span>
+                            </li>
+                          )
+                        })}
                       </ul>
                     </div>
                   </div>
@@ -414,7 +500,11 @@ export default function Landing () {
             <h2>Ready to unlock the power of your customer data?</h2>
             <p>Join The Patron Index today and turn your data into growth.</p>
           </div>
-          <button type='button' className='btn' onClick={() => handleOpenAccountModal('Sign Up')}>Sign Up Free &rarr;</button>
+          {isAuthenticated ? (
+            <Link to='/dashboard' className='btn'>Go to Dashboard &rarr;</Link>
+          ) : (
+            <Link to='/register' className='btn'>Sign Up Free &rarr;</Link>
+          )}
         </section>
       </main>
 
@@ -433,36 +523,6 @@ export default function Landing () {
         </div>
         <p className='copyright'>&copy; 2026 The Patron Index. All rights reserved.</p>
       </footer>
-
-      {/* Accessible Account Dialog */}
-      {isModalOpen && (
-        <dialog open aria-labelledby='account-title'>
-          <div className='dialog-head'>
-            <h2 id='account-title'>{modalTitle}</h2>
-            <button className='close' type='button' onClick={() => setIsModalOpen(false)} aria-label='Close'>&times;</button>
-          </div>
-          <form onSubmit={handleModalSubmit}>
-            <label>
-              Email
-              <input
-                type='email'
-                required
-                value={emailInput}
-                onChange={(e) => setEmailInput(e.target.value)}
-                autoComplete='email'
-                placeholder='you@business.com'
-              />
-            </label>
-            <button type='submit' className='btn'>Continue</button>
-            {statusMessage && <p role='status' style={{ fontSize: '11px', color: '#124477', marginTop: '6px' }}>{statusMessage}</p>}
-            <div style={{ marginTop: '12px', fontSize: '11px', textAlign: 'center' }}>
-              <Link to={modalTitle === 'Login' ? '/login' : '/register'} style={{ color: '#124477', fontWeight: 'bold' }}>
-                Open full {modalTitle} page &rarr;
-              </Link>
-            </div>
-          </form>
-        </dialog>
-      )}
     </div>
   )
 }
