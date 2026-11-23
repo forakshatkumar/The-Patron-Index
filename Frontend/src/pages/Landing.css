@@ -325,21 +325,15 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.patron-landing-page .stat-icon-wrap.user-stat {
   background: #eff6ff;
   color: #2563eb;
 }
 
-.patron-landing-page .stat-icon-wrap.revenue-stat {
-  background: #ecfdf5;
-  color: #059669;
-}
-
+.patron-landing-page .stat-icon-wrap.user-stat,
+.patron-landing-page .stat-icon-wrap.revenue-stat,
 .patron-landing-page .stat-icon-wrap.active-stat {
-  background: #f0fdf4;
-  color: #16a34a;
+  background: #eff6ff;
+  color: #2563eb;
 }
 
 .patron-landing-page .stat-icon-wrap svg {
