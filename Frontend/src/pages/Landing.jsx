@@ -489,8 +489,8 @@ export default function Landing () {
               />
             </div>
 
-            <article className={`step ${timelineProgress >= 0.05 ? 'active-step' : ''}`}>
-              <div className={`step-node ${timelineProgress >= 0.05 ? 'reached' : ''}`} aria-hidden='true'>
+            <article className={`step step-1 ${timelineProgress >= 0.06 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.06 ? 'reached' : ''}`} aria-hidden='true'>
                 <span className='node-pulse-ring' />
                 <span className='node-inner-dot' />
               </div>
@@ -501,8 +501,8 @@ export default function Landing () {
               <p>Drag and drop your business CSV file</p>
             </article>
 
-            <article className={`step ${timelineProgress >= 0.28 ? 'active-step' : ''}`}>
-              <div className={`step-node ${timelineProgress >= 0.28 ? 'reached' : ''}`} aria-hidden='true'>
+            <article className={`step step-2 ${timelineProgress >= 0.32 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.32 ? 'reached' : ''}`} aria-hidden='true'>
                 <span className='node-pulse-ring' />
                 <span className='node-inner-dot' />
               </div>
@@ -513,8 +513,8 @@ export default function Landing () {
               <p>Our platform checks for errors and inconsistencies</p>
             </article>
 
-            <article className={`step ${timelineProgress >= 0.52 ? 'active-step' : ''}`}>
-              <div className={`step-node ${timelineProgress >= 0.52 ? 'reached' : ''}`} aria-hidden='true'>
+            <article className={`step step-3 ${timelineProgress >= 0.62 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.62 ? 'reached' : ''}`} aria-hidden='true'>
                 <span className='node-pulse-ring' />
                 <span className='node-inner-dot' />
               </div>
@@ -525,8 +525,8 @@ export default function Landing () {
               <p>Discover segments like loyal, high-value or at-risk</p>
             </article>
 
-            <article className={`step ${timelineProgress >= 0.74 ? 'active-step' : ''}`}>
-              <div className={`step-node ${timelineProgress >= 0.74 ? 'reached' : ''}`} aria-hidden='true'>
+            <article className={`step step-4 ${timelineProgress >= 0.88 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.88 ? 'reached' : ''}`} aria-hidden='true'>
                 <span className='node-pulse-ring' />
                 <span className='node-inner-dot' />
               </div>
