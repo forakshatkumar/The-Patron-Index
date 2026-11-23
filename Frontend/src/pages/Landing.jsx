@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 import logoImg from '../assets/logo.png'
 import './Landing.css'
 
@@ -71,7 +70,6 @@ function generateSvgCurve (values) {
 }
 
 export default function Landing () {
-  const { isAuthenticated } = useAuth() || {}
   const [overviewRange, setOverviewRange] = useState('six')
   const [laptopMetric, setLaptopMetric] = useState('customers')
   const [selectedFeature, setSelectedFeature] = useState(0)
@@ -135,14 +133,8 @@ export default function Landing () {
           <a href='#reviews'>Reviews</a>
         </nav>
         <div className='actions'>
-          {isAuthenticated ? (
-            <Link to='/dashboard' className='btn'>Dashboard</Link>
-          ) : (
-            <>
-              <Link to='/login' className='btn outline'>Login</Link>
-              <Link to='/register' className='btn'>Sign Up</Link>
-            </>
-          )}
+          <Link to='/login' className='btn outline'>Login</Link>
+          <Link to='/register' className='btn'>Sign Up</Link>
         </div>
       </header>
 
@@ -156,11 +148,7 @@ export default function Landing () {
               <p className='tagline'>Where Buyers Become Insight</p>
               <p>Turn your business data into powerful customer intelligence. Understand. Segment. Grow.</p>
               <div className='hero-buttons'>
-                {isAuthenticated ? (
-                  <Link to='/dashboard' className='btn'>Go to Dashboard &rarr;</Link>
-                ) : (
-                  <Link to='/register' className='btn'>Get Started Free &rarr;</Link>
-                )}
+                <Link to='/register' className='btn'>Get Started Free &rarr;</Link>
                 <a className='btn outline' href='#about'>Learn More</a>
               </div>
             </div>
@@ -500,11 +488,7 @@ export default function Landing () {
             <h2>Ready to unlock the power of your customer data?</h2>
             <p>Join The Patron Index today and turn your data into growth.</p>
           </div>
-          {isAuthenticated ? (
-            <Link to='/dashboard' className='btn'>Go to Dashboard &rarr;</Link>
-          ) : (
-            <Link to='/register' className='btn'>Sign Up Free &rarr;</Link>
-          )}
+          <Link to='/register' className='btn'>Sign Up Free &rarr;</Link>
         </section>
       </main>
 
