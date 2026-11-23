@@ -635,25 +635,46 @@
   width: 95px;
 }
 
-/* Alternating workflow steps */
+/* Alternating workflow steps with animated scroll line and blinking nodes */
 .patron-landing-page .steps {
   position: relative;
   isolation: isolate;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px 64px;
+  gap: 16px 64px;
   max-width: 820px;
   margin: 32px auto 0;
 }
 
-.patron-landing-page .steps::before {
-  content: "";
+.patron-landing-page .timeline-track {
   position: absolute;
   left: 50%;
+  top: 36px;
+  bottom: 36px;
+  width: 2.5px;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.patron-landing-page .timeline-line-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: #cce2f5;
+  border-radius: 2px;
+}
+
+.patron-landing-page .timeline-line-fill {
+  position: absolute;
   top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #dce8f4;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(180deg, #0866f5 0%, #22b8f5 100%);
+  border-radius: 2px;
+  transition: height 0.08s linear;
+  max-height: 100%;
+  box-shadow: 0 0 8px rgba(8, 102, 245, 0.45);
 }
 
 .patron-landing-page .step {
@@ -669,6 +690,13 @@
   background: #fff;
   box-shadow: 0 5px 16px #0b234507;
   position: relative;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.patron-landing-page .step.active-step {
+  border-color: #b5d5f5;
+  box-shadow: 0 8px 24px rgba(8, 102, 245, 0.09);
+  transform: translateY(-2px);
 }
 
 .patron-landing-page .step:nth-child(odd) {
@@ -718,22 +746,87 @@
   display: none;
 }
 
-.patron-landing-page .step::before {
-  content: "";
+/* Timeline Nodes matching uploaded image */
+.patron-landing-page .step-node {
   position: absolute;
   top: 50%;
-  width: 11px;
-  height: 11px;
-  border: 3px solid #fff;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: #3472af;
-  box-shadow: 0 0 0 1px #bfd2e5;
-  transform: translate(-50%, -50%);
-  left: calc(100% + 33px);
+  background: #ffffff;
+  border: 2px solid #a4c8ea;
+  display: grid;
+  place-items: center;
+  z-index: 2;
+  transform: translate(50%, -50%);
+  right: -32px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.patron-landing-page .step:nth-child(even)::before {
-  left: -31px;
+.patron-landing-page .step:nth-child(even) .step-node {
+  right: auto;
+  left: -32px;
+  transform: translate(-50%, -50%);
+}
+
+.patron-landing-page .node-inner-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #2b6cb0;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.patron-landing-page .node-pulse-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  pointer-events: none;
+}
+
+/* Node blinking animation */
+.patron-landing-page .step-node.reached {
+  border-color: #0866f5;
+  box-shadow: 0 0 10px rgba(8, 102, 245, 0.4);
+}
+
+.patron-landing-page .step-node.reached .node-inner-dot {
+  background: #0866f5;
+  animation: nodeBlinkPulse 1.4s ease-in-out infinite;
+}
+
+.patron-landing-page .step-node.reached .node-pulse-ring {
+  border-color: #0866f5;
+  animation: nodeRadarPulse 1.8s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+@keyframes nodeBlinkPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.85;
+    filter: drop-shadow(0 0 2px #0866f5);
+  }
+  50% {
+    transform: scale(1.35);
+    opacity: 1;
+    filter: drop-shadow(0 0 8px #0866f5);
+  }
+}
+
+@keyframes nodeRadarPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.9;
+  }
+  65% {
+    transform: scale(1.85);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
 }
 
 /* Feature explorer */
@@ -1181,6 +1274,21 @@
   }
   .patron-landing-page .steps {
     grid-template-columns: 1fr;
+    padding-left: 36px;
+  }
+  .patron-landing-page .timeline-track {
+    left: 14px;
+    transform: none;
+  }
+  .patron-landing-page .step:nth-child(odd),
+  .patron-landing-page .step:nth-child(even) {
+    grid-column: 1;
+  }
+  .patron-landing-page .step .step-node,
+  .patron-landing-page .step:nth-child(even) .step-node {
+    left: -22px;
+    right: auto;
+    transform: translate(-50%, -50%);
   }
   .patron-landing-page .reviews {
     grid-template-columns: 1fr;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import logoImg from '../assets/logo.png'
 import './Landing.css'
@@ -76,9 +76,30 @@ export default function Landing () {
   const [activeSegment, setActiveSegment] = useState(null)
   const [donutLoaded, setDonutLoaded] = useState(false)
 
+  const stepsContainerRef = useRef(null)
+  const [timelineProgress, setTimelineProgress] = useState(0)
+
   useEffect(() => {
     const timer = setTimeout(() => setDonutLoaded(true), 50)
     return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!stepsContainerRef.current) return
+      const rect = stepsContainerRef.current.getBoundingClientRect()
+      const windowHeight = window.innerHeight
+      const startOffset = windowHeight * 0.72
+      const endOffset = windowHeight * 0.28
+      const totalDistance = rect.height + (startOffset - endOffset)
+      const currentScroll = startOffset - rect.top
+      const progress = Math.min(Math.max(currentScroll / totalDistance, 0), 1)
+      setTimelineProgress(progress)
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   const currentOverview = previewData[overviewRange]
@@ -368,23 +389,50 @@ export default function Landing () {
         <section className='how center wrap' id='how'>
           <p className='eyebrow ruled'>How It Works</p>
           <h2>From Data to Decisions in 4 Simple Steps</h2>
-          <div className='steps'>
-            <article className='step'>
+          <div className='steps' ref={stepsContainerRef}>
+            <div className='timeline-track' aria-hidden='true'>
+              <div className='timeline-line-bg' />
+              <div
+                className='timeline-line-fill'
+                style={{ height: `${Math.min(timelineProgress * 100, 100)}%` }}
+              />
+            </div>
+
+            <article className={`step ${timelineProgress >= 0.10 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.10 ? 'reached' : ''}`} aria-hidden='true'>
+                <span className='node-pulse-ring' />
+                <span className='node-inner-dot' />
+              </div>
               <img src='data:image/webp;base64,UklGRnYEAABXRUJQVlA4IGoEAADQFQCdASpDAEMAPikSiEKhoSETPMxoGAKEsoBlVhCpZ13BVgE4Hm4L8YDed98A6XP9rvRyo9n5KZT38B+TnJ3tHf33Hk/3f8sNSk5EGMD/d+ptosehfYK/V7/YDOOY63L8ro6S/bOW3+FhftFLyOiLcJ9WI+d4o7uFl0o0HULuh+JN38FqArN+GAjunNSSl+3Hv7a2G5GBAcxplcjpcyL0YKg4rtXznz6gUv/M1I97gJU0cuKtbuAA/v/+YkLouANWO20vaXvC/ROLw7K9QMln6lvZlteV2HMsE2VWfKDpsainIBbl7LtoUFlfGL8272LZP9NqLokEKC/svGojBZdSK2A6D9dPUG7kZ4CWks8bd1n5XgJAOmX3Zhyg+MyotvQWQtIhMep+X/IxJ+KgHW50B7H6AAYh/1Yyvad+jXMQh51qU21UWr23Vq4o3yy8TlyWi4a5jg+FqX8AgjRW+nKIKHx1/mOj99s0/UxwGvu8o2ESBs8+zPgwEG+AYWCRL++VDztX0V+vL/muCbObV85oJ1TyHsgiPefbUaF3BnrLir+Q79k6t504UHjHb4sPd6flc56gndlCGU0hdmg8tqMli2LhngFd06dEXsMNy7HS4E4I+7HhujZZ7YiF95mabWkC5+1ery3c1/lfMitgTfw+jc5NL0SuYvsFK9yzTPy+/Sql2AKLrRjBP+mv8IKYNRzm6ezvn+/NOMt7vixP8VD2w+rU7ZVvf+vaeDE3Z9jMmbpaOKsdY90Vzdq5+ckHzxE6ne2x5dNb+nhOg64YgQfV4JHfaAdUtEnUmAOrO49djOOpdnmcdfG1YYtAj/ClTpD8JfVC/3uvASgbr9/TtFHuyaQ/fXVraDcWvxFILlgRbHFBeN7edJiMTfGJEpCfEZVfv6zzPGOpXWUu/0ZZrhLqwETeIrXyJn70b0o4d5vO6zOuaL/ocB0l0n8DHs/o2v6wSb80UoCZfUarw4dKV57+nhxHruBi3lMs3rv8wIFbT1+cPITkLxmynUSvrN0P5Gldc8Yv4Nfa8MlmWHnbkbdWX0rDIaH0CmIfVFrf3slOe/f8X70kkqIWKrtnxetuPvnTVv//IrQEO7RlMCXaaiTKaekzM9m93fgtK1/xv392LM9SIFV3wDOzciQ0Zl/Wgr8RYXOhIN8f4vpqz4F7RkbQwEOxySzIjTl34PHd832SD2D/jJIYNI9F6yBUijGZLsMpFpWgdU5FSPzfJVE6aLHxCpk46wSx8nv70t09FkeNk1UtK9HfmGKluyh6We/bCti8gdT04Kbb8TBjsCMaA64qomQkwyphavzXnhaqZrQ/Z7CLCufDMgG3lBkVDY8a1xuOW7PukgBPVp9ep5dX6B/yI0xkwWfYe6fs/tqKIwgVSlhv4M3kb01lk91PvPo60l2hGpqQlmqz7wh0tgUYNdsL01Tbvcs9ELysqNorv7LUKfzfQKyM95IDmJG23vc+9kZ/sWYRYvEk1TK3sIYjGthvq8VYRDoYTsAAAA=' alt='' />
               <h3>1. Upload Your Data</h3>
               <p>Drag and drop your<br />business CSV file</p>
             </article>
-            <article className='step'>
+
+            <article className={`step ${timelineProgress >= 0.36 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.36 ? 'reached' : ''}`} aria-hidden='true'>
+                <span className='node-pulse-ring' />
+                <span className='node-inner-dot' />
+              </div>
               <img src='data:image/webp;base64,UklGRnQEAABXRUJQVlA4IGgEAAAQGACdASpDAEMAPikSiEKhoSESnfz0GAKEsYBk3hNJKKsHPfv9Es9nb++YDcVep059X2lf2c9FV1qvJ3oduLUuXt3M0Xx+/T3/S9wP+Tf2TrZei4P3qnksBx6nrtZubdF0VsevEM300iea3UvsX1Yx3kVrTo0cC75KOKzLvis5iaml5o7qnYsE1i6XO7WoNff8gABlGHdc0+mGp2Ug/VGIY7SenZ9h0i3BNcQvE2c4YlYga+Y5z9jbHOGg84hsP2b4CSPO/eQo8AAA/v/+Wpb0OjSZw4cc9EGkBd0kb40BIYgLdGp8AS0fFix+w4JBtfwtHaBoNnh6gXjg5HCX2Y0clOQTvUhhVgnndUkU/Wufiw/2i7I//j3WD0d82QcRjB27FEoZxXBFAco2Na49j9VF3BxHZPqgIoo91bnbgDfz3cbjwpNZKGJtdzcWBgwUTOmkM5aukrGzE7WO64Uk8kCg//e9Zt8WFM+mF42USGC3mku+ojvfpr+2yxY/p/8wH6qqjwVXIfKHm71Da2TOe1ont3kzpAwnB0wlXgcNvCtq5n0gUjScklX6iPpaYfCsPreirj1gJzb+zrzr4V/owL77+uRa00wc6WVqo1xxzl0scYOwZzPSId8qHZmB1y7/HrmRP9b9PojlM2my8tyGTFVG3drbjcrNmTpaL6XSkOHUbxqWXgxOVKQvgddHnZ/7r59x/yTOSjpRDWcCtotRG1d3pX/Px9tX5P0TNTMefq/fP8HT6PUvxgYkzshxY+867IHe1EiW81GxueiNkYgc+rRt25qaYkmwB4D0Q5fkzzRsJ//GgfyTXbaaP97Mz7B3B4WOhFuKOeRnkaltOyLiKCHsLD7jsGiysDZ6PDOUXZlpK//cyxHEZ1usxCkgBKfrM0hWEmOH85i45wX5vXjQI4f1bfexPf8XJwz224G3nFHD+Iz+svsOx7nyzOS426qkhuyLVe/JCxFqEcZ3Ge/+p1Ap1wHkG1KGS3GqzSD7ckdqv2reCu4jisRGhxrFcbqSsCWso+MYcb/I+9TyB3BGpdu+HQd2zp+jpzGhVHUY0LI4+YFH84RIatWP5K240ol8+IF+joQiD6Dp6t7I3GY0Lf2w7F7WFmyAUuDHv5trrskJESMrW6aydGFurJ7wF5Vein4mFhs6ZfgnxdQp2lvnCtzwNCs/Sx23bAIC6upyDhEuhQG5ehiwaj84RT3Zu8DENvZz2NuY/yJTrsYiOPP7CFWy59EfbAM5xiXsf8AGP1yA8Puhzd1IROm2tG2sMvnNikW+KFPhs1FX2D/hKeRO6f+qAk/hjJnxvxC5FZLIpZO63E5yXiI9L/yo7E4VE6xxBXjODXlh0OMUzdz5jDB6v1isPftl9C+XgBniwk6NQgSKGQ+WRjdN/PPxcodKIjS4uD77B9egpYS+c8w8FUdf/IU2cQYQII7SPypiI4mQDHabKpJbXRw33cojjc6Mpda6cCzL36zdOFPI901KigxAiH+LllY9gJQAAAA=' alt='' />
               <h3>2. Validate &amp; Clean</h3>
               <p>Our platform checks<br />for errors and inconsistencies</p>
             </article>
-            <article className='step'>
+
+            <article className={`step ${timelineProgress >= 0.65 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.65 ? 'reached' : ''}`} aria-hidden='true'>
+                <span className='node-pulse-ring' />
+                <span className='node-inner-dot' />
+              </div>
               <img src='data:image/webp;base64,UklGRkIEAABXRUJQVlA4IDYEAADwFgCdASpDAEMAPikSiEKhoSER/VVEGAKEsoBk3hoM89k/JvbfFd6h285eib5afs0y4z8esfd+QGfV/HDLL/on970hf+9al/xyvOFqEfqj/tuwuPEgIkWzkyjJXdra1Rm0GfkJQ+lit3M7g9+T5ZQeb73EOiEtV14UXNKwZ1atyvAWtCuG5kfeCcDLeoUY/+/KhST4vL7QoiMbjH2OXrz44G0sZiluMjeGRqGvuMGy2VD0LfwO0Rj8iQDAwQi1KVgA/v/+WjzwfbOTiuC7XjD3BXtR4JIBVuS7EwhHyIhOa5AK3bE0uT/ISrw6l6aiXvDVyeV8v/g1cg6z5hxSph2aghIsj8h86fOuLKuuHV9VnWAAgj2JN7yZFVYpM1g1BpTy5F8s8glA3eIPNbC35ovTROso9PZ0n9Ps0s/aCbbn9F8rPmg9XtXoonn8/fi5R55O3AIG8Zv/yIPss85hdMEnfvX4DSeJrt5K0gyyzFm7B2lytsXTdbfdOzl/5ymiO+r3e77myc8nBCdirl/8rP4sPQpu8j/wvxYm3PSxtkJP4Jp0RsXS4/3RlslwIC9bTswPPVaTnnGP/797+5f5L/zQsEQF1L/0il48J2nD5UkYrAb88J/hr0aLVUHPoVrj2M+7toHVEbS6l0lYwHcJinvI9Q7FJ3gqFvS8bXtazgOuSWyuEpKWPTVQ//pwLGd5owK2/7/2N6egknfT8x7IutzAfMLcc/hjql1yF+GUpDysS11/EtWzEgQ3SZ+uGCGYkrT9dEFzFv+HgBVILJx+CUvHPa0Y2L4ACmY78uTPrr1fKv6mG08ZKDDCcQl5ajHj/QBw+SskOmSrQJosJgx7JR+0qfGX/iP/DqqvRTNv3I//zyrmXpcwl3fv5QdAB7/73EzO/twhgYb4s3KsDilFc2VZFoBDSVPDDqx0oT3n7XXPIj6fKPRLS4tlOkIVXOeppC0+VdGb626Z6gE9516vHvJDC3rNNviv+GIcvZ78u3m5lwh/qIduK9J0kIO+KLv5h8fl+gqvGi9k8F/pTc6GzEpZzbeUNd4wv85/pu/yno+MrqAlNAPcM1D5GSCNgHsJP6mvL2jbSmbvzSXLtb4GSg/4HQn+zg8uVemDuZ3ZyZN1+AO0g/YJKs3pPODyRO/KfmhGA8D4yGfjLluZeGfgr6Amovjg38uNZaclrGZIW6xKV5HzmSivzhnFcw64uTPkYKTnhNUzwNNxWEju2tVtiy8IsSi0wJfN8rSKSxOWrRMLtnqFWLTOLunYtpCRbS09ExfhXO/xxpWLjdfoOtjQlx5H4dX7pEs8m8y6qbI67W6RjBE7WzKRFWiX5STXI+v30zn8fyMlHDxofVYpugDGgvQd311i4MZgBwUkwnpC9n1LvCwuCwEZohMXOAAAAAmk+EZRQtmYYsKz1o8hjJVg0vzVYSUPYAAA=' alt='' />
               <h3>3. Analyse Customers</h3>
               <p>Discover segments like<br />loyal, high-value or at-risk</p>
             </article>
-            <article className='step'>
+
+            <article className={`step ${timelineProgress >= 0.90 ? 'active-step' : ''}`}>
+              <div className={`step-node ${timelineProgress >= 0.90 ? 'reached' : ''}`} aria-hidden='true'>
+                <span className='node-pulse-ring' />
+                <span className='node-inner-dot' />
+              </div>
               <img src='data:image/webp;base64,UklGRjAEAABXRUJQVlA4ICQEAACQFgCdASpDAEMAPikUh0KhoQlO/pIMAUJZQDIzFWSVqZH0FCzGD1itN53nyW2filj1eJ3XS/Ev8a6Ap/t3IuzC/7X6MH+P9oHuk+lf+N7g36t/6b+jfuhwwBErZQui/+JgrU38dmquo5dURjuBLro72xINhTVUaGu9QbDLw3H5u8etbvyJhTHHuDqDVpTuVTKeb4deNR1BYqMFTQsarzxMsJQq3v1IiasYkf+9pT6mf6zZ/j1RpdEeAnbNbgAA/v/+lDbOCVoSPYIQF6T9dRf4I6lOQlBHYNZU9GLyooFEf/9/wjUxQ0lwIBYw8EV2ov3sYlMydk15gdoaZviu6VIf7UuyxHi+UriQ/9p6RpXH4dvWyWSHPKDJeNpKLClvsBQ2G52rmK3B4QMC+4SpYWCPGl8DB6eoQFd2edK/+nRf/ywKhvhTZe4zHNqcs+gnlvXExu5mUoOTTySzKWDpiNZww+FCUBDIBbXduOZCL5FddDEv3R7bc+8so7H0FTk1JuUZMrDnD8H8648z47UvH1w8WdV/q7v+J9T3zHtF386bg/8AB3tPtn8LPELHMc5SZEaIOZXm52s9w6qJfyYm/ZNNr/OvEW0gUEzPuIXNXFxcbVq5YuPJROCObbqN1Dfi/MseHlK9zRv/UoRcJwQYzzp1Eqqz/QT3OOOFlKuGi95kQL8oGBN/H3PqSr+ILeoq0AgpnvCf4q5En/fUD9NgZZz//FeP1xgJaYhxmit0vVusVRXASehwZfDwG7d9blX/+OFYqXyBKdKfhlKiCgCR/ePjbxz/lVRAv+vjqOH3TnQhjM2i6t8xkej8+bMFqExtb6Wch/xyJN+hTQ2XAaKdYe+hKdjawhW2UZXfr9V3VnghYKrmlE2GepG6Sw9HgMOT0cZwYdDL6OosBYl5jPZ+Gj1KzPAVA/ZpJirZJE6whb26UeUyh288ZEqP7zl56VdejZXS9iG/K/w6NG8rff/Q89vxdAhqcQdqYydL/5GIT/fLFWLx4bA1+q+GSU175VYjtgr5jST+SXkBntj0NJMONn6cLNJ2aAzlsoGse9LrWcSxEWw+MqIU9FtDEc7A8VX2SsVkEGYUMjuO9t/yQh32L//1fI81wVaxegJFkHwoXaroV+6bPT5D/g16uKI7z1R9CdBilHDz9R0KFD0zPnO0OIAGANqez07sHBwVpNiWpH/vtid9FOeXjcFtUilVNkOLviMhneyJyCz/DuKaDU3IdB4DD8mtgHhAP/N62AC5ZunlrvafezpHlM/aZinH0A0gSGqZSYV0oO/KGhILJfD0eeJBMfMGPSbJx/29c5KeRNNK8lt3MokNrTiargToUGGgwMwRYigKUmMNwov4gzWViRK7AHlcFK9s/F6f2Y6RFwjyZojRb1vYJuNhppXq4//K8ZHoAAAA=' alt='' />
               <h3>4. Get Actionable Insights</h3>
               <p>Receive easy-to-understand<br />recommendations</p>
