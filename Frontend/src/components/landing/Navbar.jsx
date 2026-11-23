@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Menu, X, ArrowRight } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import logoImg from '../../assets/logo.png'
 
-export default function Navbar ({ onOpenDemo }) {
+export default function Navbar () {
   const [scrolled, setScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [activeSection, setActiveSection] = useState('hero')
+  const [activeSection, setActiveSection] = useState('home')
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 30)
+      setScrolled(window.scrollY > 20)
 
-      const sections = ['hero', 'problem', 'how-it-works', 'data-audit', 'segments', 'score-engine', 'dashboard', 'recommendations', 'trust']
+      const sections = ['home', 'about', 'how-it-works', 'features', 'reviews']
       for (const id of sections) {
         const el = document.getElementById(id)
         if (el) {
           const rect = el.getBoundingClientRect()
-          if (rect.top <= 140 && rect.bottom >= 140) {
+          if (rect.top <= 120 && rect.bottom >= 120) {
             setActiveSection(id)
             break
           }
@@ -30,144 +30,129 @@ export default function Navbar ({ onOpenDemo }) {
   }, [])
 
   const navLinks = [
-    { id: 'how-it-works', label: 'How it works' },
-    { id: 'data-audit', label: 'Data Audit' },
-    { id: 'segments', label: 'Segments' },
-    { id: 'score-engine', label: 'Score Engine' },
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'recommendations', label: 'Insights' }
+    { id: 'home', label: 'Home', href: '#home' },
+    { id: 'features', label: 'Features', href: '#features' },
+    { id: 'about', label: 'About', href: '#about' },
+    { id: 'reviews', label: 'Reviews', href: '#reviews' }
   ]
 
-  const handleNavClick = (id) => {
+  const handleNavClick = (href) => {
     setMobileMenuOpen(false)
-    const el = document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' })
+    const element = document.querySelector(href)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' })
     }
   }
 
   return (
-    <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'py-3 bg-[#0B0F14]/85 backdrop-blur-md border-b border-[#222B36]'
-          : 'py-5 bg-transparent'
+          ? 'bg-white/95 backdrop-blur-md shadow-xs border-b border-slate-100 py-3'
+          : 'bg-white/80 backdrop-blur-sm py-4'
       }`}
-      role='navigation'
-      aria-label='Main Navigation'
     >
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between'>
-        {/* Brand Logo & Title */}
-        <Link to='/' className='flex items-center gap-3 group' aria-label='The Patron Index Home'>
-          <div className='w-9 h-9 rounded-lg bg-[#121820] border border-[#222B36] p-1 flex items-center justify-center transition-transform group-hover:scale-105'>
-            <img src={logoImg} alt='The Patron Index' className='w-full h-full object-contain' />
+      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='flex items-center justify-between'>
+          {/* Logo Brand */}
+          <a
+            href='#home'
+            onClick={(e) => { e.preventDefault(); handleNavClick('#home'); }}
+            className='flex items-center gap-2.5 group cursor-pointer'
+          >
+            <img
+              src={logoImg}
+              alt='The Patron Index'
+              className='h-9 w-9 object-contain transition-transform group-hover:scale-105'
+            />
+            <div className='flex flex-col'>
+              <span className='text-lg font-extrabold tracking-tight text-[#0B2545] font-display leading-tight'>
+                The Patron Index
+              </span>
+              <span className='text-[10px] text-[#0066FF] font-medium leading-none hidden sm:block'>
+                Where Buyers Become Insight
+              </span>
+            </div>
+          </a>
+
+          {/* Center Navigation Links */}
+          <nav className='hidden md:flex items-center gap-8'>
+            {navLinks.map((link) => {
+              const isActive = activeSection === link.id
+              return (
+                <button
+                  key={link.id}
+                  type='button'
+                  onClick={() => handleNavClick(link.href)}
+                  className={`text-sm font-medium transition-colors cursor-pointer ${
+                    isActive
+                      ? 'text-[#0066FF] font-semibold'
+                      : 'text-slate-600 hover:text-[#0B2545]'
+                  }`}
+                >
+                  {link.label}
+                </button>
+              )
+            })}
+          </nav>
+
+          {/* Right Action Buttons */}
+          <div className='hidden md:flex items-center gap-3'>
+            <Link
+              to='/login'
+              className='px-4 py-2 text-sm font-semibold text-slate-700 hover:text-[#0B2545] transition-colors rounded-full'
+            >
+              Login
+            </Link>
+            <Link
+              to='/register'
+              className='px-5 py-2 text-sm font-semibold text-white bg-[#0B2545] hover:bg-[#0066FF] transition-all rounded-full shadow-sm hover:shadow-md'
+            >
+              Sign Up
+            </Link>
           </div>
-          <div className='flex flex-col'>
-            <span className='text-sm font-bold text-[#E8EEF5] tracking-tight'>The Patron Index</span>
-            <span className='text-[10px] text-[#8A98A8] font-medium'>Customer Intelligence</span>
-          </div>
-        </Link>
 
-        {/* Desktop Navigation Links */}
-        <div className='hidden md:flex items-center gap-1 lg:gap-2 px-3 py-1.5 rounded-full bg-[#121820]/70 border border-[#222B36]/80'>
-          {navLinks.map((link) => {
-            const isActive = activeSection === link.id
-            return (
-              <button
-                key={link.id}
-                type='button'
-                onClick={() => handleNavClick(link.id)}
-                className={`px-3 py-1 text-xs font-medium rounded-full transition-all ${
-                  isActive
-                    ? 'bg-[#4F8CFF]/20 text-[#4F8CFF] shadow-sm shadow-[#4F8CFF]/20'
-                    : 'text-[#8A98A8] hover:text-[#E8EEF5] hover:bg-[#18222E]'
-                }`}
-              >
-                {link.label}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Action CTAs */}
-        <div className='hidden sm:flex items-center gap-3'>
-          <button
-            type='button'
-            onClick={onOpenDemo}
-            className='px-3.5 py-1.5 text-xs font-medium text-[#E8EEF5] bg-[#121820] hover:bg-[#18222E] border border-[#222B36] rounded-full transition-colors'
-          >
-            Live Demo
-          </button>
-          <Link
-            to='/login'
-            className='text-xs font-medium text-[#8A98A8] hover:text-[#E8EEF5] px-2 py-1 transition-colors'
-          >
-            Sign In
-          </Link>
-          <Link
-            to='/register'
-            className='flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-[#0B0F14] bg-[#4F8CFF] hover:bg-[#689DFF] rounded-full shadow-sm shadow-[#4F8CFF]/30 transition-transform hover:scale-[1.02] active:scale-[0.98]'
-          >
-            <span>Get Started</span>
-            <ArrowRight className='w-3.5 h-3.5' />
-          </Link>
-        </div>
-
-        {/* Mobile Hamburger Toggle */}
-        <div className='flex md:hidden items-center gap-2'>
-          <button
-            type='button'
-            onClick={onOpenDemo}
-            className='px-2.5 py-1 text-[11px] font-medium text-[#E8EEF5] bg-[#121820] border border-[#222B36] rounded-full'
-          >
-            Demo
-          </button>
+          {/* Mobile Menu Button */}
           <button
             type='button'
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className='p-1.5 text-[#8A98A8] hover:text-[#E8EEF5] rounded-md focus:outline-none'
-            aria-label='Toggle Menu'
-            aria-expanded={mobileMenuOpen}
+            className='md:hidden p-2 text-slate-700 hover:text-[#0B2545] rounded-lg'
+            aria-label='Toggle navigation menu'
           >
-            {mobileMenuOpen ? <X className='w-5 h-5' /> : <Menu className='w-5 h-5' />}
+            {mobileMenuOpen ? <X className='w-6 h-6' /> : <Menu className='w-6 h-6' />}
           </button>
         </div>
-      </div>
 
-      {/* Mobile Animated Slide-in Drawer */}
-      {mobileMenuOpen && (
-        <div className='md:hidden px-4 pt-3 pb-6 bg-[#0B0F14]/95 backdrop-blur-xl border-b border-[#222B36] space-y-3 animate-fadeIn'>
-          <div className='flex flex-col gap-1.5'>
+        {/* Mobile Navigation Drawer */}
+        {mobileMenuOpen && (
+          <div className='md:hidden mt-3 pt-3 pb-4 border-t border-slate-100 flex flex-col gap-2 animate-fadeIn'>
             {navLinks.map((link) => (
               <button
                 key={link.id}
                 type='button'
-                onClick={() => handleNavClick(link.id)}
-                className='text-left px-3 py-2 text-sm text-[#8A98A8] hover:text-[#E8EEF5] hover:bg-[#121820] rounded-lg'
+                onClick={() => handleNavClick(link.href)}
+                className='text-left px-3 py-2 text-sm font-medium text-slate-700 hover:text-[#0066FF] hover:bg-slate-50 rounded-lg'
               >
                 {link.label}
               </button>
             ))}
+            <div className='pt-2 border-t border-slate-100 flex flex-col gap-2'>
+              <Link
+                to='/login'
+                className='w-full text-center py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 rounded-lg'
+              >
+                Login
+              </Link>
+              <Link
+                to='/register'
+                className='w-full text-center py-2 text-sm font-semibold text-white bg-[#0B2545] hover:bg-[#0066FF] rounded-lg'
+              >
+                Sign Up
+              </Link>
+            </div>
           </div>
-          <div className='pt-3 border-t border-[#222B36] flex flex-col gap-2'>
-            <button
-              type='button'
-              onClick={() => { setMobileMenuOpen(false); onOpenDemo(); }}
-              className='w-full py-2 text-center text-xs font-medium text-[#E8EEF5] bg-[#121820] border border-[#222B36] rounded-lg'
-            >
-              Open Interactive Demo
-            </button>
-            <Link
-              to='/register'
-              onClick={() => setMobileMenuOpen(false)}
-              className='w-full py-2 text-center text-xs font-semibold text-[#0B0F14] bg-[#4F8CFF] rounded-lg'
-            >
-              Create Business Account
-            </Link>
-          </div>
-        </div>
-      )}
-    </nav>
+        )}
+      </div>
+    </header>
   )
 }
-

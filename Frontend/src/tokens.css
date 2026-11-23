@@ -8,22 +8,36 @@
   --border-light: #2E3B4B;
   --text: #E8EEF5;
   --muted: #8A98A8;
-  --accent: #4F8CFF;
-  --accent-2: #7C5CFF;
-  --accent-glow: rgba(79, 140, 255, 0.25);
+  --accent: #0066FF;
+  --accent-2: #0B2545;
+  --accent-glow: rgba(0, 102, 255, 0.2);
 
-  /* Segment colours specified in design system */
+  /* New Light Palette matching the uploaded mockup */
+  --patron-navy: #0B2545;
+  --patron-navy-dark: #071A31;
+  --patron-blue: #0066FF;
+  --patron-blue-hover: #0052CC;
+  --patron-blue-light: #EEF4FC;
+  --patron-blue-tint: #F3F7FD;
+  --patron-bg: #F8FAFD;
+  --patron-card: #FFFFFF;
+  --patron-card-border: #E2E8F0;
+  --patron-text-main: #0B2545;
+  --patron-text-body: #475569;
+  --patron-text-muted: #64748B;
+
+  /* Segment colours */
   --vip: #F5B83D;
   --loyal: #3DD6A0;
-  --regular: #4F8CFF;
+  --regular: #0066FF;
   --new: #7C5CFF;
   --occasional: #8A98A8;
   --at-risk: #FF9F43;
   --inactive: #FF5D6C;
 
   /* Typography scale */
-  --font-display: 'Fraunces', serif;
-  --font-body: 'Inter', sans-serif;
+  --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .font-display {
