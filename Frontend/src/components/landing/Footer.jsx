@@ -18,25 +18,28 @@ export default function Footer ({ onOpenPolicy }) {
 
   return (
     <footer className='bg-white border-t border-slate-100 pt-12 pb-10 text-slate-600'>
-      <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+      <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
         
         {/* Main Footer Row */}
         <div className='flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-slate-100'>
-          {/* Brand Logo & Tagline */}
+          
+          {/* Brand Logo & Subtitle */}
           <div className='flex items-center gap-3'>
-            <img src={logoImg} alt='The Patron Index' className='h-8 w-8 object-contain' />
+            <div className='w-8 h-8 rounded-lg flex items-center justify-center p-0.5 bg-white border border-slate-100 shadow-2xs'>
+              <img src={logoImg} alt='The Patron Index' className='h-full w-full object-contain' />
+            </div>
             <div>
               <div className='text-base font-extrabold text-[#0B2545] font-display leading-tight'>
                 The Patron Index
               </div>
-              <div className='text-[11px] text-[#0066FF] font-medium'>
+              <div className='text-[11px] text-[#0066FF] font-semibold'>
                 Where Buyers Become Insight
               </div>
             </div>
           </div>
 
           {/* Navigation Links */}
-          <nav className='flex items-center gap-6 sm:gap-8 text-xs font-semibold text-slate-600'>
+          <nav className='flex items-center gap-7 sm:gap-9 text-xs font-semibold text-slate-600'>
             {navLinks.map((link) => (
               <button
                 key={link.label}
@@ -93,7 +96,7 @@ export default function Footer ({ onOpenPolicy }) {
             &copy; {currentYear} The Patron Index. All rights reserved.
           </div>
 
-          <div className='flex flex-wrap items-center gap-4 sm:gap-6 text-slate-500'>
+          <div className='flex flex-wrap items-center gap-4 sm:gap-6 text-slate-500 font-medium'>
             <button
               type='button'
               onClick={() => onOpenPolicy('privacy')}
@@ -122,7 +125,7 @@ export default function Footer ({ onOpenPolicy }) {
             >
               Data Deletion
             </button>
-            <Link to='/login' className='text-[#0066FF] font-semibold hover:underline'>
+            <Link to='/login' className='text-[#0066FF] font-bold hover:underline'>
               Portal Sign In
             </Link>
           </div>

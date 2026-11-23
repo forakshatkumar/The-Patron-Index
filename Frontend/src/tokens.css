@@ -40,6 +40,10 @@
   --font-body: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 .font-display {
   font-family: var(--font-display);
 }
