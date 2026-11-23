@@ -83,6 +83,11 @@ export default function Landing () {
   const laptopSectionRef = useRef(null)
 
   useEffect(() => {
+    // Ensure the landing page loads at the very top so only the hero section is visible initially
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual'
+    }
+    window.scrollTo(0, 0)
     const timer = setTimeout(() => setDonutLoaded(true), 50)
     return () => clearTimeout(timer)
   }, [])

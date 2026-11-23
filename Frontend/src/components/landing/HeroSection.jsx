@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, TrendingUp, Users, ShoppingCart, UserCheck } from 'lucide-react'
+import { TrendingUp, Users, ShoppingCart, UserCheck } from 'lucide-react'
 
 export default function HeroSection () {
   const [activePoint, setActivePoint] = useState(null)
@@ -49,10 +49,9 @@ export default function HeroSection () {
             <div className='flex flex-wrap items-center gap-3.5 pt-2'>
               <Link
                 to='/register'
-                className='inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-[#0B2545] hover:bg-[#0066FF] transition-all shadow-xs'
+                className='inline-flex items-center justify-center px-6 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-[#0B2545] hover:bg-[#0066FF] transition-all shadow-xs'
               >
                 <span>Get Started Free</span>
-                <ArrowRight className='w-4 h-4' />
               </Link>
             </div>
           </div>
