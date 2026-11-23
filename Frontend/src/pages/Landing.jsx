@@ -79,9 +79,27 @@ export default function Landing () {
   const stepsContainerRef = useRef(null)
   const [timelineProgress, setTimelineProgress] = useState(0)
 
+  const [isLaptopOpen, setIsLaptopOpen] = useState(false)
+  const laptopSectionRef = useRef(null)
+
   useEffect(() => {
     const timer = setTimeout(() => setDonutLoaded(true), 50)
     return () => clearTimeout(timer)
+  }, [])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsLaptopOpen(true)
+        }
+      },
+      { threshold: 0.25 }
+    )
+    if (laptopSectionRef.current) {
+      observer.observe(laptopSectionRef.current)
+    }
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -338,50 +356,78 @@ export default function Landing () {
               <span>Make smarter business<br />decisions</span>
             </div>
           </div>
-          <div className='laptop'>
-            <div className='laptop-lid'>
-              <div className='laptop-screen'>
-                <div className='screen-head'>
-                  <strong>Customer analytics</strong>
-                  <select
-                    className='period'
-                    aria-label='Laptop analytics metric'
-                    value={laptopMetric}
-                    onChange={(e) => setLaptopMetric(e.target.value)}
-                  >
-                    <option value='customers'>Customers</option>
-                    <option value='revenue'>Revenue</option>
-                  </select>
-                </div>
-                <div className='screen-metric'>
-                  <strong>{currentLaptop.metric}</strong>
-                  <small>{currentLaptop.delta}</small>
-                </div>
-                <div className='plot'>
-                  <svg viewBox='0 0 240 100' preserveAspectRatio='none' role='img' aria-label='Laptop analytics curve'>
-                    <defs>
-                      <linearGradient id='area-laptop' x2='0' y2='1'>
-                        <stop stopColor='#dae9fa' />
-                        <stop offset='1' stopColor='#f4f8fc' />
-                      </linearGradient>
-                    </defs>
-                    <path className='trend-area' fill='url(#area-laptop)' d={currentLaptopCurve.area} />
-                    <path className='trend-line' pathLength='1' fill='none' stroke='#195994' strokeWidth='1.6' d={currentLaptopCurve.line} />
-                    <g className='trend-markers' fill='#195994'>
-                      {currentLaptopCurve.points.map((pt, i) => (
-                        <circle key={i} cx={pt.x} cy={pt.y} r='2' />
-                      ))}
-                    </g>
-                  </svg>
-                </div>
-                <div className='months'>
-                  {currentLaptop.months.map((m, i) => (
-                    <span key={i}>{m}</span>
-                  ))}
+          <div className='laptop-wrapper' ref={laptopSectionRef}>
+            <div className='laptop-controls'>
+              <button
+                type='button'
+                className='laptop-flap-toggle'
+                onClick={() => setIsLaptopOpen(prev => !prev)}
+                aria-label={isLaptopOpen ? 'Shut laptop flap' : 'Open laptop flap'}
+              >
+                <span className={`flap-indicator ${isLaptopOpen ? 'open' : 'shut'}`} />
+                {isLaptopOpen ? 'Click to Shut Flap' : 'Click to Open Flap'}
+              </button>
+            </div>
+            <div
+              className='laptop'
+              onClick={() => setIsLaptopOpen(prev => !prev)}
+              role='region'
+              aria-label='Interactive analytics laptop preview'
+            >
+              <div className={`laptop-lid ${isLaptopOpen ? 'open' : 'shut'}`}>
+                <div className='laptop-screen'>
+                  <div className='screen-head'>
+                    <div className='screen-title-wrap'>
+                      <strong>Customer analytics</strong>
+                      <span className='live-pill'>
+                        <span className='live-dot' />
+                        Live
+                      </span>
+                    </div>
+                    <select
+                      className='period'
+                      aria-label='Laptop analytics metric'
+                      value={laptopMetric}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => setLaptopMetric(e.target.value)}
+                    >
+                      <option value='customers'>Customers</option>
+                      <option value='revenue'>Revenue</option>
+                    </select>
+                  </div>
+                  <div className='screen-metric'>
+                    <strong>{currentLaptop.metric}</strong>
+                    <small>{currentLaptop.delta}</small>
+                  </div>
+                  <div className='plot'>
+                    <svg viewBox='0 0 240 100' preserveAspectRatio='none' role='img' aria-label='Laptop analytics curve'>
+                      <defs>
+                        <linearGradient id='area-laptop' x2='0' y2='1'>
+                          <stop stopColor='#dae9fa' stopOpacity='0.9' />
+                          <stop offset='1' stopColor='#f4f8fc' stopOpacity='0.1' />
+                        </linearGradient>
+                      </defs>
+                      <path className='trend-area' fill='url(#area-laptop)' d={currentLaptopCurve.area} />
+                      <path className='trend-line lively' pathLength='1' fill='none' stroke='#0866f5' strokeWidth='2' d={currentLaptopCurve.line} />
+                      <g className='trend-markers'>
+                        {currentLaptopCurve.points.map((pt, i) => (
+                          <g key={i} className='lively-node' style={{ '--node-delay': `${i * 0.22}s` }}>
+                            <circle className='pulse-halo' cx={pt.x} cy={pt.y} r='5' />
+                            <circle className='node-dot' cx={pt.x} cy={pt.y} r='2.2' />
+                          </g>
+                        ))}
+                      </g>
+                    </svg>
+                  </div>
+                  <div className='months'>
+                    {currentLaptop.months.map((m, i) => (
+                      <span key={i}>{m}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
+              <div className='laptop-base' aria-hidden='true' />
             </div>
-            <div className='laptop-base' aria-hidden='true' />
           </div>
         </section>
 
