@@ -306,6 +306,44 @@
   border: 1px solid #f8b4b4;
 }
 
+@media (max-width: 480px) {
+  .account-page-root {
+    padding: 16px 12px;
+  }
+  .account-card {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+  .account-brand {
+    font-size: 18px;
+    gap: 10px;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+  }
+  .account-logo {
+    width: 40px;
+    height: 40px;
+  }
+  .account-logo img {
+    width: 26px;
+    height: 26px;
+  }
+  .account-card h1 {
+    font-size: 22px;
+  }
+  .account-copy {
+    font-size: 13px;
+  }
+  .account-field input {
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .account-submit {
+    min-height: 44px;
+    font-size: 15px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .account-art * {
     animation: none !important;

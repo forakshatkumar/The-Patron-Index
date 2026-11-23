@@ -1728,6 +1728,57 @@ a {
   }
 }
 
+@media (max-width: 520px) {
+  .sidebar {
+    width: 56px;
+  }
+  .app-content {
+    margin-left: 56px;
+    width: calc(100% - 56px);
+  }
+  .sidebar-brand {
+    padding: 12px 6px;
+    justify-content: center;
+  }
+  .sidebar-link {
+    padding: 10px 0;
+  }
+  .sidebar-user {
+    padding: 8px 4px;
+    justify-content: center;
+  }
+  .sidebar-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+  .top-header {
+    height: 60px;
+    padding: 0 12px;
+  }
+  .header-title h1 {
+    font-size: 17px;
+  }
+  .page-content {
+    padding: 12px;
+  }
+  .card, .panel, .dashboard-card {
+    padding: 14px;
+  }
+  .stat-card {
+    padding: 12px;
+  }
+  .profile-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 11px;
+  }
+  .notification-button {
+    width: 34px;
+    height: 34px;
+  }
+}
+
 /* =========================
    AUTH + INTEGRATION STATES
 ========================= */

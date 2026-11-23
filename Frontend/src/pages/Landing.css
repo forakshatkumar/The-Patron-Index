@@ -1440,6 +1440,14 @@
     max-width: 480px;
     margin: auto;
   }
+  .patron-landing-page .stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .patron-landing-page .charts {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
   .patron-landing-page .steps {
     grid-template-columns: 1fr;
     padding-left: 36px;
@@ -1474,5 +1482,124 @@
   }
   .patron-landing-page .feature-explorer {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .patron-landing-page .wrap {
+    width: calc(100% - 24px);
+  }
+  .patron-landing-page .header {
+    gap: 10px;
+  }
+  .patron-landing-page .header .brand span {
+    font-size: 17px;
+  }
+  .patron-landing-page .header .brand img {
+    width: 28px;
+    height: 28px;
+  }
+  .patron-landing-page .header .actions {
+    gap: 6px;
+  }
+  .patron-landing-page .header .actions .btn {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  .patron-landing-page .hero {
+    min-height: auto;
+    padding: 20px 0 32px;
+  }
+  .patron-landing-page .hero-copy h1 {
+    font-size: clamp(28px, 8vw, 36px);
+  }
+  .patron-landing-page .hero-copy .tagline {
+    font-size: clamp(18px, 5.5vw, 24px);
+  }
+  .patron-landing-page .hero-buttons .btn {
+    width: 100%;
+    text-align: center;
+  }
+  .patron-landing-page .panel {
+    padding: 16px 14px;
+  }
+  .patron-landing-page .panel-head {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .patron-landing-page .trend .plot {
+    height: 100px;
+  }
+  .patron-landing-page .segments-donut-wrap {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .patron-landing-page .laptop-wrapper {
+    margin-top: 14px;
+  }
+  .patron-landing-page .laptop-screen {
+    padding: 10px 10px 8px;
+  }
+  .patron-landing-page .feature-tabs {
+    padding: 10px;
+    gap: 4px;
+  }
+  .patron-landing-page .feature-tab {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+  .patron-landing-page .feature-tab-icon-wrap {
+    width: 28px;
+    height: 28px;
+  }
+  .patron-landing-page .feature-panel {
+    padding: 18px 16px;
+  }
+  .patron-landing-page .cta {
+    padding: 24px 16px;
+  }
+  .patron-landing-page .cta h2 {
+    font-size: 20px;
+  }
+  .patron-landing-page .cta .btn {
+    width: 100%;
+    text-align: center;
+  }
+  .patron-landing-page .steps {
+    padding-left: 30px;
+    gap: 12px;
+  }
+  .patron-landing-page .timeline-track {
+    left: 11px;
+  }
+  .patron-landing-page .step {
+    padding: 14px 14px;
+    column-gap: 10px;
+  }
+  .patron-landing-page .step-icon-box {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+  }
+  .patron-landing-page .step-icon-box svg {
+    width: 22px;
+    height: 22px;
+  }
+  .patron-landing-page .step h3 {
+    font-size: 14px;
+  }
+  .patron-landing-page .step p {
+    font-size: 12px;
+  }
+  .patron-landing-page .step .step-node,
+  .patron-landing-page .step.step-1 .step-node,
+  .patron-landing-page .step.step-2 .step-node,
+  .patron-landing-page .step.step-3 .step-node,
+  .patron-landing-page .step.step-4 .step-node,
+  .patron-landing-page article.step:nth-of-type(even) .step-node {
+    left: -19px;
+    width: 18px;
+    height: 18px;
   }
 }
