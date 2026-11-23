@@ -1,0 +1,344 @@
+/* Account / Auth Pages (Login & Sign Up) */
+.account-page-root {
+  position: relative;
+  isolation: isolate;
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 24px 18px;
+  overflow: hidden;
+  background: #edf4fc;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #0b2345;
+  box-sizing: border-box;
+}
+
+.account-page-root * {
+  box-sizing: border-box;
+}
+
+.account-art {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 19% 25%, #cee4fa 0, transparent 45%),
+              radial-gradient(ellipse at 90% 75%, #d2e7fc 0, transparent 43%),
+              linear-gradient(155deg, #f8fbff, #e8f1fb);
+}
+
+.account-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, #2c67a00d 0 1px, transparent 1px 52px),
+              repeating-linear-gradient(#2c67a00d 0 1px, transparent 1px 52px);
+  mask-image: linear-gradient(transparent, #000 24% 78%, transparent);
+}
+
+.account-trend {
+  position: absolute;
+  top: 20%;
+  left: 0;
+  width: 100%;
+  height: 65%;
+  color: #568dc4;
+  opacity: 0.56;
+  overflow: visible;
+}
+
+.account-trend .signal {
+  stroke-dasharray: 0.12 0.88;
+  animation: signal-flow 8s linear infinite;
+}
+
+@keyframes signal-flow {
+  to {
+    stroke-dashoffset: -1;
+  }
+}
+
+.account-bars {
+  position: absolute;
+  left: 7%;
+  bottom: 13%;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  width: 22%;
+  height: 26%;
+  opacity: 0.68;
+}
+
+.account-bars span {
+  flex: 1;
+  height: var(--height);
+  border-radius: 7px 7px 0 0;
+  background: linear-gradient(#77aae1, rgba(220, 236, 251, 0.25));
+  transform-origin: bottom;
+  animation: bar-drift 4s ease-in-out infinite alternate;
+  animation-delay: var(--delay);
+}
+
+@keyframes bar-drift {
+  from {
+    transform: scaleY(0.65);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+.account-ring {
+  position: absolute;
+  right: 9%;
+  top: 13%;
+  width: clamp(100px, 15vw, 225px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: conic-gradient(#387ab8 0 27%, #a1c4e8 27% 58%, #d2e6fa 58% 76%, #6a9ed3 76%);
+  mask-image: radial-gradient(transparent 57%, #000 58%);
+  opacity: 0.46;
+  animation: ring-drift 20s linear infinite;
+}
+
+@keyframes ring-drift {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+.account-card {
+  width: min(100%, 550px);
+  padding: clamp(23px, 5vw, 40px);
+  border: 1px solid #d4e0ec;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 24px 65px rgba(22, 60, 100, 0.12);
+  position: relative;
+  z-index: 1;
+}
+
+.account-brand-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.account-brand {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding-bottom: 25px;
+  margin-bottom: 29px;
+  border-bottom: 1px solid #dce6ef;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0b2345;
+}
+
+.account-logo {
+  display: grid;
+  place-items: center;
+  width: 50px;
+  height: 50px;
+  border: 1px solid #dce6ef;
+  border-radius: 10px;
+  background: #f8fbff;
+  flex: none;
+}
+
+.account-logo img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.account-brand small,
+.account-copy,
+.account-switch {
+  display: block;
+  color: #4b6480;
+  font-size: 14px;
+}
+
+.account-card h1 {
+  font-size: 28px;
+  letter-spacing: -0.55px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: #0b2345;
+  margin: 0;
+}
+
+.account-copy {
+  margin-top: 8px;
+}
+
+.account-form {
+  display: grid;
+  gap: 17px;
+  margin-top: 24px;
+}
+
+.account-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.account-field label,
+.account-consent {
+  font-size: 13px;
+  font-weight: 600;
+  color: #34516d;
+}
+
+.account-field input {
+  width: 100%;
+  min-height: 49px;
+  margin-top: 6px;
+  padding: 9px 12px;
+  border: 1px solid #ccdbe9;
+  border-radius: 9px;
+  background: #fff;
+  color: #0b2345;
+  font-size: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.account-field input:focus {
+  border-color: #3c83c6;
+  box-shadow: 0 0 0 3px #d9ebfc;
+}
+
+.account-field input[aria-invalid="true"] {
+  border-color: #b74848;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  padding-right: 65px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 4px;
+  bottom: 4px;
+  min-height: 41px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 6px;
+  background: #eff6fc;
+  color: #1c5588;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.password-toggle:hover {
+  background: #dbeafe;
+}
+
+.account-hint,
+.account-error {
+  display: block;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.account-hint {
+  color: #4b6480;
+}
+
+.account-error {
+  color: #a22525;
+}
+
+.account-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.account-consent input {
+  accent-color: #174c7e;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin: 1px 0 0;
+}
+
+.account-submit {
+  min-height: 47px;
+  width: 100%;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid #123d69;
+  background: linear-gradient(110deg, #174c7e, #0b315b);
+  color: #fff;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.account-submit:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.account-submit:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.account-switch {
+  text-align: center;
+  margin-top: 22px;
+}
+
+.account-switch a {
+  color: #145a9b;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.account-switch a:hover {
+  text-decoration: underline;
+}
+
+.account-status {
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.account-status.success {
+  background: #e6f9f2;
+  color: #0b7852;
+  border: 1px solid #a3e6cf;
+}
+
+.account-status.error {
+  background: #fdf2f2;
+  color: #a22525;
+  border: 1px solid #f8b4b4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .account-art * {
+    animation: none !important;
+  }
+  .account-field input {
+    transition: none;
+  }
+}
