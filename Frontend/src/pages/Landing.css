@@ -915,91 +915,6 @@
   font-size: 12px;
 }
 
-/* Reviews */
-.patron-landing-page .reviews-section {
-  padding-top: 40px;
-}
-
-.patron-landing-page .reviews-section .ruled::before,
-.patron-landing-page .reviews-section .ruled::after {
-  width: 62px;
-}
-
-.patron-landing-page .reviews {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  margin-top: 14px;
-}
-
-.patron-landing-page .card {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-}
-
-.patron-landing-page .review {
-  padding: 16px 18px 12px;
-  text-align: left;
-}
-
-.patron-landing-page .quote {
-  display: flex;
-  gap: 12px;
-  font-size: 13px;
-  line-height: 1.45;
-  min-height: 54px;
-  color: #334155;
-}
-
-.patron-landing-page .quote span {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: #edf5fc;
-  color: #0866f5;
-  font-size: 32px;
-  line-height: 1.2;
-  text-align: center;
-  flex: none;
-  font-weight: bold;
-}
-
-.patron-landing-page .person {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 12px;
-  margin-top: 10px;
-}
-
-.patron-landing-page .person img {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-}
-
-.patron-landing-page .person b {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: #0b2345;
-}
-
-.patron-landing-page .person small {
-  display: block;
-  font-size: 11px;
-  color: #64748b;
-}
-
-.patron-landing-page .stars {
-  display: block;
-  color: #edab53;
-  letter-spacing: 2px;
-  line-height: 1;
-  font-size: 12px;
-}
-
 /* CTA */
 .patron-landing-page .cta {
   width: min(100% - 64px, 1360px);
@@ -1167,52 +1082,11 @@
   margin-top: 10px;
 }
 
-.patron-landing-page .laptop-controls {
-  margin-bottom: 12px;
-  display: flex;
-  justify-content: center;
-}
-
-.patron-landing-page .laptop-flap-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 5px 14px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #195994;
-  background: #f0f6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.patron-landing-page .laptop-flap-toggle:hover {
-  background: #dbeafe;
-  color: #0b2345;
-  transform: translateY(-1px);
-}
-
-.patron-landing-page .flap-indicator {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #00b884;
-  display: inline-block;
-  transition: background-color 0.3s;
-}
-
-.patron-landing-page .flap-indicator.shut {
-  background: #f59e0b;
-}
-
 .patron-landing-page .laptop {
   position: relative;
   width: 100%;
   max-width: 440px;
   transform-style: preserve-3d;
-  cursor: pointer;
 }
 
 .patron-landing-page .laptop-lid {
@@ -1470,9 +1344,6 @@
     left: -22px;
     right: auto;
     transform: translate(-50%, -50%);
-  }
-  .patron-landing-page .reviews {
-    grid-template-columns: 1fr;
   }
   .patron-landing-page .cta {
     grid-template-columns: 1fr;

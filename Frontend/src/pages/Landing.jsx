@@ -78,7 +78,6 @@ export default function Landing () {
 
   const stepsContainerRef = useRef(null)
   const [timelineProgress, setTimelineProgress] = useState(0)
-
   const [isLaptopOpen, setIsLaptopOpen] = useState(false)
   const laptopSectionRef = useRef(null)
 
@@ -87,19 +86,49 @@ export default function Landing () {
     return () => clearTimeout(timer)
   }, [])
 
+  // Scroll-linked laptop flap: opens as user scrolls down, shuts as user scrolls up
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsLaptopOpen(true)
-        }
-      },
-      { threshold: 0.25 }
-    )
-    if (laptopSectionRef.current) {
-      observer.observe(laptopSectionRef.current)
+    let lastScrollY = window.scrollY
+    let ticking = false
+
+    const handleLaptopScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          if (!laptopSectionRef.current) {
+            ticking = false
+            return
+          }
+
+          const currentScrollY = window.scrollY
+          const delta = currentScrollY - lastScrollY
+          const rect = laptopSectionRef.current.getBoundingClientRect()
+          const windowHeight = window.innerHeight
+
+          // In viewport range
+          const inView = rect.top < windowHeight * 0.92 && rect.bottom > 50
+
+          if (inView) {
+            if (delta > 0.5) {
+              // Scrolling DOWN: Open flap
+              setIsLaptopOpen(true)
+            } else if (delta < -0.5) {
+              // Scrolling UP: Close flap
+              setIsLaptopOpen(false)
+            }
+          } else if (rect.top >= windowHeight * 0.85) {
+            // Above the laptop: keep flap shut
+            setIsLaptopOpen(false)
+          }
+
+          lastScrollY = currentScrollY
+          ticking = false
+        })
+        ticking = true
+      }
     }
-    return () => observer.disconnect()
+
+    window.addEventListener('scroll', handleLaptopScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleLaptopScroll)
   }, [])
 
   useEffect(() => {
@@ -169,7 +198,6 @@ export default function Landing () {
           <a href='#home'>Home</a>
           <a href='#features'>Features</a>
           <a href='#about'>About</a>
-          <a href='#reviews'>Reviews</a>
         </nav>
         <div className='actions'>
           <Link to='/login' className='btn outline'>Login</Link>
@@ -357,20 +385,8 @@ export default function Landing () {
             </div>
           </div>
           <div className='laptop-wrapper' ref={laptopSectionRef}>
-            <div className='laptop-controls'>
-              <button
-                type='button'
-                className='laptop-flap-toggle'
-                onClick={() => setIsLaptopOpen(prev => !prev)}
-                aria-label={isLaptopOpen ? 'Shut laptop flap' : 'Open laptop flap'}
-              >
-                <span className={`flap-indicator ${isLaptopOpen ? 'open' : 'shut'}`} />
-                {isLaptopOpen ? 'Click to Shut Flap' : 'Click to Open Flap'}
-              </button>
-            </div>
             <div
               className='laptop'
-              onClick={() => setIsLaptopOpen(prev => !prev)}
               role='region'
               aria-label='Interactive analytics laptop preview'
             >
@@ -524,55 +540,6 @@ export default function Landing () {
                 <span className='feature-example'>{feat.example}</span>
               </article>
             ))}
-          </div>
-        </section>
-
-        {/* Reviews Section */}
-        <section className='reviews-section center wrap' id='reviews'>
-          <h2 className='ruled'>What Our Users Say</h2>
-          <div className='reviews'>
-            <article className='review card'>
-              <div className='quote'>
-                <span aria-hidden='true'>&ldquo;</span>
-                <p>&ldquo;The Patron Index has completely changed the way I understand my customers. Super easy to use!&rdquo;</p>
-              </div>
-              <div className='person'>
-                <img src='data:image/webp;base64,UklGRg4EAABXRUJQVlA4IAIEAADwEQCdASopACkAPikUhkKhoQnOApIMAUJYwCdMoSGhIiq/XSCxQqdvNzSlm9T6Dk38Fe0nJE5Q7JX3TOTf27+U77/ArtkOQXkD8+X/g/wv43e3H6R/63uFfq7/vCN9looC18suBkvkt/CjPg7vfJno/c2/44AKEFpaSx0KpLsjpfvpnVCFNGL2OpxiPWteDSuFH9zVDtDsAAD+//6UhOM7b6w8s9bxgj1/WODQz4xOFzVS+IWaJ1CQXRnfv/Psyu4scqVeDBriKkBtUHoHgJkGz86a422kb0EguT9MK+/gemhnmozlYdfrjS0uSk/4M9MbGw1vymGgHDXa7PQrAC7eZPzAHf875f1KhhYKj/aNXmOMVqX+7a5zXoiXU3y6bLzif4nBpeEvriDFf8fesCVWLLQ5skO/EH28jYPX43aXqXPnepfP01uafsshQzOeD5rygeZIcoui9iBb+M2XSH7mR1lwlOxCU1WtQfozU8LAXbvW1lf/BZ34Ka2Gli3I9FzQGExgW0cyJo4suHEXmGyhDDQmatqdfxXUWDPLccl2Av+LaW+7J47Jinu0fw94kx5sJPRTr9OesJv/ilsbcXLWTl4XKrReYJVJ1riOglWFouOtF8E20zfQsf16sz3PfdI07l/Dz7OKFP+53wcJPNz2fPOMSQOmI5UqnGerOadbUGsGg/75GqV6RuwXtS0bTQKJ1Yc7uATnjn77RpYKy/Gf/HEazDW7TngUZKm4nN729yBF2nGDyyZg6IGhmFA7bp4+k6T5TTwY3rcrqjmZjf8+YJ6GwVcPK/oYBwlzCoRh2smQIyF//OL2gQg7454Uwfoutdk/HklZI+bA+FhUQi9WrqxcDvobqZ2rdGCCfGPFTWqWn2hseLsNE+Jhw0cptNvlZ4jMu5+aIvMN6SNWYXZXNxOIZWC8Cp6mTDvD7YyPbPw9mJAyrZXLnT1X3Qzm23SL6abWwno3gnqK9fZsU1mRUsnKcK2XKdHejsDLxMAXDfv++2Km7gboYpfhiRyybtkl2GKergWz79jzWip/zFDmCvRRyfV0xI+BCtMLG95vF4v/9TMmEaaB/k2t/s+Sfk2/FZL+h1/VnQDixEOPMYXKnWTYd7OfyLJ2cKYxV97+9bDHi3dpSb03578ec/uyQsC20VRpEfwwFZ/iNFKv/PW1FLCTWJ36Q/SbM5gNz1vdIs5EBsB3izn/Lniy3sBF7K1/2R25TyMHE2nVEV3+1uHGP/v//1enpYbfleas6i1So8D1JJ228L5R4Midu04r5Ebs/nP3A/GBtQv1uvK7SbIMp5Z1N/LffeDv/wa/LivOQbtkN4o1GjobX6MUmPDSU9/VPG7eDZaGY0ZeVI2rUzMAAAA=' alt='' />
-                <div>
-                  <b>Priya Sharma</b>
-                  <small>Retail Store Owner</small>
-                  <span className='stars' aria-label='5 out of 5 stars'>★★★★★</span>
-                </div>
-              </div>
-            </article>
-            <article className='review card'>
-              <div className='quote'>
-                <span aria-hidden='true'>&ldquo;</span>
-                <p>&ldquo;Simple, powerful and insightful. A must-have for any small business.&rdquo;</p>
-              </div>
-              <div className='person'>
-                <img src='data:image/webp;base64,UklGRugDAABXRUJQVlA4INwDAACQEgCdASopACkAPikQh0KhoQnOAtoMAUJQBOmXsICz3+5a5cUfsinRbbrPM+t79ADpcPJVuYHgv39PTvsfk13wXgu74b/Nv8d/Kd/GyRxAd5vhaI7/Px/3vMf9H+wX+rX+74E0vH/2avhn3F4E4hCd81mCPi+It8tUeN/bJJNzkI1fgBDLpItx3aDOih9f8pYg1xdGEv9n8R7EMTkAAP7//pSJs05ONrtM5QsrJHLH/c83fpsODcUZ8sBPsu+2qAH7qx/MFmMpeeP7sFXD33aySMY3nxQdxgu3s4ulH+9SPZW4Oiw7jPVIRJaAzHZq+VQGnMA9T18HvuN4ypGWLPmv9N8G9I0lYdrDjb9leBaYn/0bjtdYqWPIF6H4fHf08WizTS/nyRzhUiVLqTfyZmf/ySNAyT3aIVRbBEaBAFkuC+4P3pzxmiewmF4MvP70tTx1IX/kmOPlZEGDoRMDDkhG3xNGc2cAB5gaP8qpfhzfNYVP1BKpl1CuZIeEy+ZSjRHcQQEOcBVD9V6bRkQfdbQzYW0EDuQe/64HWDVcsKVqGnP8JXOmCENufvaCXVUKtqrLOA3/4N6nYR6B1txIGnNm4JDubQ5G7ioGoHx1o2W8qepqokTzp2PMzd2DFGp8v38vCIZ6xmNmufqG8VCzriqpR6d6IAPNOZuydNo2nonACf9V030Ub3NGhjEgLv1J17j225XMgm3gErH+tQhT/pjm6qHwddQuBwUJtxZGJ0CLGNvSBa2td2GEZQAJLFLaf5WDFy2mrPwGrDSkQP8kU1sCSH7Ch7ZWWzQpHTTIKDJtmh3kWR+6e//sHCed3fhG5L+e71mrHv0YoX6+wD0S9qMhHBL91JpWdgXI0usqgVw/HO9heEg+BU9qos5jedMH5cW+FRPxdBf1oYoUudeXThDzZ3+SN6rd9hOkzF1c9J4MCR3pl7EP74AVTG/fCpBiXlHFn18qi5xLpVELBw6bWQOUVolf8UhwuZ7IWTV1fHiwE11MoaNg4XhsoJCEJOjBO398UX84dfkSs8IIX/r8qmAP92TtopY1rIcSNhkpn5HbAaPFGhTsTzwCVaWGpcurSOLxNe5TKWx7X66hqY3NaAyL9/69/OxFfSR6EvfQmwSav9Nu5r2kR7Ytj7uDLxsQJJDSDK9TDe/0K6A4FXp64XnaQiU2m4w74jrNhIBC96MXp8TdzkWABeWUg4RT8tSfbbvBYkEXL80JvDFRV5eTKpL/nblHVdQ2HLufYG5FILEYSQDXqKTNbv3T7kEsW0gkDuR612llemCjWimRj5cgp+JnzxC2K4SXkjbICwAA' alt='' />
-                <div>
-                  <b>Rohit Mehta</b>
-                  <small>Shop Owner</small>
-                  <span className='stars' aria-label='5 out of 5 stars'>★★★★★</span>
-                </div>
-              </div>
-            </article>
-            <article className='review card'>
-              <div className='quote'>
-                <span aria-hidden='true'>&ldquo;</span>
-                <p>&ldquo;Finally, a platform that makes customer analytics simple!&rdquo;</p>
-              </div>
-              <div className='person'>
-                <img src='data:image/webp;base64,UklGRuoDAABXRUJQVlA4IN4DAACwEgCdASopACkAPikShkKhoQnKkgwBQljAJ0y8cLJTb3L3+B7t3JpmnzXI/2k9lNytvr/t/5S/lV8K9KT5J/659pPET5S/1H5O8wHbGcclHr/r/T6/3vMr9Hf9T3CP1T/135jcbAr0M8YOw9XqEYOyjfjYGr3x8ZBeGIv3n5R5nKjMkhGVHkuwkkWo0Zfcb9myMCJ/XIiy//6QQlE6AAD+//7OVHXExfflkH7r/0FLoqAuMD1Prg/v7M+ePkX4QgcSF5hrsfeane77VTcquTX4Nqfzf4Cq8BZeOSwO7OyYJlmbprsb7DnEywMB0sYTxMGh8lIvXtwaSAj1IW9cDVNqJpxZBviODnSnq6CPNB6jbPdql3wwipxN+7GzKB28xMM++eQQs9I67yfTSIqnEbe3Qp9bKW/Yw6CvrQ65zJfhOXt7XcHRo26xBNrwOW9jmfXKbbTvx7+/s0t35AFWOAlGXji7uLb5rJiQNwIxcr7lpfLQmtA+XXIneLVBQHVVpC1osmf5xEpNeq9TUJ5qWHjJ0fk8Yfj2+J/M2v9uOyuoNdZ+RVmjhXGa9OJ4ZvRq57juX+tC9c7JDuJFvJ+HQa5uuoqx0K63tKtZ+KlIa/+vuk/JDYHYCKKaeuMiaysFx3jBP6xL7IxrVZtcXDUx+g9nB4A1RTGNnKRFSbZXYXJDeHwRnv2XZVh9jucjGtEtdCT/j+5HOG1o7OixZ3lD9J2y64EE+/NaQWyPlYzuCbd6w2/1fVSvVgh2DjuJAj7EgMyGRvR7/Dz48jCTLBxS8Suo4Yrf4sWZFQDZC+3en0ssdzh17SS324OEvLWf07usv2poo6XK/5Ke7814fkdTAxLHn8GCEIVWHbimZbZKEDwV5QsYLUbThRjQFE2jvhfIASfxK2zO09Y3X+K74vHxWboLL/KsqdTXYHFAoSf64lfxuOhbGdInYk23p2f8S3OSzpILqxj15B0gDmzVZsXt24vI87AhlzA08c75U+UB9zpLvSkPzx1aaKgG6+/mvC+23GQkjPrNwCdzq9uQzaTvn5Y3IHXf34FEZ6bponDc7Y2MCAI04FNQ6IZtxKi8orm7wqaI6Zn6puKuHBrbv87XIw88uTjgyMnLfNC9b+y71JH2LRAsZ4VpouYnUlv2MblUsYX5a5D5mXGbwhEjEYTzD1cRmU7+TGueDJ8ftCKoj4JVD7xnMSlr5BzhXRbUeUI/qYi8hau2+OdGnrbqD61orvjwW5Z38FNs5GztsQN/uQY2v9XFVqbDqGMm8kaZdJoZEXEMlifjahPTb2jX23tC1OHgMCirnTgiMSzLPYAAAAA=' alt='' />
-                <div>
-                  <b>Sneha Verma</b>
-                  <small>Business Owner</small>
-                  <span className='stars' aria-label='5 out of 5 stars'>★★★★★</span>
-                </div>
-              </div>
-            </article>
           </div>
         </section>
 
