@@ -125,7 +125,15 @@ function InteractiveRevenueChart ({ data = [] }) {
           const ptColor = colors[idx % colors.length]
 
           return (
-            <g key={pt.label} onMouseEnter={() => setActivePoint(pt)} style={{ cursor: 'pointer' }}>
+            <g
+              key={pt.label}
+              onMouseEnter={() => setActivePoint(pt)}
+              className='animated-chart-point'
+              style={{
+                cursor: 'pointer',
+                animationDelay: `${0.35 + idx * 0.08}s`
+              }}
+            >
               <circle
                 cx={pt.x}
                 cy={pt.y}
@@ -298,7 +306,15 @@ function InteractiveCustomerGrowthChart ({ data = [] }) {
           const ptColor = colors[idx % colors.length]
 
           return (
-            <g key={pt.month} onMouseEnter={() => setActivePoint(pt)} style={{ cursor: 'pointer' }}>
+            <g
+              key={pt.month}
+              onMouseEnter={() => setActivePoint(pt)}
+              className='animated-chart-point'
+              style={{
+                cursor: 'pointer',
+                animationDelay: `${0.35 + idx * 0.08}s`
+              }}
+            >
               <circle
                 cx={pt.x}
                 cy={pt.y}
@@ -409,18 +425,23 @@ function InteractiveSegmentDistribution ({ segments = [] }) {
   )
 }
 
-// 4. Interactive Multi-Color New vs Repeat Clustered Bar Chart (Stable Header Readout)
+// 4. Interactive Multi-Color New vs Repeat Clustered Bar Chart with Block Hover Tooltips
 function InteractiveNewVsRepeatChart ({ activity = [] }) {
-  const [hoveredMonth, setHoveredMonth] = useState(null)
+  const [hoveredBar, setHoveredBar] = useState(null)
 
   const maxVal = Math.max(...activity.map(a => Math.max(a.newCustomers, a.repeatCustomers)), 1)
-  const activeRepeatPct = hoveredMonth
-    ? Math.round((hoveredMonth.repeatCustomers / (hoveredMonth.newCustomers + hoveredMonth.repeatCustomers)) * 100)
-    : 69
+  const activeRepeatPct = hoveredBar
+    ? Math.round((hoveredBar.item.repeatCustomers / (hoveredBar.item.newCustomers + hoveredBar.item.repeatCustomers)) * 100)
+    : 68.7
+
+  // Calculate clamped left percent for floating tooltip
+  const tooltipLeftPct = hoveredBar
+    ? Math.min(Math.max((hoveredBar.columnIndex / (activity.length - 1 || 1)) * 74 + 13, 16), 84)
+    : 50
 
   return (
-    <div className='activity-chart-interactive-wrapper' onMouseLeave={() => setHoveredMonth(null)}>
-      {/* Legend & Dynamic Non-Messy Readout Ribbon */}
+    <div className='activity-chart-interactive-wrapper' onMouseLeave={() => setHoveredBar(null)}>
+      {/* Legend & Dynamic Interactive Readout Ribbon */}
       <div className='activity-legend-bar'>
         <div className='activity-legend-item'>
           <span className='legend-color-box new-box' />
@@ -431,54 +452,112 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
           <span>Repeat Customers</span>
         </div>
 
-        {/* Dynamic Stable Readout (Replaces chaotic hover boxes with clean metrics) */}
-        {hoveredMonth ? (
+        {/* Dynamic Stable Readout */}
+        {hoveredBar ? (
           <span className='activity-retention-pill active-readout'>
-            {hoveredMonth.month}: <strong>{hoveredMonth.newCustomers}</strong> New • <strong>{hoveredMonth.repeatCustomers}</strong> Repeat ({activeRepeatPct}%)
+            {hoveredBar.item.month}: <strong>{hoveredBar.count}</strong> {hoveredBar.type} ({hoveredBar.sharePct}%) • {hoveredBar.total} Total
           </span>
         ) : (
-          <span className='activity-retention-pill'>68.7% Retention Rate</span>
+          <span className='activity-retention-pill'>{activeRepeatPct}% Retention Rate</span>
         )}
       </div>
 
-      <div className='activity-chart-interactive'>
+      <div className={`activity-chart-interactive ${hoveredBar ? 'has-active-bar' : ''}`}>
         {activity.map((item, index) => {
-          const isHovered = hoveredMonth?.month === item.month
-          const newHeight = Math.max(12, Math.round((item.newCustomers / maxVal) * 140))
-          const repeatHeight = Math.max(12, Math.round((item.repeatCustomers / maxVal) * 140))
+          const isMonthHovered = hoveredBar?.item.month === item.month
+          const isNewActive = isMonthHovered && hoveredBar?.type === 'New'
+          const isRepeatActive = isMonthHovered && hoveredBar?.type === 'Repeat'
+          const totalCohort = item.newCustomers + item.repeatCustomers
+
+          const newHeight = Math.max(16, Math.round((item.newCustomers / maxVal) * 140))
+          const repeatHeight = Math.max(16, Math.round((item.repeatCustomers / maxVal) * 140))
 
           return (
             <div
               key={item.month}
-              className={`activity-column-interactive ${isHovered ? 'col-active' : ''}`}
-              onMouseEnter={() => setHoveredMonth(item)}
+              className={`activity-column-interactive ${isMonthHovered ? 'col-active' : ''} ${hoveredBar ? 'has-hovered-bar' : ''}`}
             >
               <div className='activity-bars-interactive'>
-                {/* New Customers Column */}
+                {/* New Customers Bar Block */}
                 <div
-                  className='activity-bar-vibrant bar-new'
+                  className={`activity-bar-vibrant bar-new ${isNewActive ? 'bar-block-active' : ''}`}
                   style={{
                     height: `${newHeight}px`,
-                    animationDelay: `${index * 0.07}s`
+                    animationDelay: `${index * 0.08}s`
                   }}
+                  onMouseEnter={() => setHoveredBar({
+                    item,
+                    type: 'New',
+                    typeLabel: 'New Customers',
+                    count: item.newCustomers,
+                    total: totalCohort,
+                    sharePct: Math.round((item.newCustomers / totalCohort) * 100),
+                    color: '#10B981',
+                    columnIndex: index,
+                    isNew: true
+                  })}
+                  title={`${item.month}: ${item.newCustomers} New Customers`}
                 />
 
-                {/* Repeat Customers Column */}
+                {/* Repeat Customers Bar Block */}
                 <div
-                  className='activity-bar-vibrant bar-repeat'
+                  className={`activity-bar-vibrant bar-repeat ${isRepeatActive ? 'bar-block-active' : ''}`}
                   style={{
                     height: `${repeatHeight}px`,
-                    animationDelay: `${index * 0.07 + 0.04}s`
+                    animationDelay: `${index * 0.08 + 0.04}s`
                   }}
+                  onMouseEnter={() => setHoveredBar({
+                    item,
+                    type: 'Repeat',
+                    typeLabel: 'Repeat Customers',
+                    count: item.repeatCustomers,
+                    total: totalCohort,
+                    sharePct: Math.round((item.repeatCustomers / totalCohort) * 100),
+                    color: '#118DFF',
+                    columnIndex: index,
+                    isNew: false
+                  })}
+                  title={`${item.month}: ${item.repeatCustomers} Repeat Customers`}
                 />
               </div>
 
-              <span className={`activity-x-label ${isHovered ? 'x-label-active' : ''}`}>
+              <span className={`activity-x-label ${isMonthHovered ? 'x-label-active' : ''}`}>
                 {item.month}
               </span>
             </div>
           )
         })}
+
+        {/* Interactive Floating Hover Tooltip on Bar Blocks */}
+        {hoveredBar && (
+          <div
+            className='barchart-floating-tooltip'
+            style={{
+              left: `${tooltipLeftPct}%`
+            }}
+          >
+            <div className='barchart-tooltip-header'>
+              <span className='barchart-type-dot' style={{ backgroundColor: hoveredBar.color }} />
+              <strong>{hoveredBar.typeLabel}</strong>
+              <span className='barchart-tooltip-month'>{hoveredBar.item.month} 2026</span>
+            </div>
+            <div className='barchart-tooltip-metric-row'>
+              <div className='barchart-metric-main'>
+                <span className='barchart-metric-label'>Volume:</span>
+                <strong className='barchart-metric-val'>{hoveredBar.count.toLocaleString()}</strong>
+              </div>
+              <div className='barchart-metric-share' style={{ color: hoveredBar.color }}>
+                {hoveredBar.sharePct}% share
+              </div>
+            </div>
+            <div className='barchart-tooltip-foot'>
+              <span>Total month: <strong>{hoveredBar.total.toLocaleString()}</strong> patrons</span>
+              <span className='barchart-sub-text'>
+                {hoveredBar.isNew ? 'Acquisition velocity' : 'Retention efficiency'}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -487,7 +566,7 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
 function Analytics () {
   return (
     <div className='page analytics-page'>
-      <div className='page-heading'>
+      <div className='page-heading analytics-heading-animated'>
         <div>
           <h2>Analytics & Behavioral Insights</h2>
           <p>Interactive customer intelligence, cohort economic velocity, and retention dynamics.</p>
