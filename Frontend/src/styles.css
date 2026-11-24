@@ -37,6 +37,32 @@
 
   --danger: #b73434;
   --danger-bg: #fdf2f2;
+
+  /* ==========================================================================
+     GLASSMORHPISM & CLAYMORPHISM DESIGN SYSTEM TOKENS
+     ========================================================================== */
+  /* Glassmorphism Surfaces */
+  --glass-bg: rgba(255, 255, 255, 0.78);
+  --glass-bg-hover: rgba(255, 255, 255, 0.92);
+  --glass-border: rgba(255, 255, 255, 0.85);
+  --glass-border-subtle: rgba(210, 226, 245, 0.65);
+  --glass-blur: blur(16px) saturate(170%);
+  --glass-shadow: 0 10px 30px rgba(11, 35, 69, 0.05), 0 1px 3px rgba(11, 35, 69, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  --glass-shadow-hover: 0 16px 42px rgba(8, 102, 245, 0.12), 0 2px 8px rgba(11, 35, 69, 0.06), inset 0 1px 0 #ffffff;
+
+  /* Claymorphism Tactile 3D Tokens */
+  --clay-card-radius: 16px;
+  --clay-btn-radius: 12px;
+  --clay-pill-radius: 9999px;
+  --clay-card-shadow: 6px 6px 16px rgba(163, 177, 198, 0.28), -6px -6px 16px rgba(255, 255, 255, 0.95), inset 0 1px 1px #ffffff;
+  --clay-card-hover: 8px 12px 24px rgba(11, 35, 69, 0.12), -6px -6px 16px #ffffff, inset 0 1px 1px #ffffff;
+  --clay-btn-primary: 0 8px 20px rgba(8, 102, 245, 0.32), inset 0 1px 1.5px rgba(255, 255, 255, 0.5), inset 0 -2px 4px rgba(0, 0, 0, 0.16);
+  --clay-btn-primary-hover: 0 12px 26px rgba(8, 102, 245, 0.44), inset 0 1px 2px rgba(255, 255, 255, 0.65), inset 0 -2px 4px rgba(0, 0, 0, 0.18);
+  --clay-btn-primary-active: 0 2px 6px rgba(8, 102, 245, 0.25), inset 0 3px 6px rgba(0, 0, 0, 0.25);
+  --clay-control-shadow: 4px 4px 10px rgba(163, 177, 198, 0.25), -4px -4px 10px rgba(255, 255, 255, 0.9), inset 0 1px 1px #ffffff;
+  --clay-control-hover: 6px 8px 16px rgba(8, 102, 245, 0.16), -4px -4px 12px #ffffff;
+  --clay-control-active: inset 2px 2px 5px rgba(163, 177, 198, 0.35), inset -2px -2px 5px rgba(255, 255, 255, 0.8);
+  --clay-inset-pill: inset 1px 1px 2.5px rgba(255, 255, 255, 0.85), inset -1px -1px 2.5px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(11, 35, 69, 0.05);
 }
 
 html,
@@ -481,9 +507,10 @@ a {
 
 .top-header {
   height: 80px;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(8px);
-  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.75);
   padding: 0 28px;
   display: flex;
   align-items: center;
@@ -491,7 +518,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: 0 2px 10px rgba(11, 35, 69, 0.03);
+  box-shadow: 0 4px 20px rgba(11, 35, 69, 0.03);
 }
 
 .header-left {
@@ -506,19 +533,24 @@ a {
   justify-content: center;
   width: 42px;
   height: 42px;
-  border-radius: 10px;
+  border-radius: var(--clay-btn-radius);
   background: #ffffff;
-  border: 1px solid var(--border);
-  box-shadow: 0 2px 6px rgba(11, 35, 69, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--clay-control-shadow);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
   text-decoration: none;
 }
 
 .header-brand-link:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
   border-color: #bad3f5;
-  box-shadow: 0 4px 12px rgba(8, 102, 245, 0.15);
+  box-shadow: var(--clay-control-hover);
+}
+
+.header-brand-link:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: var(--clay-control-active);
 }
 
 .header-brand-logo {
@@ -534,25 +566,26 @@ a {
   justify-content: center;
   width: 38px;
   height: 38px;
-  border: 1px solid var(--border);
-  border-radius: 9px;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--clay-btn-radius);
   background: #ffffff;
   color: var(--navy);
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 6px rgba(11, 35, 69, 0.04);
+  box-shadow: var(--clay-control-shadow);
 }
 
 .sidebar-toggle-btn:hover {
   background: #eff5ff;
   border-color: #bad3f5;
   color: var(--accent);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(8, 102, 245, 0.15);
+  transform: translateY(-2px);
+  box-shadow: var(--clay-control-hover);
 }
 
 .sidebar-toggle-btn:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.97);
+  box-shadow: var(--clay-control-active);
 }
 
 .header-title h1 {
@@ -622,16 +655,29 @@ a {
 
 .notification-button {
   position: relative;
-
-  border: none;
-  background: none;
-
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: #ffffff;
+  border-radius: var(--clay-btn-radius);
   width: 38px;
   height: 38px;
-
   cursor: pointer;
+  color: var(--navy);
+  display: grid;
+  place-items: center;
+  box-shadow: var(--clay-control-shadow);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  font-size: 20px;
+.notification-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--clay-control-hover);
+  border-color: #bad3f5;
+  color: var(--accent);
+}
+
+.notification-button:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: var(--clay-control-active);
 }
 
 .notification-dot {
@@ -747,15 +793,32 @@ a {
 }
 
 .secondary-button {
-  background: white;
-
-  border: 1px solid var(--border);
-
+  border-radius: var(--clay-btn-radius);
+  background: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--clay-control-shadow);
+  padding: 9px 18px;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .secondary-button:hover {
-  background: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: var(--clay-control-hover);
+  border-color: #bad3f5;
+  background: #ffffff;
+}
+
+.secondary-button:active {
+  transform: translateY(1px) scale(0.97);
+  box-shadow: var(--clay-control-active);
 }
 
 .text-button {
@@ -767,15 +830,21 @@ a {
 }
 
 .card {
-  background: white;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--clay-card-radius);
+  padding: 22px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  border: 1px solid var(--border);
-
-  border-radius: 12px;
-
-  padding: 20px;
-
-  box-shadow: none;
+.card:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .card-header {
@@ -816,15 +885,21 @@ a {
 }
 
 .stat-card {
-  background: white;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--clay-card-radius);
+  padding: 20px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-  border: 1px solid var(--border);
-
-  border-radius: 12px;
-
-  padding: 18px;
-
-  box-shadow: none;
+.stat-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .stat-card-top {
@@ -3975,7 +4050,9 @@ a {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(12, 32, 60, 0.65);
+  background: rgba(11, 35, 69, 0.50);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: grid;
   place-items: center;
   padding: 20px;
@@ -3986,12 +4063,15 @@ a {
   width: 100%;
   max-width: 680px;
   max-height: 85vh;
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: 18px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 24px 64px rgba(11, 35, 69, 0.22), inset 0 1px 1px #ffffff;
 }
 
 .modal-header {
@@ -4364,22 +4444,27 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: #118dff;
+  background: linear-gradient(145deg, #1677ff 0%, #0866f5 100%);
   color: #ffffff;
-  border: 0;
-  border-radius: 8px;
-  padding: 9px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: var(--clay-btn-radius);
+  padding: 10px 20px;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(17, 141, 255, 0.28);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--clay-btn-primary);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .powerbi-primary-btn:hover:not(:disabled) {
-  background: #0284c7;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(17, 141, 255, 0.42);
+  background: linear-gradient(145deg, #2b85ff 0%, #0654cc 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--clay-btn-primary-hover);
+}
+
+.powerbi-primary-btn:active:not(:disabled) {
+  transform: translateY(1.5px) scale(0.98);
+  box-shadow: var(--clay-btn-primary-active);
 }
 
 .powerbi-primary-btn:disabled {
@@ -4422,29 +4507,31 @@ a {
 }
 
 .powerbi-ribbon-card {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--accent-color, #118dff);
-  border-radius: 8px;
-  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-top: 3.5px solid var(--accent-color, #118dff);
+  border-radius: var(--clay-card-radius);
+  padding: 14px 16px;
   cursor: pointer;
-  transition: all 0.22s ease-in-out;
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   gap: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--clay-card-shadow);
 }
 
 .powerbi-ribbon-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px) scale(1.015);
+  box-shadow: var(--clay-card-hover);
 }
 
 .powerbi-ribbon-card.ribbon-card-active {
   border-color: var(--accent-color, #118dff);
-  box-shadow: 0 0 0 2px var(--accent-color, #118dff), 0 6px 16px rgba(0, 0, 0, 0.08);
-  background: #fdfdfd;
+  box-shadow: 0 0 0 2px var(--accent-color, #118dff), inset 1px 1px 3px rgba(11, 35, 69, 0.1), 0 8px 20px rgba(17, 141, 255, 0.22);
+  background: #ffffff;
 }
 
 .ribbon-card-header {
@@ -4520,11 +4607,21 @@ a {
 }
 
 .powerbi-card {
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--clay-card-radius);
+  padding: 22px;
+  box-shadow: var(--glass-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.powerbi-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--glass-shadow-hover);
+  transform: translateY(-2px);
 }
 
 .powerbi-chart-header {
@@ -5903,15 +6000,33 @@ button:active:not(:disabled),
   position: absolute;
   top: calc(100% + 12px);
   right: 0;
-  width: 290px;
-  background: #ffffff;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 12px 36px rgba(11, 35, 69, 0.16), 0 2px 8px rgba(11, 35, 69, 0.06);
-  padding: 16px;
+  width: 295px;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  border-radius: var(--clay-card-radius);
+  box-shadow: 0 16px 48px rgba(11, 35, 69, 0.18), 0 2px 8px rgba(11, 35, 69, 0.06), inset 0 1px 1px #ffffff;
+  padding: 18px;
   z-index: 1000;
   transform-origin: top right;
   animation: dropdownScaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Tactile Clay Badges & Pills */
+.analytics-kpi-badge,
+.activity-retention-pill,
+.toggle-chip,
+.growth-tag,
+.status-badge,
+.index-score-pill,
+.dropdown-role-pill,
+.frequency-badge,
+.ribbon-filter-tag,
+.score-meter-label {
+  border-radius: var(--clay-pill-radius) !important;
+  box-shadow: var(--clay-inset-pill) !important;
+  border: 1px solid rgba(255, 255, 255, 0.75) !important;
 }
 
 @keyframes dropdownScaleIn {
