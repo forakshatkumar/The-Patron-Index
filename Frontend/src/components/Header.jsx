@@ -63,8 +63,13 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
     navigate('/login', { replace: true })
   }
 
+  // Derive display name, email, and organization dynamically from authenticated user
+  const displayName = user?.name || (user?.email ? user.email.split('@')[0] : (demoMode ? 'Demo Account' : 'Authenticated User'))
+  const displayEmail = user?.email || (demoMode ? 'demo@patronindex.local' : '')
+  const displayOrganization = user?.organization || (demoMode ? 'Patron Index Demo' : 'Enterprise Workspace')
+
   // Get initials for circular avatar
-  const initials = (user?.name || 'Akshat Kumar')
+  const initials = displayName
     .split(' ')
     .filter(Boolean)
     .map(part => part[0])
@@ -154,11 +159,11 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
                   {initials}
                 </div>
                 <div className='dropdown-user-info'>
-                  <strong className='dropdown-user-name'>{user?.name || 'Akshat Kumar'}</strong>
-                  <span className='dropdown-user-email'>{user?.email || 'akshat.kumar@patronindex.com'}</span>
+                  <strong className='dropdown-user-name'>{displayName}</strong>
+                  {displayEmail && <span className='dropdown-user-email'>{displayEmail}</span>}
                   <div className='dropdown-badge-row'>
                     <span className={`dropdown-role-pill ${demoMode ? 'role-demo' : 'role-admin'}`}>
-                      {demoMode ? 'Demo Session' : 'Admin • Business Account'}
+                      {demoMode ? 'Demo Session' : `${user?.role ? user.role.toUpperCase() : 'USER'} • BUSINESS`}
                     </span>
                   </div>
                 </div>
@@ -167,7 +172,7 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
               {/* Account Workspace Summary */}
               <div className='dropdown-tier-card'>
                 <div className='tier-label-group'>
-                  <span className='tier-name'>{user?.organization || 'Brew & Bites'}</span>
+                  <span className='tier-name'>{displayOrganization}</span>
                   <span className='tier-tag'>ENTERPRISE</span>
                 </div>
                 <span className='tier-sub'>Active Workspace</span>

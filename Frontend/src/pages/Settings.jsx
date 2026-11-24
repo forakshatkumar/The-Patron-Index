@@ -1,11 +1,15 @@
 import { useState } from 'react'
-
+import { useAuth } from '../context/AuthContext'
 import { businessProfile } from '../data/mockData'
 
 function Settings () {
+  const { user } = useAuth()
   const saved =
-    JSON.parse(localStorage.getItem('patron-business-settings')) ||
-    businessProfile
+    JSON.parse(localStorage.getItem('patron-business-settings')) || {
+      ...businessProfile,
+      ...(user?.name ? { ownerName: user.name } : {}),
+      ...(user?.email ? { email: user.email } : {})
+    }
 
   const [form, setForm] = useState(saved)
 

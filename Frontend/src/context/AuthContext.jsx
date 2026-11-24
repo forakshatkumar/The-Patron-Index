@@ -5,10 +5,10 @@ import { loginUser, registerUser, googleLogin, removeToken, getToken, getUser, s
 const AuthContext = createContext(null)
 
 const DEMO_USER = {
-  name: 'Akshat Kumar',
-  email: 'akshat.kumar@patronindex.com',
+  name: 'Demo Account',
+  email: 'demo@patronindex.local',
   role: 'admin',
-  organization: 'Brew & Bites'
+  organization: 'Patron Index Demo'
 }
 
 export function AuthProvider ({ children }) {
@@ -19,7 +19,16 @@ export function AuthProvider ({ children }) {
   const login = async (email, password) => {
     const data = await loginUser(email, password)
     setToken(data.token)
-    if (data.user) setUser(data.user)
+    const normalizedEmail = email.trim().toLowerCase()
+    const authenticatedUser = {
+      id: data.user?.id || data.userId || 'usr_current',
+      name: data.user?.name || normalizedEmail.split('@')[0],
+      email: data.user?.email || normalizedEmail,
+      role: data.user?.role || 'analyst',
+      organization: data.user?.organization || 'Enterprise Workspace'
+    }
+    setUser(authenticatedUser)
+    saveUser(authenticatedUser)
     setDemoMode(false)
     localStorage.removeItem('patron_demo')
     return data
@@ -29,7 +38,16 @@ export function AuthProvider ({ children }) {
     const data = await registerUser(userData)
     if (data.token) {
       setToken(data.token)
-      if (data.user) setUser(data.user)
+      const normalizedEmail = userData.email.trim().toLowerCase()
+      const authenticatedUser = {
+        id: data.user?.id || data.userId || 'usr_current',
+        name: data.user?.name || userData.name || normalizedEmail.split('@')[0],
+        email: data.user?.email || normalizedEmail,
+        role: data.user?.role || userData.role || 'analyst',
+        organization: data.user?.organization || 'Enterprise Workspace'
+      }
+      setUser(authenticatedUser)
+      saveUser(authenticatedUser)
       setDemoMode(false)
       localStorage.removeItem('patron_demo')
       return data
@@ -44,7 +62,10 @@ export function AuthProvider ({ children }) {
     const data = await googleLogin(credential)
     if (data.token) {
       setToken(data.token)
-      if (data.user) setUser(data.user)
+      if (data.user) {
+        setUser(data.user)
+        saveUser(data.user)
+      }
       setDemoMode(false)
       localStorage.removeItem('patron_demo')
     }
@@ -71,7 +92,7 @@ export function AuthProvider ({ children }) {
   const value = useMemo(
     () => ({
       token,
-      user: user || DEMO_USER,
+      user: user || (demoMode ? DEMO_USER : null),
       demoMode,
       isAuthenticated: Boolean(token || demoMode),
       login,

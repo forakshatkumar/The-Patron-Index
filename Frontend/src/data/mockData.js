@@ -519,10 +519,10 @@ export const customerSpendingHistory = {
 };
 
 export const businessProfile = {
-  businessName: "Brew & Bites",
-  ownerName: "Akshat Kumar",
-  email: "admin@brewandbites.com",
+  businessName: "Patron Analytics",
+  ownerName: "Workspace Admin",
+  email: "admin@patronindex.com",
   phone: "+91 98765 43210",
-  industry: "Food & Beverage",
-  location: "Delhi, India",
+  industry: "Retail & Commerce",
+  location: "New Delhi, India",
 };
