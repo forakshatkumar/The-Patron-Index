@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import logoImg from '../assets/logo.png'
 
 function Header ({ onToggleSidebar, sidebarOpen = true }) {
   const navigate = useNavigate()
@@ -79,31 +80,11 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
 
   return (
     <header className='top-header'>
-      {/* Top-Left Corner: Hamburger Toggle & Workspace Title */}
+      {/* Top-Left Corner: Patron Index Icon & Workspace Title */}
       <div className='header-left'>
-        <button
-          type='button'
-          className='sidebar-toggle-btn'
-          onClick={onToggleSidebar}
-          aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
-          title={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
-        >
-          <svg
-            className='hamburger-icon'
-            width='20'
-            height='20'
-            viewBox='0 0 24 24'
-            fill='none'
-            stroke='currentColor'
-            strokeWidth='2.2'
-            strokeLinecap='round'
-            strokeLinejoin='round'
-          >
-            <line x1='3' y1='12' x2='21' y2='12' />
-            <line x1='3' y1='6' x2='21' y2='6' />
-            <line x1='3' y1='18' x2='21' y2='18' />
-          </svg>
-        </button>
+        <Link to='/dashboard' className='header-brand-link' aria-label='Patron Index Home' title='The Patron Index'>
+          <img src={logoImg} alt='The Patron Index' className='header-brand-logo' />
+        </Link>
 
         <div className='header-title'>
           <h1>{getPageTitle()}</h1>
@@ -111,7 +92,7 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
         </div>
       </div>
 
-      {/* Top-Right Corner: Notifications & Circular Profile with Dropdown Menu */}
+      {/* Top-Right Corner: Notifications, Circular Profile, and Hamburger Menu */}
       <div className='header-right'>
         {/* Notification Bell */}
         <button
@@ -209,6 +190,31 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
             </div>
           )}
         </div>
+
+        {/* Hamburger Menu Toggle in Top-Right Corner */}
+        <button
+          type='button'
+          className={`sidebar-toggle-btn ${sidebarOpen ? 'sidebar-btn-open' : ''}`}
+          onClick={onToggleSidebar}
+          aria-label={sidebarOpen ? 'Close sidebar navigation' : 'Open sidebar navigation'}
+          title={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+        >
+          <svg
+            className='hamburger-icon'
+            width='20'
+            height='20'
+            viewBox='0 0 24 24'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='2.2'
+            strokeLinecap='round'
+            strokeLinejoin='round'
+          >
+            <line x1='3' y1='12' x2='21' y2='12' />
+            <line x1='3' y1='6' x2='21' y2='6' />
+            <line x1='3' y1='18' x2='21' y2='18' />
+          </svg>
+        </button>
       </div>
     </header>
   )
