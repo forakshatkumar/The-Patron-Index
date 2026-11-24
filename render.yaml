@@ -1,0 +1,31 @@
+services:
+  # 1. Express Backend Service
+  - type: web
+    name: patron-index-backend
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # 2. Python ML Microservice (Optional)
+  - type: web
+    name: patron-index-ml
+    runtime: python
+    plan: free
+    rootDir: ml
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn business.api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
