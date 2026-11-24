@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { TextPlugin } from 'gsap/TextPlugin'
 import {
   Users,
   IndianRupee,
@@ -19,7 +20,7 @@ import {
 import logoImg from '../assets/logo.png'
 import './Landing.css'
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger, TextPlugin)
 
 const previewData = {
   six: {
@@ -95,6 +96,8 @@ export default function Landing () {
   const [donutLoaded, setDonutLoaded] = useState(false)
 
   const landingRef = useRef(null)
+  const typewriterRef = useRef(null)
+  const cursorRef = useRef(null)
   const stepsContainerRef = useRef(null)
   const [timelineProgress, setTimelineProgress] = useState(0)
   const [isLaptopOpen, setIsLaptopOpen] = useState(false)
@@ -110,10 +113,75 @@ export default function Landing () {
     return () => clearTimeout(timer)
   }, [])
 
-  // GSAP ScrollTrigger Integration for smooth, physics-based scroll animations
+  // GSAP ScrollTrigger & TextPlugin Integration
   useEffect(() => {
     const ctx = gsap.context(() => {
-      // 1. Scroll-Linked 3D Laptop Flap: opens as user scrolls into view, shuts when scrolling back up
+      // 1. Hero Title & Text Entrance Animations
+      gsap.from('.hero-copy h1', {
+        opacity: 0,
+        y: 24,
+        duration: 0.8,
+        ease: 'power3.out'
+      })
+
+      // 2. Typewriter Effect for Hero Tagline
+      if (typewriterRef.current) {
+        const phrases = [
+          'Where Buyers Become Insight',
+          'Understand. Segment. Grow.',
+          'Turn Data into Revenue',
+          'Retain High-Value Patrons'
+        ]
+
+        const typeTl = gsap.timeline({ repeat: -1, repeatDelay: 0.8 })
+        phrases.forEach((phrase) => {
+          typeTl
+            .to(typewriterRef.current, {
+              duration: phrase.length * 0.055,
+              text: phrase,
+              ease: 'none'
+            })
+            .to({}, { duration: 2.2 })
+            .to(typewriterRef.current, {
+              duration: phrase.length * 0.028,
+              text: '',
+              ease: 'none'
+            })
+        })
+      }
+
+      gsap.from('.hero-copy p:not(.tagline)', {
+        opacity: 0,
+        y: 18,
+        duration: 0.8,
+        delay: 0.35,
+        ease: 'power2.out'
+      })
+
+      gsap.from('.hero-buttons', {
+        opacity: 0,
+        y: 18,
+        duration: 0.8,
+        delay: 0.55,
+        ease: 'power2.out'
+      })
+
+      // 3. Section Headings Reveal on Scroll
+      gsap.utils.toArray('main section h2').forEach((h2) => {
+        gsap.from(h2, {
+          scrollTrigger: {
+            trigger: h2,
+            start: 'top 88%',
+            toggleActions: 'play none none none'
+          },
+          opacity: 0,
+          y: 22,
+          duration: 0.75,
+          ease: 'power2.out'
+        })
+      })
+
+      // 4. Scroll-Linked 3D Laptop Flap: opens as user scrolls into view, shuts when scrolling back up
       if (laptopSectionRef.current) {
         ScrollTrigger.create({
           trigger: laptopSectionRef.current,
@@ -132,7 +200,7 @@ export default function Landing () {
         })
       }
 
-      // 2. 4-Steps Timeline Progress with butter-smooth scrub
+      // 5. 4-Steps Timeline Progress with butter-smooth scrub
       if (stepsContainerRef.current) {
         ScrollTrigger.create({
           trigger: stepsContainerRef.current,
@@ -145,7 +213,7 @@ export default function Landing () {
         })
       }
 
-      // 3. Staggered Scroll Entrance for About Benefits
+      // 6. Staggered Scroll Entrance for About Benefits
       gsap.from('.benefit', {
         scrollTrigger: {
           trigger: '.benefits',
@@ -159,7 +227,7 @@ export default function Landing () {
         ease: 'power2.out'
       })
 
-      // 4. Staggered Entrance for Timeline Step Articles
+      // 7. Staggered Entrance for Timeline Step Articles
       if (stepsContainerRef.current) {
         gsap.from('.steps article.step', {
           scrollTrigger: {
@@ -175,7 +243,7 @@ export default function Landing () {
         })
       }
 
-      // 5. Powerful Features Section Reveal
+      // 8. Powerful Features Section Reveal
       gsap.from('.feature-explorer', {
         scrollTrigger: {
           trigger: '#features',
@@ -188,7 +256,7 @@ export default function Landing () {
         ease: 'power3.out'
       })
 
-      // 6. Call To Action Banner Reveal
+      // 9. Call To Action Banner Reveal
       gsap.from('.cta', {
         scrollTrigger: {
           trigger: '.cta',
@@ -268,7 +336,10 @@ export default function Landing () {
           <div className='hero-grid wrap'>
             <div className='hero-copy'>
               <h1>The Patron Index</h1>
-              <p className='tagline'>Where Buyers Become Insight</p>
+              <p className='tagline'>
+                <span className='typewriter-text' ref={typewriterRef}>Where Buyers Become Insight</span>
+                <span className='typewriter-cursor' ref={cursorRef} aria-hidden='true'>|</span>
+              </p>
               <p>Turn your business data into powerful customer intelligence. Understand. Segment. Grow.</p>
               <div className='hero-buttons'>
                 <Link to='/register' className='btn'>Get Started Free</Link>
