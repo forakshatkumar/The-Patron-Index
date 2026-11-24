@@ -7,3 +7,4 @@ export const POWER_BI_COLORS = {
   'At-Risk': { base: '#F97316', light: '#FFEDD5', gradient: 'url(#grad-atrisk)' },
   Inactive: { base: '#EF4444', light: '#FEE2E2', gradient: 'url(#grad-inactive)' }
 }
+

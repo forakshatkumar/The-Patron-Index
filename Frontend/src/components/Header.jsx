@@ -1,11 +1,8 @@
-import { useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 function Header ({ onToggleSidebar, sidebarOpen = true }) {
   const navigate = useNavigate()
   const location = useLocation()
-
-  const [search, setSearch] = useState('')
 
   const pageNames = {
     '/dashboard': 'Dashboard',
@@ -24,20 +21,6 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
     return pageNames[location.pathname] || 'The Patron Index'
   }
 
-  const handleSearch = event => {
-    event.preventDefault()
-
-    const value = search.trim()
-
-    if (!value) {
-      return
-    }
-
-    navigate(`/customers?q=${encodeURIComponent(value)}`)
-
-    setSearch('')
-  }
-
   const handleNotification = () => {
     alert('You have no new notifications.')
   }
@@ -45,6 +28,7 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
   return (
     <header className='top-header'>
       <div className='header-left'>
+        {/* Hamburger Toggle */}
         <button
           type='button'
           className='sidebar-toggle-btn'
@@ -69,6 +53,43 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
           </svg>
         </button>
 
+        {/* Top-Left Corner: Profile Icon and Notification Icon */}
+        <div className='header-corner-actions'>
+          <button
+            type='button'
+            className='header-profile-icon'
+            onClick={() => navigate('/settings')}
+            title='Account Profile'
+            aria-label='Account Profile'
+          >
+            <div className='profile-avatar'>AK</div>
+          </button>
+
+          <button
+            type='button'
+            className='notification-button'
+            onClick={handleNotification}
+            aria-label='Notifications'
+            title='Notifications'
+          >
+            <svg
+              width='17'
+              height='17'
+              viewBox='0 0 24 24'
+              fill='none'
+              stroke='currentColor'
+              strokeWidth='2.2'
+              strokeLinecap='round'
+              strokeLinejoin='round'
+            >
+              <path d='M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9' />
+              <path d='M13.73 21a2 2 0 0 1-3.46 0' />
+            </svg>
+            <span className='notification-dot' />
+          </button>
+        </div>
+
+        {/* Page Title & Subtitle */}
         <div className='header-title'>
           <h1>{getPageTitle()}</h1>
           <p>Understand your customers and grow your business.</p>
@@ -76,45 +97,7 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
       </div>
 
       <div className='header-right'>
-        <form className='header-search' onSubmit={handleSearch}>
-          <span className='search-icon'>⌕</span>
-
-          <input
-            type='text'
-            placeholder='Search customers...'
-            value={search}
-            onChange={event => setSearch(event.target.value)}
-          />
-        </form>
-
-        <select className='date-filter' defaultValue='30'>
-          <option value='7'>Last 7 days</option>
-          <option value='30'>Last 30 days</option>
-          <option value='90'>Last 3 months</option>
-          <option value='365'>Last 12 months</option>
-        </select>
-
-        <button
-          className='notification-button'
-          onClick={handleNotification}
-          aria-label='Notifications'
-        >
-          ♢<span className='notification-dot'></span>
-        </button>
-
-        <button
-          className='header-profile'
-          onClick={() => navigate('/settings')}
-        >
-          <div className='profile-avatar'>AK</div>
-
-          <div className='profile-details'>
-            <strong>Brew & Bites</strong>
-            <span>Admin</span>
-          </div>
-
-          <span className='profile-arrow'>▾</span>
-        </button>
+        {/* Searchbar removed from global header — provided exclusively in customer section */}
       </div>
     </header>
   )
