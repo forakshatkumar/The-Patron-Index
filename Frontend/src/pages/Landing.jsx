@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
   Users,
   IndianRupee,
@@ -16,6 +18,8 @@ import {
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import './Landing.css'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const previewData = {
   six: {
@@ -90,6 +94,7 @@ export default function Landing () {
   const [activeSegment, setActiveSegment] = useState(null)
   const [donutLoaded, setDonutLoaded] = useState(false)
 
+  const landingRef = useRef(null)
   const stepsContainerRef = useRef(null)
   const [timelineProgress, setTimelineProgress] = useState(0)
   const [isLaptopOpen, setIsLaptopOpen] = useState(false)
@@ -105,67 +110,99 @@ export default function Landing () {
     return () => clearTimeout(timer)
   }, [])
 
-  // Scroll-linked laptop flap: opens as user scrolls down, shuts as user scrolls up
+  // GSAP ScrollTrigger Integration for smooth, physics-based scroll animations
   useEffect(() => {
-    let lastScrollY = window.scrollY
-    let ticking = false
-
-    const handleLaptopScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          if (!laptopSectionRef.current) {
-            ticking = false
-            return
-          }
-
-          const currentScrollY = window.scrollY
-          const delta = currentScrollY - lastScrollY
-          const rect = laptopSectionRef.current.getBoundingClientRect()
-          const windowHeight = window.innerHeight
-
-          // In viewport range
-          const inView = rect.top < windowHeight * 0.92 && rect.bottom > 50
-
-          if (inView) {
-            if (delta > 0.5) {
-              // Scrolling DOWN: Open flap
+    const ctx = gsap.context(() => {
+      // 1. Scroll-Linked 3D Laptop Flap: opens as user scrolls into view, shuts when scrolling back up
+      if (laptopSectionRef.current) {
+        ScrollTrigger.create({
+          trigger: laptopSectionRef.current,
+          start: 'top 85%',
+          end: 'bottom 15%',
+          onEnter: () => setIsLaptopOpen(true),
+          onLeaveBack: () => setIsLaptopOpen(false),
+          onEnterBack: () => setIsLaptopOpen(true),
+          onUpdate: (self) => {
+            if (self.direction === 1 && self.progress > 0.04) {
               setIsLaptopOpen(true)
-            } else if (delta < -0.5) {
-              // Scrolling UP: Close flap
+            } else if (self.direction === -1 && self.progress < 0.15) {
               setIsLaptopOpen(false)
             }
-          } else if (rect.top >= windowHeight * 0.85) {
-            // Above the laptop: keep flap shut
-            setIsLaptopOpen(false)
           }
-
-          lastScrollY = currentScrollY
-          ticking = false
         })
-        ticking = true
       }
-    }
 
-    window.addEventListener('scroll', handleLaptopScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleLaptopScroll)
-  }, [])
+      // 2. 4-Steps Timeline Progress with butter-smooth scrub
+      if (stepsContainerRef.current) {
+        ScrollTrigger.create({
+          trigger: stepsContainerRef.current,
+          start: 'top 75%',
+          end: 'bottom 25%',
+          scrub: 0.25,
+          onUpdate: (self) => {
+            setTimelineProgress(self.progress)
+          }
+        })
+      }
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!stepsContainerRef.current) return
-      const rect = stepsContainerRef.current.getBoundingClientRect()
-      const windowHeight = window.innerHeight
-      const startOffset = windowHeight * 0.75
-      const endOffset = windowHeight * 0.25
-      const totalDistance = rect.height + (startOffset - endOffset)
-      const currentScroll = startOffset - rect.top
-      const progress = Math.min(Math.max(currentScroll / totalDistance, 0), 1)
-      setTimelineProgress(progress)
-    }
+      // 3. Staggered Scroll Entrance for About Benefits
+      gsap.from('.benefit', {
+        scrollTrigger: {
+          trigger: '.benefits',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        },
+        y: 28,
+        opacity: 0,
+        duration: 0.7,
+        stagger: 0.14,
+        ease: 'power2.out'
+      })
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    handleScroll()
-    return () => window.removeEventListener('scroll', handleScroll)
+      // 4. Staggered Entrance for Timeline Step Articles
+      if (stepsContainerRef.current) {
+        gsap.from('.steps article.step', {
+          scrollTrigger: {
+            trigger: stepsContainerRef.current,
+            start: 'top 80%',
+            toggleActions: 'play none none none'
+          },
+          y: 25,
+          opacity: 0,
+          duration: 0.8,
+          stagger: 0.18,
+          ease: 'power2.out'
+        })
+      }
+
+      // 5. Powerful Features Section Reveal
+      gsap.from('.feature-explorer', {
+        scrollTrigger: {
+          trigger: '#features',
+          start: 'top 82%',
+          toggleActions: 'play none none none'
+        },
+        y: 32,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      })
+
+      // 6. Call To Action Banner Reveal
+      gsap.from('.cta', {
+        scrollTrigger: {
+          trigger: '.cta',
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        },
+        y: 28,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      })
+    }, landingRef)
+
+    return () => ctx.revert()
   }, [])
 
   const currentOverview = previewData[overviewRange]
@@ -206,7 +243,7 @@ export default function Landing () {
   ]
 
   return (
-    <div className='patron-landing-page' id='home'>
+    <div className='patron-landing-page' id='home' ref={landingRef}>
       {/* Header / Navbar */}
       <header className='header wrap'>
         <a className='brand' href='#home'>
