@@ -6,10 +6,11 @@ const customerPredictionSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Customer',
       required: true,
-      unique: true
+      unique: true,
+      index: true
     },
-    segment: { type: String, default: null },
-    patronIndex: { type: Number, default: 0 },
+    segment: { type: String, default: null, index: true },
+    patronIndex: { type: Number, default: 0, index: true },
     atRiskProbability: { type: Number, default: null },
     recommendation: { type: String, default: '' },
     modelVersion: { type: String, default: 'rfm-v1' }

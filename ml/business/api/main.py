@@ -1,9 +1,14 @@
+import sys
+import os
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
+# Ensure ml package is resolvable
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
+
 from ml.business.classifier import classify_customer
 
-app = FastAPI(title="The Patron Index Business Classification API", version="1.0.0")
+app = FastAPI(title="The Patron Index Business Classification Service", version="1.0.0")
 
 
 class CustomerFeatures(BaseModel):

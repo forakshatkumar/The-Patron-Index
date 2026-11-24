@@ -21,6 +21,13 @@ async function request(path, options = {}) {
     data = {}
   }
 
+  if (response.status === 401) {
+    removeToken()
+    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
+      window.dispatchEvent(new CustomEvent('patron:unauthorized'))
+    }
+  }
+
   if (!response.ok) {
     const error = new Error(data.message || `Request failed (${response.status})`)
     error.status = response.status

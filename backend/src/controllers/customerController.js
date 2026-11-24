@@ -9,12 +9,27 @@ const {
   customerStatus
 } = require('../utils/customerScoring');
 
+const MAX_CSV_ROWS = 10000;
+
 function daysSince(dateValue) {
   if (!dateValue) return 0;
   const date = new Date(dateValue);
   if (Number.isNaN(date.getTime())) return 0;
   const now = new Date();
   return Math.max(0, Math.floor((now - date) / 86400000));
+}
+
+/**
+ * Sanitize string against CSV Formula Injection (DDE attacks)
+ * Disallows or prefixes unquoted formulas starting with =, +, -, @, \t, \r
+ */
+function sanitizeCsvValue(val) {
+  if (typeof val !== 'string') return val;
+  const trimmed = val.trim();
+  if (/^[=+\-@\t\r]/.test(trimmed)) {
+    return `'${trimmed}`;
+  }
+  return trimmed;
 }
 
 function parseCsv(text) {
@@ -24,6 +39,9 @@ function parseCsv(text) {
     .filter(line => line.trim());
 
   if (lines.length < 2) throw new Error('CSV file must contain a header and at least one data row');
+  if (lines.length > MAX_CSV_ROWS + 1) {
+    throw new Error(`CSV exceeds maximum limit of ${MAX_CSV_ROWS} rows`);
+  }
 
   const splitLine = line => {
     const values = [];
@@ -39,17 +57,17 @@ function parseCsv(text) {
           quoted = !quoted;
         }
       } else if (char === ',' && !quoted) {
-        values.push(current.trim());
+        values.push(sanitizeCsvValue(current));
         current = '';
       } else {
         current += char;
       }
     }
-    values.push(current.trim());
+    values.push(sanitizeCsvValue(current));
     return values;
   };
 
-  const headers = splitLine(lines[0]).map(h => h.toLowerCase().trim());
+  const headers = splitLine(lines[0]).map(h => String(h).toLowerCase().trim().replace(/^'/, ''));
   const required = ['customer_id', 'name', 'purchase_date', 'amount'];
   const missing = required.filter(key => !headers.includes(key));
   if (missing.length) throw new Error(`Missing required columns: ${missing.join(', ')}`);
@@ -105,15 +123,27 @@ const createCustomer = async (req, res, next) => {
       return res.status(400).json({ message: 'customerId, name and email are required' });
     }
 
-    const existingCustomer = await Customer.findOne({ customerId });
+    const cleanCustomerId = String(customerId).trim();
+    const cleanEmail = String(email).trim().toLowerCase();
+    const cleanName = String(name).trim();
+
+    const existingCustomer = await Customer.findOne({ customerId: cleanCustomerId });
     if (existingCustomer) return res.status(409).json({ message: 'Customer already exists' });
 
-    const customer = await Customer.create({ customerId, name, email, totalSpent, totalOrders });
+    const customer = await Customer.create({
+      customerId: cleanCustomerId,
+      name: cleanName,
+      email: cleanEmail,
+      totalSpent: Math.max(0, Number(totalSpent) || 0),
+      totalOrders: Math.max(0, Number(totalOrders) || 0),
+      user: req.user?.userId
+    });
+
     const features = {
       recency: 0,
-      frequency: Number(totalOrders || 0),
-      monetary: Number(totalSpent || 0),
-      averageOrderValue: totalOrders ? Number((totalSpent / totalOrders).toFixed(2)) : 0
+      frequency: Number(customer.totalOrders || 0),
+      monetary: Number(customer.totalSpent || 0),
+      averageOrderValue: customer.totalOrders ? Number((customer.totalSpent / customer.totalOrders).toFixed(2)) : 0
     };
     const patronIndex = calculatePatronIndex(features);
     const segment = classifyCustomer({ ...features, patronIndex });
@@ -134,7 +164,7 @@ const createCustomer = async (req, res, next) => {
       action: 'CUSTOMER_CREATED',
       resource: 'Customer',
       resourceId: customer._id.toString(),
-      details: `Customer ${customerId} was created`,
+      details: `Customer ${cleanCustomerId} was created`,
       ipAddress: req.ip
     });
 
@@ -146,7 +176,7 @@ const createCustomer = async (req, res, next) => {
 
 const getCustomers = async (req, res, next) => {
   try {
-    const customers = await Customer.find().sort({ updatedAt: -1 });
+    const customers = await Customer.find().sort({ updatedAt: -1 }).limit(1000);
     const enriched = await Promise.all(customers.map(enrichCustomer));
     res.json({ count: enriched.length, customers: enriched });
   } catch (error) {
@@ -156,7 +186,7 @@ const getCustomers = async (req, res, next) => {
 
 const getCustomer = async (req, res, next) => {
   try {
-    const customer = await Customer.findOne({ customerId: req.params.id });
+    const customer = await Customer.findOne({ customerId: String(req.params.id).trim() });
     if (!customer) return res.status(404).json({ message: 'Customer not found' });
     const enriched = await enrichCustomer(customer);
     res.json(enriched);
@@ -178,8 +208,8 @@ const importCustomers = async (req, res, next) => {
       const amount = Number(row.amount || 0);
       const current = grouped.get(id) || {
         customerId: id,
-        name: row.name || id,
-        email: row.email || `${id.toLowerCase().replace(/[^a-z0-9]/g, '')}@patron.local`,
+        name: String(row.name || id).trim(),
+        email: String(row.email || `${id.toLowerCase().replace(/[^a-z0-9]/g, '')}@patron.local`).trim(),
         totalSpent: 0,
         totalOrders: 0,
         latestPurchase: null
@@ -202,7 +232,8 @@ const importCustomers = async (req, res, next) => {
           name: item.name,
           email: item.email,
           totalSpent: Number(item.totalSpent.toFixed(2)),
-          totalOrders: item.totalOrders
+          totalOrders: item.totalOrders,
+          user: req.user?.userId
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
       );

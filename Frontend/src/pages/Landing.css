@@ -182,24 +182,6 @@
   letter-spacing: -0.8px;
   margin: 8px 0 18px;
   line-height: 1.15;
-  min-height: 1.25em;
-  display: inline-flex;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-.patron-landing-page .typewriter-cursor {
-  display: inline-block;
-  color: #0866f5;
-  font-weight: 300;
-  margin-left: 2px;
-  opacity: 1;
-  animation: blinkCursor 0.75s infinite ease-in-out;
-}
-
-@keyframes blinkCursor {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
 }
 
 .patron-landing-page .hero-copy p:not(.tagline) {

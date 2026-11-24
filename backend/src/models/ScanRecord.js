@@ -5,7 +5,8 @@ const scanRecordSchema = new mongoose.Schema(
         scanId: {
             type: String,
             required: true,
-            unique: true
+            unique: true,
+            index: true
         },
 
         fileName: {
@@ -26,7 +27,8 @@ const scanRecordSchema = new mongoose.Schema(
         status: {
             type: String,
             enum: ["pending", "scanning", "completed", "failed"],
-            default: "pending"
+            default: "pending",
+            index: true
         },
 
         riskScore: {
@@ -43,12 +45,15 @@ const scanRecordSchema = new mongoose.Schema(
         uploadedBy: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true
+            required: true,
+            index: true
         }
     },
     {
         timestamps: true
     }
 );
+
+scanRecordSchema.index({ createdAt: -1 });
 
 module.exports = mongoose.model("ScanRecord", scanRecordSchema);

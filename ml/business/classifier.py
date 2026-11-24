@@ -1,14 +1,14 @@
-"""Explainable RFM customer segmentation used by The Patron Index MVP."""
+"""Explainable RFM customer segmentation used by The Patron Index."""
 
 
-def _clamp(value, low=0.0, high=100.0):
+def _clamp(value: float, low: float = 0.0, high: float = 100.0) -> float:
     return max(low, min(high, float(value)))
 
 
 def patron_index(recency: float, frequency: float, monetary: float) -> int:
-    recency_score = _clamp(100 - recency)
-    frequency_score = _clamp(frequency * 5)
-    monetary_score = _clamp(monetary / 1000)
+    recency_score = _clamp(100.0 - recency)
+    frequency_score = _clamp(frequency * 5.0)
+    monetary_score = _clamp(monetary / 1000.0)
     return round(recency_score * 0.35 + frequency_score * 0.30 + monetary_score * 0.35)
 
 
