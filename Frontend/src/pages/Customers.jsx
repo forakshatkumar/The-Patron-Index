@@ -609,21 +609,31 @@ function Customers () {
 
                 {/* Real-time RFM Score & Cohort Preview Card */}
                 <div className='powerbi-preview-card'>
-                  <div className='preview-label'>Automated Classification Preview</div>
+                  <div className='preview-label'>
+                    <svg width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2.2' strokeLinecap='round' strokeLinejoin='round'>
+                      <path d='M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83' />
+                    </svg>
+                    <span>Automated Classification Preview</span>
+                  </div>
                   <div className='preview-metrics'>
-                    <div>
-                      <span>Patron Index</span>
-                      <strong style={{ color: POWER_BI_COLORS[previewCohort]?.base }}>
-                        {previewScore} / 100
+                    <div className='preview-metric-box'>
+                      <span className='preview-metric-label'>Patron Index</span>
+                      <strong className='preview-metric-value' style={{ color: POWER_BI_COLORS[previewCohort]?.base }}>
+                        {previewScore} <small>/ 100</small>
                       </strong>
                     </div>
-                    <div>
-                      <span>Cohort</span>
+                    <div className='preview-metric-divider' />
+                    <div className='preview-metric-box'>
+                      <span className='preview-metric-label'>Cohort</span>
                       <SegmentBadge segment={previewCohort} />
                     </div>
-                    <div>
-                      <span>Status</span>
-                      <span className='status-badge status-active'>Active</span>
+                    <div className='preview-metric-divider' />
+                    <div className='preview-metric-box'>
+                      <span className='preview-metric-label'>Status</span>
+                      <span className='status-badge status-active'>
+                        <span className='status-dot-active' />
+                        Active
+                      </span>
                     </div>
                   </div>
                 </div>
