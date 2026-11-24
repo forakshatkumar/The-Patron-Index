@@ -45,6 +45,10 @@ function InteractiveRevenueChart ({ data = [] }) {
   const groundY = height - paddingBottom
   const areaPath = `${path} L ${points[points.length - 1].x} ${groundY} L ${points[0].x} ${groundY} Z`
 
+  // Tooltip position calculations with strict bounds clamping
+  const isNearTop = activePoint ? (activePoint.y / height) < 0.40 : false
+  const clampedLeft = activePoint ? Math.min(Math.max((activePoint.x / width) * 100, 18), 82) : 50
+
   return (
     <div className='interactive-chart-wrapper' onMouseLeave={() => setActivePoint(null)}>
       <svg className='interactive-svg' viewBox={`0 0 ${width} ${height}`}>
@@ -86,10 +90,10 @@ function InteractiveRevenueChart ({ data = [] }) {
           )
         })}
 
-        {/* Vibrant Gradient Area */}
-        <path d={areaPath} fill='url(#rev-area-gradient)' />
+        {/* Transitional Area Fill */}
+        <path d={areaPath} fill='url(#rev-area-gradient)' className='chart-area animated-chart-area' />
 
-        {/* Multi-Color Gradient Trendline */}
+        {/* Multi-Color Gradient Trendline with Drawing Animation */}
         <path
           d={path}
           fill='none'
@@ -97,7 +101,7 @@ function InteractiveRevenueChart ({ data = [] }) {
           strokeWidth='3.5'
           strokeLinecap='round'
           strokeLinejoin='round'
-          className='animated-chart-line'
+          className='chart-line animated-chart-line'
         />
 
         {/* Vertical Active Crosshair */}
@@ -110,6 +114,7 @@ function InteractiveRevenueChart ({ data = [] }) {
             stroke='#8B5CF6'
             strokeWidth='1.5'
             strokeDasharray='3 3'
+            style={{ pointerEvents: 'none' }}
           />
         )}
 
@@ -124,22 +129,23 @@ function InteractiveRevenueChart ({ data = [] }) {
               <circle
                 cx={pt.x}
                 cy={pt.y}
-                r={isActive ? 8 : 5}
+                r={isActive ? 7.5 : 5}
                 fill='#ffffff'
                 stroke={ptColor}
                 strokeWidth={isActive ? 3.5 : 2.5}
                 filter={isActive ? 'url(#point-glow)' : 'none'}
-                style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                style={{ transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)' }}
               />
-              {/* Invisible larger hover hit area */}
-              <circle cx={pt.x} cy={pt.y} r='18' fill='transparent' />
+              {/* Invisible large hover target */}
+              <circle cx={pt.x} cy={pt.y} r='20' fill='transparent' />
               <text
                 x={pt.x}
                 y={height - 12}
                 textAnchor='middle'
                 fill={isActive ? '#0F172A' : '#64748B'}
-                fontWeight={isActive ? 700 : 500}
+                fontWeight='600'
                 fontSize='11'
+                style={{ userSelect: 'none' }}
               >
                 {pt.label}
               </text>
@@ -148,13 +154,15 @@ function InteractiveRevenueChart ({ data = [] }) {
         })}
       </svg>
 
-      {/* Floating Interactive Tooltip */}
+      {/* Floating Clamped Tooltip (Never causes reflow, never overlaps cursor) */}
       {activePoint && (
         <div
           className='chart-float-tooltip'
           style={{
-            left: `${(activePoint.x / width) * 100}%`,
-            top: `${(activePoint.y / height) * 100}%`
+            left: `${clampedLeft}%`,
+            top: `${(activePoint.y / height) * 100}%`,
+            transform: isNearTop ? 'translate(-50%, 18px)' : 'translate(-50%, -125%)',
+            pointerEvents: 'none'
           }}
         >
           <div className='tooltip-header'>
@@ -167,7 +175,7 @@ function InteractiveRevenueChart ({ data = [] }) {
             <span>Settled Revenue</span>
             <strong>₹{Number(activePoint.value).toLocaleString()}</strong>
           </div>
-          <div className='tooltip-sub'>Daily Velocity: ₹{Math.round(activePoint.value / 30).toLocaleString()}/day</div>
+          <div className='tooltip-sub'>Daily Run-Rate: ₹{Math.round(activePoint.value / 30).toLocaleString()}/day</div>
         </div>
       )}
     </div>
@@ -211,6 +219,9 @@ function InteractiveCustomerGrowthChart ({ data = [] }) {
   const groundY = height - paddingBottom
   const areaPath = `${path} L ${points[points.length - 1].x} ${groundY} L ${points[0].x} ${groundY} Z`
 
+  const isNearTop = activePoint ? (activePoint.y / height) < 0.40 : false
+  const clampedLeft = activePoint ? Math.min(Math.max((activePoint.x / width) * 100, 18), 82) : 50
+
   return (
     <div className='interactive-chart-wrapper' onMouseLeave={() => setActivePoint(null)}>
       <svg className='interactive-svg' viewBox={`0 0 ${width} ${height}`}>
@@ -252,10 +263,10 @@ function InteractiveCustomerGrowthChart ({ data = [] }) {
           )
         })}
 
-        {/* Multi-Color Gradient Area */}
-        <path d={areaPath} fill='url(#cust-area-gradient)' />
+        {/* Transitional Area Fill */}
+        <path d={areaPath} fill='url(#cust-area-gradient)' className='chart-area animated-chart-area' />
 
-        {/* Trendline */}
+        {/* Trendline with Drawing Animation */}
         <path
           d={path}
           fill='none'
@@ -263,7 +274,7 @@ function InteractiveCustomerGrowthChart ({ data = [] }) {
           strokeWidth='3.5'
           strokeLinecap='round'
           strokeLinejoin='round'
-          className='animated-chart-line'
+          className='chart-line animated-chart-line'
         />
 
         {/* Vertical Active Crosshair */}
@@ -276,6 +287,7 @@ function InteractiveCustomerGrowthChart ({ data = [] }) {
             stroke='#00B4D8'
             strokeWidth='1.5'
             strokeDasharray='3 3'
+            style={{ pointerEvents: 'none' }}
           />
         )}
 
@@ -290,21 +302,22 @@ function InteractiveCustomerGrowthChart ({ data = [] }) {
               <circle
                 cx={pt.x}
                 cy={pt.y}
-                r={isActive ? 8 : 5}
+                r={isActive ? 7.5 : 5}
                 fill='#ffffff'
                 stroke={ptColor}
                 strokeWidth={isActive ? 3.5 : 2.5}
                 filter={isActive ? 'url(#cust-point-glow)' : 'none'}
-                style={{ transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)' }}
+                style={{ transition: 'all 0.2s cubic-bezier(0.16, 1, 0.3, 1)' }}
               />
-              <circle cx={pt.x} cy={pt.y} r='18' fill='transparent' />
+              <circle cx={pt.x} cy={pt.y} r='20' fill='transparent' />
               <text
                 x={pt.x}
                 y={height - 12}
                 textAnchor='middle'
                 fill={isActive ? '#0F172A' : '#64748B'}
-                fontWeight={isActive ? 700 : 500}
+                fontWeight='600'
                 fontSize='11'
+                style={{ userSelect: 'none' }}
               >
                 {pt.month}
               </text>
@@ -313,13 +326,15 @@ function InteractiveCustomerGrowthChart ({ data = [] }) {
         })}
       </svg>
 
-      {/* Floating Tooltip */}
+      {/* Floating Clamped Tooltip */}
       {activePoint && (
         <div
           className='chart-float-tooltip'
           style={{
-            left: `${(activePoint.x / width) * 100}%`,
-            top: `${(activePoint.y / height) * 100}%`
+            left: `${clampedLeft}%`,
+            top: `${(activePoint.y / height) * 100}%`,
+            transform: isNearTop ? 'translate(-50%, 18px)' : 'translate(-50%, -125%)',
+            pointerEvents: 'none'
           }}
         >
           <div className='tooltip-header'>
@@ -337,72 +352,94 @@ function InteractiveCustomerGrowthChart ({ data = [] }) {
   )
 }
 
-// 3. Interactive Multi-Color Segment Distribution Progress List
+// 3. Interactive Multi-Color Segment Distribution (No messy overlapping popups!)
 function InteractiveSegmentDistribution ({ segments = [] }) {
   const [hoveredSegment, setHoveredSegment] = useState(null)
 
   return (
-    <div className='analytics-segment-list-vibrant' onMouseLeave={() => setHoveredSegment(null)}>
-      {segments.map((segment, index) => {
-        const colors = POWER_BI_COLORS[segment.name] || { base: '#118DFF' }
-        const isHovered = hoveredSegment?.id === segment.id
+    <div className='analytics-segment-container' onMouseLeave={() => setHoveredSegment(null)}>
+      <div className='analytics-segment-list-vibrant'>
+        {segments.map((segment, index) => {
+          const colors = POWER_BI_COLORS[segment.name] || { base: '#118DFF' }
+          const isHovered = hoveredSegment?.id === segment.id
 
-        return (
-          <Link
-            key={segment.id}
-            to={`/customers?segment=${encodeURIComponent(segment.name)}`}
-            className={`analytics-segment-row-vibrant ${isHovered ? 'row-active' : ''}`}
-            onMouseEnter={() => setHoveredSegment(segment)}
-            style={{ '--segment-color': colors.base }}
-          >
-            <div className='segment-meta-col'>
-              <span className='segment-color-dot' style={{ backgroundColor: colors.base }} />
-              <strong className='segment-row-name'>{segment.name}</strong>
-              <span className='segment-row-count'>({segment.customers.toLocaleString()})</span>
-            </div>
-
-            <div className='progress-track-vibrant'>
-              <div
-                className='progress-fill-vibrant'
-                style={{
-                  width: `${segment.percentage}%`,
-                  backgroundColor: colors.base,
-                  boxShadow: isHovered ? `0 2px 10px ${colors.base}66` : 'none',
-                  animationDelay: `${index * 0.08}s`
-                }}
-              />
-            </div>
-
-            <div className='segment-percentage-col'>
-              <strong style={{ color: isHovered ? colors.base : 'inherit' }}>
-                {segment.percentage}%
-              </strong>
-            </div>
-
-            {/* Hover Tooltip Details */}
-            {isHovered && (
-              <div className='segment-hover-card'>
-                <span><strong>Avg Spend:</strong> ₹{(segment.averageSpending || 0).toLocaleString()}</span>
-                <span><strong>Rev Share:</strong> {segment.revenueContribution || 0}%</span>
-                <span><strong>Velocity:</strong> {segment.purchaseFrequency || 0} orders</span>
+          return (
+            <Link
+              key={segment.id}
+              to={`/customers?segment=${encodeURIComponent(segment.name)}`}
+              className={`analytics-segment-row-vibrant ${isHovered ? 'row-active' : ''}`}
+              onMouseEnter={() => setHoveredSegment(segment)}
+              style={{ '--segment-color': colors.base }}
+            >
+              <div className='segment-meta-col'>
+                <span className='segment-color-dot' style={{ backgroundColor: colors.base }} />
+                <strong className='segment-row-name'>{segment.name}</strong>
+                <span className='segment-row-count'>({segment.customers.toLocaleString()})</span>
               </div>
-            )}
-          </Link>
-        )
-      })}
+
+              <div className='progress-track-vibrant'>
+                <div
+                  className='progress-fill-vibrant'
+                  style={{
+                    width: `${segment.percentage}%`,
+                    backgroundColor: colors.base,
+                    boxShadow: isHovered ? `0 2px 10px ${colors.base}66` : 'none',
+                    animationDelay: `${index * 0.08}s`
+                  }}
+                />
+              </div>
+
+              {/* In-Line Stable Metrics (Never occludes rows or jumps) */}
+              <div className='segment-inline-metrics'>
+                <span>₹{(segment.averageSpending || 0).toLocaleString()} avg</span>
+                <span>•</span>
+                <span>{segment.revenueContribution || 0}% rev</span>
+              </div>
+
+              <div className='segment-percentage-col'>
+                <strong style={{ color: isHovered ? colors.base : 'inherit' }}>
+                  {segment.percentage}%
+                </strong>
+              </div>
+            </Link>
+          )
+        })}
+      </div>
+
+      {/* Dedicated Interactive Cohort Status Strip */}
+      <div className='segment-inspector-strip'>
+        {hoveredSegment ? (
+          <div className='inspector-content active'>
+            <span className='inspector-dot' style={{ backgroundColor: POWER_BI_COLORS[hoveredSegment.name]?.base }} />
+            <strong>{hoveredSegment.name} Cohort:</strong>
+            <span>{hoveredSegment.customers.toLocaleString()} Patrons ({hoveredSegment.percentage}%)</span>
+            <span>•</span>
+            <span>₹{(hoveredSegment.averageSpending || 0).toLocaleString()} Avg Spend</span>
+            <span>•</span>
+            <span>{hoveredSegment.revenueContribution}% Total Revenue</span>
+          </div>
+        ) : (
+          <div className='inspector-content muted'>
+            <span>Hover any cohort above to inspect customer volume and revenue velocity</span>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
 
-// 4. Interactive Multi-Color New vs Repeat Clustered Bar Chart
+// 4. Interactive Multi-Color New vs Repeat Clustered Bar Chart (Stable Header Readout)
 function InteractiveNewVsRepeatChart ({ activity = [] }) {
   const [hoveredMonth, setHoveredMonth] = useState(null)
 
   const maxVal = Math.max(...activity.map(a => Math.max(a.newCustomers, a.repeatCustomers)), 1)
+  const activeRepeatPct = hoveredMonth
+    ? Math.round((hoveredMonth.repeatCustomers / (hoveredMonth.newCustomers + hoveredMonth.repeatCustomers)) * 100)
+    : 69
 
   return (
     <div className='activity-chart-interactive-wrapper' onMouseLeave={() => setHoveredMonth(null)}>
-      {/* Legend & Summary Ribbon */}
+      {/* Legend & Dynamic Non-Messy Readout Ribbon */}
       <div className='activity-legend-bar'>
         <div className='activity-legend-item'>
           <span className='legend-color-box new-box' />
@@ -412,7 +449,15 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
           <span className='legend-color-box repeat-box' />
           <span>Repeat Customers</span>
         </div>
-        <span className='activity-retention-pill'>68.7% Retention Rate</span>
+
+        {/* Dynamic Stable Readout (Replaces chaotic hover boxes with clean metrics) */}
+        {hoveredMonth ? (
+          <span className='activity-retention-pill active-readout'>
+            {hoveredMonth.month}: <strong>{hoveredMonth.newCustomers}</strong> New • <strong>{hoveredMonth.repeatCustomers}</strong> Repeat ({activeRepeatPct}%)
+          </span>
+        ) : (
+          <span className='activity-retention-pill'>68.7% Retention Rate</span>
+        )}
       </div>
 
       <div className='activity-chart-interactive'>
@@ -420,8 +465,6 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
           const isHovered = hoveredMonth?.month === item.month
           const newHeight = Math.max(12, Math.round((item.newCustomers / maxVal) * 140))
           const repeatHeight = Math.max(12, Math.round((item.repeatCustomers / maxVal) * 140))
-          const total = item.newCustomers + item.repeatCustomers
-          const repeatPct = Math.round((item.repeatCustomers / total) * 100)
 
           return (
             <div
@@ -437,7 +480,6 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
                     height: `${newHeight}px`,
                     animationDelay: `${index * 0.07}s`
                   }}
-                  title={`New Customers: ${item.newCustomers}`}
                 />
 
                 {/* Repeat Customers Column */}
@@ -447,31 +489,12 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
                     height: `${repeatHeight}px`,
                     animationDelay: `${index * 0.07 + 0.04}s`
                   }}
-                  title={`Repeat Customers: ${item.repeatCustomers}`}
                 />
               </div>
 
               <span className={`activity-x-label ${isHovered ? 'x-label-active' : ''}`}>
                 {item.month}
               </span>
-
-              {/* Hover Floating Tooltip */}
-              {isHovered && (
-                <div className='activity-tooltip'>
-                  <div className='act-tooltip-title'>{item.month} 2026</div>
-                  <div className='act-tooltip-row'>
-                    <span className='dot-new' />
-                    <span>New: <strong>{item.newCustomers}</strong></span>
-                  </div>
-                  <div className='act-tooltip-row'>
-                    <span className='dot-repeat' />
-                    <span>Repeat: <strong>{item.repeatCustomers}</strong></span>
-                  </div>
-                  <div className='act-tooltip-footer'>
-                    <span>Repeat Share: <strong>{repeatPct}%</strong></span>
-                  </div>
-                </div>
-              )}
             </div>
           )
         })}

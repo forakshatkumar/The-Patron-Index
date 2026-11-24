@@ -5461,3 +5461,111 @@ button:active:not(:disabled),
     animation: none !important;
   }
 }
+
+/* ==========================================================================
+   TRANSITIONAL ANIMATIONS & ZERO-INTERFERENCE HOVER INSPECTORS
+   ========================================================================== */
+
+/* Universal SVG Drawing & Area Rise Transitions */
+.animated-chart-line {
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  animation: drawChartLine 1.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes drawChartLine {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animated-chart-area {
+  opacity: 0;
+  animation: fadeChartAreaIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+}
+
+@keyframes fadeChartAreaIn {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Zero-Flicker Protected Floating Tooltip */
+.chart-float-tooltip {
+  pointer-events: none !important;
+  user-select: none !important;
+  z-index: 60;
+  max-width: 220px;
+  white-space: nowrap;
+}
+
+/* In-Line Stable Metrics for Segment Distribution */
+.segment-inline-metrics {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #64748b;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+/* Dedicated Non-Occluding Segment Inspector Strip */
+.segment-inspector-strip {
+  margin-top: 14px;
+  padding: 8px 14px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 11px;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.inspector-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.inspector-content.muted {
+  color: #94a3b8;
+}
+
+.inspector-content.active {
+  color: var(--navy);
+  font-weight: 500;
+}
+
+.inspector-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Power BI Header Readout Chip */
+.powerbi-header-readout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--navy);
+  animation: fadeIn 0.15s ease-out;
+}
+
+.readout-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

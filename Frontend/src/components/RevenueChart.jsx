@@ -110,6 +110,7 @@ function RevenueChart ({ data = [] }) {
         {activePoint && (
           <g
             className='chart-tooltip'
+            style={{ pointerEvents: 'none' }}
             transform={`translate(${Math.min(Math.max(activePoint.x - 55, 10), width - 120)}, ${Math.max(activePoint.y - 42, 10)})`}
           >
             <rect

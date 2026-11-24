@@ -204,6 +204,13 @@ export function PowerBIBarChart ({
             {isSpending ? 'Average customer spend (₹) per segment' : 'Revenue contribution percentage (%)'}
           </span>
         </div>
+        {hoveredIndex !== null && segments[hoveredIndex] && (
+          <div className='powerbi-header-readout'>
+            <span className='readout-dot' style={{ backgroundColor: POWER_BI_COLORS[segments[hoveredIndex].name]?.base }} />
+            <strong>{segments[hoveredIndex].name}:</strong>
+            <span>{isSpending ? `₹${(segments[hoveredIndex].averageSpending || 0).toLocaleString()} avg` : `${segments[hoveredIndex].revenueContribution}% rev`}</span>
+          </div>
+        )}
       </div>
 
       <div className='powerbi-bar-canvas' onMouseLeave={() => setHoveredIndex(null)}>
@@ -234,7 +241,7 @@ export function PowerBIBarChart ({
                     height: `${heightPct}%`,
                     backgroundColor: color,
                     boxShadow: isHovered || isSelected ? `0 6px 16px ${color}55` : 'none',
-                    animationDelay: `${idx * 0.06}s`
+                    animationDelay: `${idx * 0.05}s`
                   }}
                 />
               </div>
@@ -243,16 +250,6 @@ export function PowerBIBarChart ({
               <span className='powerbi-bar-x-label' style={{ fontWeight: isSelected ? 700 : 500 }}>
                 {seg.name}
               </span>
-
-              {/* Tooltip on Hover */}
-              {isHovered && (
-                <div className='powerbi-bar-tooltip'>
-                  <strong>{seg.name} Segment</strong>
-                  <span>Avg Spend: ₹{seg.averageSpending?.toLocaleString() || 0}</span>
-                  <span>Rev Share: {seg.revenueContribution}%</span>
-                  <span>Purchases: {seg.purchaseFrequency} avg</span>
-                </div>
-              )}
             </div>
           )
         })}
