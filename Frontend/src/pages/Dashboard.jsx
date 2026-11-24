@@ -90,7 +90,7 @@ function Dashboard () {
               <h3>Customer Segments</h3>
               <p>Distribution of your customer base</p>
             </div>
-            <Link to='/segments' className='text-button'>View all</Link>
+            <Link to='/customers' className='text-button'>View all</Link>
           </div>
           <div className='segment-list'>
             {segments.map(segment => (

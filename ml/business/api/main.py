@@ -25,3 +25,4 @@ def health():
 @app.post("/classify")
 def classify(features: CustomerFeatures):
     return classify_customer(features.recency, features.frequency, features.monetary)
+

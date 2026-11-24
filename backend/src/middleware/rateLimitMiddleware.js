@@ -34,3 +34,4 @@ const apiLimiter = rateLimit({
 });
 
 module.exports = { authLimiter, uploadLimiter, apiLimiter };
+

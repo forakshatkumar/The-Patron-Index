@@ -9,11 +9,9 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
 
   const pageNames = {
     '/dashboard': 'Dashboard',
-    '/customers': 'Customers',
-    '/segments': 'Customer Segments',
+    '/customers': 'Customers & Segments',
     '/transactions': 'Transactions',
     '/analytics': 'Analytics',
-    '/reports': 'Reports',
     '/settings': 'Settings',
     '/import': 'Import Customer Data'
   }

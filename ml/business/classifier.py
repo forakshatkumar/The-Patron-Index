@@ -43,3 +43,4 @@ def classify_customer(recency: float, frequency: float, monetary: float):
         "patron_index": score,
         "recommendation": recommendations[segment],
     }
+

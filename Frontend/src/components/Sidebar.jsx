@@ -7,11 +7,9 @@ function Sidebar ({ isOpen = true, onClose }) {
   const { logout, demoMode } = useAuth()
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: '▦' },
-    { name: 'Customers', path: '/customers', icon: '◉' },
-    { name: 'Customer Segments', path: '/segments', icon: '◫' },
+    { name: 'Customers & Segments', path: '/customers', icon: '◉' },
     { name: 'Transactions', path: '/transactions', icon: '↔' },
-    { name: 'Analytics', path: '/analytics', icon: '⌁' },
-    { name: 'Reports', path: '/reports', icon: '▤' }
+    { name: 'Analytics', path: '/analytics', icon: '⌁' }
   ]
 
   const signOut = () => {

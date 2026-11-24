@@ -11,3 +11,4 @@ The Patron Index provides two dedicated machine learning and statistical microse
    - Static heuristic detection and PE binary structure analysis.
    - Shannon entropy distribution inspection for packed/encrypted content.
    - Automated quarantine verdict generation (ALLOW vs. REVIEW).
+
