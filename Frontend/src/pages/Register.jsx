@@ -41,7 +41,7 @@ function Register () {
           window.google.accounts.id.renderButton(btnEl, {
             theme: 'outline',
             size: 'large',
-            width: 380,
+            width: 360,
             text: 'signup_with',
             shape: 'rectangular',
             logo_alignment: 'left'
@@ -135,31 +135,33 @@ function Register () {
         <p className='account-copy'>Start turning buyer behavior into actionable business intelligence.</p>
 
         <form className='account-form' onSubmit={submit}>
-          <div className='account-field'>
-            <label htmlFor='account-name'>Name</label>
-            <input
-              id='account-name'
-              type='text'
-              autoComplete='name'
-              maxLength={120}
-              value={form.name}
-              onChange={e => setForm({ ...form, name: e.target.value })}
-              placeholder='Your name or business'
-              required
-            />
-          </div>
+          <div className='account-field-grid'>
+            <div className='account-field'>
+              <label htmlFor='account-name'>Name</label>
+              <input
+                id='account-name'
+                type='text'
+                autoComplete='name'
+                maxLength={120}
+                value={form.name}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                placeholder='Your name'
+                required
+              />
+            </div>
 
-          <div className='account-field'>
-            <label htmlFor='account-email'>Email</label>
-            <input
-              id='account-email'
-              type='email'
-              autoComplete='email'
-              value={form.email}
-              onChange={e => setForm({ ...form, email: e.target.value })}
-              placeholder='you@business.com'
-              required
-            />
+            <div className='account-field'>
+              <label htmlFor='account-email'>Email</label>
+              <input
+                id='account-email'
+                type='email'
+                autoComplete='email'
+                value={form.email}
+                onChange={e => setForm({ ...form, email: e.target.value })}
+                placeholder='you@business.com'
+                required
+              />
+            </div>
           </div>
 
           <div className='account-field'>
@@ -171,10 +173,9 @@ function Register () {
               minLength={6}
               value={form.password}
               onChange={e => setForm({ ...form, password: e.target.value })}
-              placeholder='••••••••'
+              placeholder='•••••••• (min 6 chars)'
               required
             />
-            <span className='account-hint'>Use at least 6 characters.</span>
           </div>
 
           <label className='account-consent'>

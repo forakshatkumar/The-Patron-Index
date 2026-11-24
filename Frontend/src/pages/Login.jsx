@@ -45,7 +45,7 @@ function Login () {
           window.google.accounts.id.renderButton(btnEl, {
             theme: 'outline',
             size: 'large',
-            width: 380,
+            width: 360,
             text: 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'left'

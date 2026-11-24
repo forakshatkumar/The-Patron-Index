@@ -111,12 +111,12 @@
 }
 
 .account-card {
-  width: min(100%, 450px);
-  padding: clamp(22px, 4.5vw, 34px);
+  width: min(100%, 420px);
+  padding: 22px 24px;
   border: 1px solid #d4e0ec;
   border-radius: 16px;
   background: #fff;
-  box-shadow: 0 24px 65px rgba(22, 60, 100, 0.12);
+  box-shadow: 0 20px 50px rgba(22, 60, 100, 0.10);
   position: relative;
   z-index: 1;
 }
@@ -130,11 +130,11 @@
 .account-brand {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding-bottom: 25px;
-  margin-bottom: 29px;
-  border-bottom: 1px solid #dce6ef;
-  font-size: 22px;
+  gap: 12px;
+  padding-bottom: 12px;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #e2eaf1;
+  font-size: 18px;
   font-weight: 700;
   color: #0b2345;
 }
@@ -142,45 +142,54 @@
 .account-logo {
   display: grid;
   place-items: center;
-  width: 50px;
-  height: 50px;
+  width: 38px;
+  height: 38px;
   border: 1px solid #dce6ef;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #f8fbff;
   flex: none;
 }
 
 .account-logo img {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
 }
 
-.account-brand small,
-.account-copy,
-.account-switch {
+.account-brand small {
   display: block;
   color: #4b6480;
-  font-size: 14px;
+  font-size: 11.5px;
+  font-weight: 500;
 }
 
 .account-card h1 {
-  font-size: 28px;
-  letter-spacing: -0.55px;
+  font-size: 20px;
+  letter-spacing: -0.4px;
   line-height: 1.2;
-  font-weight: 600;
+  font-weight: 700;
   color: #0b2345;
   margin: 0;
 }
 
 .account-copy {
-  margin-top: 8px;
+  display: block;
+  color: #4b6480;
+  font-size: 12.5px;
+  margin-top: 3px;
+  line-height: 1.35;
 }
 
 .account-form {
   display: grid;
-  gap: 17px;
-  margin-top: 24px;
+  gap: 11px;
+  margin-top: 14px;
+}
+
+.account-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .account-field {
@@ -190,21 +199,21 @@
 
 .account-field label,
 .account-consent {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #34516d;
 }
 
 .account-field input {
   width: 100%;
-  min-height: 49px;
-  margin-top: 6px;
-  padding: 9px 12px;
+  min-height: 39px;
+  margin-top: 4px;
+  padding: 6px 11px;
   border: 1px solid #ccdbe9;
-  border-radius: 9px;
+  border-radius: 8px;
   background: #fff;
   color: #0b2345;
-  font-size: 16px;
+  font-size: 13.5px;
   transition: border-color 0.2s, box-shadow 0.2s;
   outline: none;
 }
@@ -221,12 +230,12 @@
 .account-hint,
 .account-error {
   display: block;
-  font-size: 12px;
-  margin-top: 5px;
+  font-size: 11px;
+  margin-top: 3px;
 }
 
 .account-hint {
-  color: #4b6480;
+  color: #64748b;
 }
 
 .account-error {
@@ -236,30 +245,34 @@
 .account-consent {
   display: flex;
   align-items: flex-start;
-  gap: 9px;
+  gap: 7px;
   cursor: pointer;
-  margin-top: 2px;
+  margin-top: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  color: #475569;
 }
 
 .account-consent input {
   accent-color: #174c7e;
-  width: 18px;
-  height: 18px;
+  width: 14px;
+  height: 14px;
   flex: none;
   margin: 1px 0 0;
 }
 
 .account-submit {
-  min-height: 47px;
+  min-height: 40px;
   width: 100%;
-  border-radius: 9px;
-  font-size: 14px;
+  border-radius: 8px;
+  font-size: 13.5px;
   font-weight: 700;
   border: 1px solid #123d69;
   background: linear-gradient(110deg, #174c7e, #0b315b);
   color: #fff;
   cursor: pointer;
   transition: filter 0.15s ease;
+  margin-top: 2px;
 }
 
 .account-submit:hover:not(:disabled) {
@@ -274,16 +287,24 @@
 
 .account-switch {
   text-align: center;
-  margin-top: 22px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.account-switch a {
+  color: #0866f5;
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .account-divider {
   display: flex;
   align-items: center;
   text-align: center;
-  margin: 20px 0 16px;
-  color: #64748b;
-  font-size: 13px;
+  margin: 12px 0 10px;
+  color: #94a3b8;
+  font-size: 11.5px;
   font-weight: 500;
 }
 
@@ -303,7 +324,7 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  min-height: 44px;
+  min-height: 40px;
 }
 
 .google-btn-wrap > div {
