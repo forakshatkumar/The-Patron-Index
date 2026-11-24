@@ -173,7 +173,7 @@ function Register () {
               minLength={6}
               value={form.password}
               onChange={e => setForm({ ...form, password: e.target.value })}
-              placeholder='•••••••• (min 6 chars)'
+              placeholder='••••••••'
               required
             />
           </div>

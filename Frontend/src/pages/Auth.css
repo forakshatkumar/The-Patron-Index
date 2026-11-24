@@ -191,6 +191,8 @@
   font-weight: 700;
   color: #0b2345;
   margin: 0;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .account-copy {
@@ -199,6 +201,8 @@
   font-size: 12.5px;
   margin-top: 3px;
   line-height: 1.35;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
 .account-form {
