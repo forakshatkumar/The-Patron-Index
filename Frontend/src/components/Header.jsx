@@ -8,38 +8,68 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
   const location = useLocation()
   const { user, logout, demoMode } = useAuth()
 
-  const [isProfileOpen, setIsProfileOpen] = useState(false)
-  const profileMenuRef = useRef(null)
-
-  const pageNames = {
-    '/dashboard': 'Dashboard',
-    '/customers': 'Customers & Segments',
-    '/transactions': 'Transactions',
-    '/analytics': 'Analytics',
-    '/settings': 'Settings',
-    '/import': 'Import Customer Data'
-  }
-
-  const getPageTitle = () => {
-    if (location.pathname.startsWith('/customers/')) {
-      return 'Customer Profile'
+  const DEFAULT_NOTIFICATIONS = [
+    {
+      id: 'notif_1',
+      title: 'VIP Cohort Transition',
+      text: '3 high-value patrons have migrated into the VIP tier (₹50k+ spend).',
+      time: '12m ago',
+      type: 'vip',
+      read: false
+    },
+    {
+      id: 'notif_2',
+      title: 'Revenue Velocity Milestone',
+      text: "Daily transaction velocity is up +18.4% compared to this week's baseline.",
+      time: '1h ago',
+      type: 'growth',
+      read: false
+    },
+    {
+      id: 'notif_3',
+      title: 'RFM Model Synchronized',
+      text: 'Behavioral clustering updated across all registered customer profiles.',
+      time: '3h ago',
+      type: 'system',
+      read: true
     }
+  ]
 
-    return pageNames[location.pathname] || 'The Patron Index'
-  }
+  const [notifications, setNotifications] = useState(() => {
+    try {
+      const saved = localStorage.getItem('patron_notifications')
+      if (saved) return JSON.parse(saved)
+    } catch {
+      // fallback
+    }
+    return DEFAULT_NOTIFICATIONS
+  })
 
-  // Close dropdown on click outside or Escape key
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false)
+  const profileMenuRef = useRef(null)
+  const notificationMenuRef = useRef(null)
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  // Close dropdowns on click outside or Escape key
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileMenuRef.current && !profileMenuRef.current.contains(e.target)) {
         setIsProfileOpen(false)
       }
+      if (notificationMenuRef.current && !notificationMenuRef.current.contains(e.target)) {
+        setIsNotificationOpen(false)
+      }
     }
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setIsProfileOpen(false)
+      if (e.key === 'Escape') {
+        setIsProfileOpen(false)
+        setIsNotificationOpen(false)
+      }
     }
 
-    if (isProfileOpen) {
+    if (isProfileOpen || isNotificationOpen) {
       document.addEventListener('mousedown', handleClickOutside)
       document.addEventListener('keydown', handleKeyDown)
     }
@@ -47,10 +77,39 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('keydown', handleKeyDown)
     }
-  }, [isProfileOpen])
+  }, [isProfileOpen, isNotificationOpen])
 
-  const handleNotification = () => {
-    alert('You have no new notifications.')
+  const toggleNotifications = () => {
+    setIsNotificationOpen(prev => {
+      const next = !prev
+      if (next) setIsProfileOpen(false)
+      return next
+    })
+  }
+
+  const toggleProfile = () => {
+    setIsProfileOpen(prev => {
+      const next = !prev
+      if (next) setIsNotificationOpen(false)
+      return next
+    })
+  }
+
+  const markAllAsRead = () => {
+    const updated = notifications.map(n => ({ ...n, read: true }))
+    setNotifications(updated)
+    localStorage.setItem('patron_notifications', JSON.stringify(updated))
+  }
+
+  const markItemAsRead = (id) => {
+    const updated = notifications.map(n => n.id === id ? { ...n, read: true } : n)
+    setNotifications(updated)
+    localStorage.setItem('patron_notifications', JSON.stringify(updated))
+  }
+
+  const clearAllNotifications = () => {
+    setNotifications([])
+    localStorage.setItem('patron_notifications', JSON.stringify([]))
   }
 
   const handleGoToSettings = () => {
@@ -62,6 +121,23 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
     setIsProfileOpen(false)
     logout()
     navigate('/login', { replace: true })
+  }
+
+  const getPageTitle = () => {
+    switch (location.pathname) {
+      case '/dashboard':
+        return 'Dashboard'
+      case '/customers':
+        return 'Customers & Segments'
+      case '/transactions':
+        return 'Transactions'
+      case '/analytics':
+        return 'Analytics'
+      case '/settings':
+        return 'Settings'
+      default:
+        return 'Dashboard'
+    }
   }
 
   // Derive display name, email, and organization dynamically from authenticated user
@@ -165,13 +241,14 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
 
           {/* Action Buttons Group */}
           <div className='docker-controls-group'>
-            {/* Notification Bell Icon */}
-            <div className='docker-item-wrapper'>
+            {/* Notification Bell Icon & Interactive Dropdown Menu */}
+            <div className='header-notification-menu-wrapper' ref={notificationMenuRef}>
               <button
                 type='button'
-                className='docker-item docker-btn-notification'
-                onClick={handleNotification}
+                className={`docker-item docker-btn-notification ${isNotificationOpen ? 'docker-btn-active' : ''}`}
+                onClick={toggleNotifications}
                 aria-label='Notifications'
+                aria-expanded={isNotificationOpen}
               >
                 <svg
                   width='17'
@@ -186,9 +263,70 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
                   <path d='M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9' />
                   <path d='M13.73 21a2 2 0 0 1-3.46 0' />
                 </svg>
-                <span className='notification-dot' />
+                {/* Blue dot ONLY visible when there are new/unread notifications */}
+                {unreadCount > 0 && <span className='notification-dot' />}
                 <span className='docker-tooltip'>Notifications</span>
               </button>
+
+              {/* Notification Dropdown Panel */}
+              {isNotificationOpen && (
+                <div className='header-notification-dropdown'>
+                  <div className='notification-dropdown-header'>
+                    <div className='notification-header-title'>
+                      <h4>Notifications</h4>
+                      {unreadCount > 0 && (
+                        <span className='notification-count-chip'>{unreadCount} new</span>
+                      )}
+                    </div>
+                    {notifications.length > 0 && (
+                      <button
+                        type='button'
+                        className='notification-header-action'
+                        onClick={unreadCount > 0 ? markAllAsRead : clearAllNotifications}
+                      >
+                        {unreadCount > 0 ? 'Mark all read' : 'Clear all'}
+                      </button>
+                    )}
+                  </div>
+
+                  {notifications.length > 0 ? (
+                    <div className='notification-list'>
+                      {notifications.map(item => (
+                        <div
+                          key={item.id}
+                          className={`notification-item ${!item.read ? 'unread' : ''}`}
+                          onClick={() => markItemAsRead(item.id)}
+                          title={!item.read ? 'Click to mark as read' : ''}
+                        >
+                          <div className={`notification-item-icon ${item.type || 'system'}`}>
+                            {item.type === 'vip' ? '★' : item.type === 'growth' ? '↗' : 'ℹ'}
+                          </div>
+                          <div className='notification-item-content'>
+                            <div className='notification-item-title'>
+                              <span>{item.title}</span>
+                              {!item.read && <span className='notification-unread-dot' />}
+                            </div>
+                            <span className='notification-item-text'>{item.text}</span>
+                            <span className='notification-item-time'>{item.time}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className='notification-empty-state'>
+                      <div className='notification-empty-icon'>
+                        <svg width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
+                          <path d='M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9' />
+                          <path d='M13.73 21a2 2 0 0 1-3.46 0' />
+                          <line x1='2' y1='2' x2='22' y2='22' />
+                        </svg>
+                      </div>
+                      <strong>No notifications</strong>
+                      <p>You&apos;re all caught up! New business alerts will appear here.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Circular Profile Avatar Icon */}
@@ -196,7 +334,7 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
               <button
                 type='button'
                 className={`docker-item docker-profile-btn ${isProfileOpen ? 'profile-btn-active' : ''}`}
-                onClick={() => setIsProfileOpen(prev => !prev)}
+                onClick={toggleProfile}
                 aria-label='User Profile Menu'
                 aria-expanded={isProfileOpen}
               >
