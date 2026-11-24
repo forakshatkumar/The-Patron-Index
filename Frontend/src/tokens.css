@@ -25,6 +25,22 @@
   /* Typography scale */
   --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* ==========================================================================
+     UX MOTION TOKENS: 20 Principles of UX & Animation
+     ========================================================================== */
+  /* Principle 5: Slow in, slow out (physics-accurate cubic beziers) */
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);       /* Decel: enters fast, settles gently */
+  --ease-exit: cubic-bezier(0.7, 0, 0.84, 0);        /* Accel: starts slow, leaves fast */
+  --ease-move: cubic-bezier(0.65, 0, 0.35, 1);       /* Smooth point-to-point transitions */
+  --ease-squash: cubic-bezier(0.34, 1.56, 0.64, 1);  /* Playful elastic overshoot */
+
+  /* Principle 8 & 16: Snappy timing and Doherty threshold (<100ms response) */
+  --duration-instant: 90ms;                          /* Tactile button depression / click feedback */
+  --duration-micro: 140ms;                           /* Hover highlights and status shifts */
+  --duration-enter: 220ms;                           /* In-view entrances, dialog opens */
+  --duration-exit: 110ms;                            /* Principle 18: Exits 2x faster than entrances */
+  --duration-sheet: 290ms;                           /* Sidebar and heavy drawer reveals */
 }
 
 * {
