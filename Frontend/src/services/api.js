@@ -51,6 +51,17 @@ export async function registerUser(user) {
   return data
 }
 
+export async function googleLogin(credential) {
+  const data = await request('/auth/google', {
+    method: 'POST',
+    body: JSON.stringify({ credential })
+  })
+  if (data.token) {
+    saveToken(data.token)
+  }
+  return data
+}
+
 export const getDashboardSummary = () => request('/dashboard/summary')
 export const getCustomers = () => request('/customers')
 export const getCustomer = id => request(`/customers/${encodeURIComponent(id)}`)

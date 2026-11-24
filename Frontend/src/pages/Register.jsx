@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import logoImg from '../assets/logo.png'
@@ -6,11 +6,64 @@ import './Auth.css'
 
 function Register () {
   const navigate = useNavigate()
-  const { register } = useAuth()
+  const { register, loginWithGoogle } = useAuth()
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'analyst' })
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '978238561753-daj7ignsgo9lbg31ag5c0ke3lukuarbh.apps.googleusercontent.com'
+
+    const initGoogle = () => {
+      if (!window.google?.accounts?.id) return
+      try {
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          callback: async (response) => {
+            if (response?.credential) {
+              try {
+                setLoading(true)
+                setError('')
+                await loginWithGoogle(response.credential)
+                navigate('/dashboard', { replace: true })
+              } catch (err) {
+                setError(err.message || 'Google sign up failed')
+              } finally {
+                setLoading(false)
+              }
+            }
+          }
+        })
+        const btnEl = document.getElementById('google-btn-register')
+        if (btnEl) {
+          btnEl.innerHTML = ''
+          window.google.accounts.id.renderButton(btnEl, {
+            theme: 'outline',
+            size: 'large',
+            width: 380,
+            text: 'signup_with',
+            shape: 'rectangular',
+            logo_alignment: 'left'
+          })
+        }
+      } catch (e) {
+        console.error('Google Auth Init Error:', e)
+      }
+    }
+
+    if (window.google?.accounts?.id) {
+      initGoogle()
+    } else {
+      const interval = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          clearInterval(interval)
+          initGoogle()
+        }
+      }, 150)
+      return () => clearInterval(interval)
+    }
+  }, [loginWithGoogle, navigate])
 
   const submit = async event => {
     event.preventDefault()
@@ -144,6 +197,12 @@ function Register () {
             {loading ? 'Creating Account...' : 'Create Account'}
           </button>
         </form>
+
+        <div className='account-divider'>
+          <span>or</span>
+        </div>
+
+        <div id='google-btn-register' className='google-btn-wrap' />
 
         <p className='account-switch'>
           <span>Already registered? </span>

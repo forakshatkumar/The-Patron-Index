@@ -25,6 +25,16 @@ const userSchema = new mongoose.Schema(
             type: String,
             enum: ["admin", "analyst"],
             default: "analyst"
+        },
+
+        googleId: {
+            type: String,
+            default: null
+        },
+
+        avatar: {
+            type: String,
+            default: ""
         }
     },
     {

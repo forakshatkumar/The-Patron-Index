@@ -277,6 +277,45 @@
   margin-top: 22px;
 }
 
+.account-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 20px 0 16px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.account-divider::before,
+.account-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #dce6ef;
+}
+
+.account-divider span {
+  padding: 0 12px;
+}
+
+.google-btn-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 44px;
+}
+
+.google-btn-wrap > div {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+.google-btn-wrap iframe {
+  margin: 0 auto !important;
+}
+
 .account-switch a {
   color: #145a9b;
   font-weight: 700;
