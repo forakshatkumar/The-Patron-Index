@@ -405,25 +405,6 @@ function InteractiveSegmentDistribution ({ segments = [] }) {
           )
         })}
       </div>
-
-      {/* Dedicated Interactive Cohort Status Strip */}
-      <div className='segment-inspector-strip'>
-        {hoveredSegment ? (
-          <div className='inspector-content active'>
-            <span className='inspector-dot' style={{ backgroundColor: POWER_BI_COLORS[hoveredSegment.name]?.base }} />
-            <strong>{hoveredSegment.name} Cohort:</strong>
-            <span>{hoveredSegment.customers.toLocaleString()} Patrons ({hoveredSegment.percentage}%)</span>
-            <span>•</span>
-            <span>₹{(hoveredSegment.averageSpending || 0).toLocaleString()} Avg Spend</span>
-            <span>•</span>
-            <span>{hoveredSegment.revenueContribution}% Total Revenue</span>
-          </div>
-        ) : (
-          <div className='inspector-content muted'>
-            <span>Hover any cohort above to inspect customer volume and revenue velocity</span>
-          </div>
-        )}
-      </div>
     </div>
   )
 }
