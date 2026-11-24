@@ -1,176 +1,269 @@
 # The Patron Index
 
-**Secure Customer Intelligence & Segmentation Platform**
+Customer Intelligence & Behavioral Segmentation Platform
 
-The Patron Index helps business owners turn raw purchase history into understandable customer segments and actions. It combines a React SaaS dashboard, a Node/Express API, MongoDB storage, explainable RFM-based customer classification, JWT authentication, secure file handling, and optional ML/security services.
+The Patron Index converts raw transactional purchase records into actionable customer segments, recency-frequency-monetary (RFM) metrics, and proprietary Patron Index scores (0-100). The architecture couples a responsive React dashboard with an Express REST API, MongoDB document store, secure file quarantine pipeline, and optional machine learning services.
 
-## Core workflow
+---
 
-1. Business owner registers/signs in.
-2. Uploads a customer purchase CSV.
-3. Backend validates and quarantines the upload.
-4. CSV data is aggregated into customer-level RFM features: **Recency, Frequency, Monetary value**.
-5. Customers are assigned a **Patron Index (0-100)** and segment such as VIP, Loyal, Regular, New, Occasional, At-Risk or Inactive.
-6. Dashboard and customer pages show business-friendly insights and recommendations.
+## System Architecture
 
-## Repository structure
+```mermaid
+flowchart TD
+    Client["Browser / Client"] --> WebApp["React 19 + Vite Frontend"]
+    WebApp -->|REST API + JWT| API["Node.js / Express API Gateway"]
+    WebApp -->|Google Credential| GAuth["Google OAuth 2.0"]
+    API -->|Auth Verification| GAuth
+    API -->|Persistence| DB[("MongoDB Storage")]
+    API -->|Quarantine & Scan| Storage["Quarantine File Pipeline"]
+    Storage -->|Feature Extraction| RFM["RFM Analytics & Scoring Engine"]
+    RFM --> DB
+    API -.->|Inference| ML["FastAPI ML Services"]
+```
+
+---
+
+## Core Capabilities
+
+| Capability | Technical Implementation | Outcome |
+| :--- | :--- | :--- |
+| **RFM Segmentation** | Weighted quantile scoring on Recency, Frequency, and Monetary value | Classifies customers into VIP, Loyal, Regular, New, Occasional, At-Risk, and Inactive |
+| **Patron Index Metric** | Normalized 0-100 composite index calculated per customer | Quantifies individual customer loyalty and lifetime value |
+| **Data Ingestion** | CSV parsing with header validation and quarantine storage | Safe processing of customer purchase transactions |
+| **Authentication** | Hybrid local JWT authentication and Google OAuth 2.0 token verification | Secure, auditable session management |
+| **Visualization Suite** | SVG animated revenue curves, activity bar charts, segment progress tracks | Real-time analytics with collapsible sidebar and responsive layout |
+
+---
+
+## Repository Structure
 
 ```text
 The-Patron-Index/
-├── Frontend/          React + Vite SaaS dashboard
-├── backend/           Node.js + Express + MongoDB API
-├── ml/                Business classification + file-risk services/research
-├── sample-data/       Ready-to-import demo CSV
+├── Frontend/                 React 19, Vite, React Router, Tailwind CSS
+│   ├── src/
+│   │   ├── components/       Layout, Header, Sidebar, RevenueChart, StatCard
+│   │   ├── pages/            Landing, Dashboard, Customers, Segments, Analytics, Reports
+│   │   ├── context/          AuthContext (Local & Google OAuth session management)
+│   │   └── services/         API client and data normalization
+├── backend/                  Express REST API, Mongoose, JWT, Multer
+│   ├── controllers/          Auth, Customer, Dashboard, File Scan controllers
+│   ├── middleware/           JWT verification, file quarantine, rate limiting
+│   ├── models/               User, Customer, Transaction, Scan schemas
+│   └── routes/               REST endpoint routing
+├── ml/                       FastAPI classification and malware detection services
+│   ├── business/             Business category classification service
+│   └── malware/              File-risk and PE heuristic scanning engine
+├── sample-data/              Validated sample dataset (customer_purchases.csv)
 └── README.md
 ```
 
-## Tech stack
+---
 
-- **Frontend:** React, React Router, Vite
-- **Backend:** Node.js, Express
-- **Database:** MongoDB + Mongoose
-- **Authentication:** JWT + bcrypt
-- **Customer Intelligence:** RFM analysis + Patron Index scoring
-- **Security:** Multer file restrictions, size validation, quarantine, Helmet, JWT-protected endpoints, audit logging
-- **ML API:** FastAPI services for business classification and file-risk analysis
+## Quick Start
 
-## Quick demo (frontend only)
+<details open>
+<summary><b>Option A: Frontend Demo Mode (Instant Evaluation)</b></summary>
 
-The frontend includes **Demo Mode**, so evaluators can explore the complete UI without database credentials.
+The client includes an isolated demo mode providing pre-populated business metrics, charts, and customer segment profiles without requiring external database connections.
 
 ```bash
+# Navigate to Frontend directory
 cd Frontend
+
+# Install dependencies
 npm install
+
+# Launch development server
 npm run dev
 ```
 
-Open the Vite URL and click **Open Demo Dashboard**.
+Open `http://localhost:5173` in your browser and click **Open Demo Dashboard** or navigate directly to `/dashboard`.
 
-## Full-stack setup
+</details>
 
-### 1. Backend
+<details open>
+<summary><b>Option B: Full-Stack Setup (Production / Local Integration)</b></summary>
+
+### 1. Prerequisites
+- Node.js 18+ and npm
+- MongoDB instance (local or MongoDB Atlas URI)
+- Python 3.10+ (optional, for ML microservices)
+
+### 2. Backend Configuration & Launch
 
 ```bash
 cd backend
 npm install
 ```
 
-Copy `.env.example` to `.env` and fill in your own values:
+Create `backend/.env` with the following parameters:
 
 ```env
 PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_long_random_secret
-FRONTEND_URL=http://localhost:5173
 NODE_ENV=development
+MONGO_URI=mongodb://localhost:27017/patron-index
+JWT_SECRET=replace_with_a_secure_random_secret_key
+FRONTEND_URL=http://localhost:5173
+GOOGLE_CLIENT_ID=978238561753-daj7ignsgo9lbg31ag5c0ke3lukuarbh.apps.googleusercontent.com
 ```
 
-Run:
+Start the backend:
 
 ```bash
 npm run dev
 ```
 
-Health check:
-
+Verify service status:
 ```text
 GET http://localhost:5000/api/health
 ```
 
-### 2. Frontend
+### 3. Frontend Configuration & Launch
 
 ```bash
 cd Frontend
 npm install
-npm run dev
 ```
 
-Optional `Frontend/.env`:
+Create `Frontend/.env`:
 
 ```env
 VITE_API_URL=http://localhost:5000/api
+VITE_GOOGLE_CLIENT_ID=978238561753-daj7ignsgo9lbg31ag5c0ke3lukuarbh.apps.googleusercontent.com
 ```
 
-Register a user from the UI, then sign in.
-
-### 3. Import sample customer data
-
-Use:
-
-```text
-sample-data/customer_purchases.csv
-```
-
-The required columns are:
-
-```text
-customer_id,name,purchase_date,amount
-```
-
-`email` and `product` are optional.
-
-## API overview
-
-### Public
-
-```text
-POST /api/auth/register
-POST /api/auth/login
-GET  /api/health
-```
-
-### JWT protected
-
-```text
-GET  /api/dashboard/summary
-GET  /api/customers
-GET  /api/customers/:id
-POST /api/customers
-POST /api/customers/import
-POST /api/scan/upload
-GET  /api/scan/:id
-```
-
-Protected calls use:
-
-```text
-Authorization: Bearer <JWT_TOKEN>
-```
-
-## ML services
-
-Install:
+Start the client:
 
 ```bash
-pip install -r ml/requirements.txt
+npm run dev
 ```
 
-Business classification API:
+</details>
+
+<details>
+<summary><b>Option C: Machine Learning Microservices (Optional)</b></summary>
 
 ```bash
+cd ml
+python -m venv venv
+source venv/bin/activate  # Windows: .\venv\Scripts\activate
+pip install -r requirements.txt
+
+# Start Business Classification Service (Port 8001)
 uvicorn ml.business.api.main:app --reload --port 8001
-```
 
-File-risk API:
-
-```bash
+# Start File-Risk Inspection Service (Port 8002)
 uvicorn ml.malware.api.main:app --reload --port 8002
 ```
 
-The repository contains EMBER research/preprocessing code. A trained malware model artifact is **not** included in the submission; the runnable file-risk API transparently uses a heuristic fallback until a trained artifact is mounted.
+</details>
 
-## Security notes
+---
 
-- Real `.env` files, database credentials and JWT secrets are intentionally excluded.
-- Uploaded files are restricted by extension and size and stored in a quarantine directory.
-- CSV customer imports undergo schema validation before processing.
-- Business APIs require JWT authentication.
-- Sensitive actions create audit logs.
+## Data Ingestion Specification
 
-## Submission checklist
+Upload files via the dashboard import view (`/import`) or direct API invocation (`POST /api/customers/import`).
 
-- No `node_modules/` included.
-- No `.env` or credentials included.
-- `.env.example` files included.
-- Sample dataset included.
-- Frontend Demo Mode works without external services.
+```text
+Sample file location: sample-data/customer_purchases.csv
+```
+
+### CSV Schema Requirements
+
+| Field | Type | Requirement | Description |
+| :--- | :--- | :--- | :--- |
+| `customer_id` | String | Required | Unique business identifier for customer |
+| `name` | String | Required | Full customer name |
+| `purchase_date` | ISO 8601 / YYYY-MM-DD | Required | Timestamp of transaction |
+| `amount` | Number (Float) | Required | Monetary purchase value |
+| `email` | String | Optional | Customer contact address |
+| `product` | String | Optional | Product name or SKU |
+
+---
+
+## RFM & Scoring Methodology
+
+```mermaid
+sequenceDiagram
+    participant User as Business User
+    participant CSV as Raw Transaction Log
+    participant Pipeline as Ingestion Engine
+    participant RFM as Scoring Matrix
+    participant Output as Customer Intelligence Record
+
+    User->>CSV: Upload Purchase Records
+    CSV->>Pipeline: Validate Headers & Types
+    Pipeline->>RFM: Aggregate Metrics
+    Note over RFM: Calculate Recency (Days since last order)<br/>Calculate Frequency (Total orders)<br/>Calculate Monetary (Total spend)
+    RFM->>Output: Compute Patron Index (0-100) & Assign Segment
+```
+
+### Customer Segments
+
+- **VIP**: Top tier monetary spending and high transaction frequency within recent period.
+- **Loyal**: Consistent repeat buyers with dependable purchase intervals.
+- **Regular**: Average frequency and spending; core baseline patrons.
+- **New**: First-time transactions recorded within the last 30 days.
+- **Occasional**: Infrequent buyers requiring promotional re-engagement.
+- **At-Risk**: Previously frequent buyers with recency exceeding 90 days.
+- **Inactive**: No recorded purchasing activity for over 180 days.
+
+---
+
+## API Reference
+
+### Authentication Endpoints
+
+| Method | Route | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/auth/register` | Public | Register business account with name, email, password |
+| `POST` | `/api/auth/login` | Public | Authenticate with email/password and receive JWT |
+| `POST` | `/api/auth/google` | Public | Verify Google OAuth credential and issue JWT |
+| `GET` | `/api/health` | Public | System status and service health check |
+
+### Authenticated Data Endpoints
+
+Protected routes require standard authorization header: `Authorization: Bearer <JWT_TOKEN>`
+
+| Method | Route | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/dashboard/summary` | Overall KPI metrics (customers, active count, revenue) |
+| `GET` | `/api/customers` | Query customers with pagination, search, and segment filters |
+| `GET` | `/api/customers/:id` | Detailed individual customer profile and history |
+| `POST` | `/api/customers` | Create or update individual customer record |
+| `POST` | `/api/customers/import` | Multipart CSV bulk upload and auto-segmentation |
+| `POST` | `/api/scan/upload` | Upload file to secure quarantine buffer |
+| `GET` | `/api/scan/:id` | Retrieve status of file safety assessment |
+
+---
+
+## Security Architecture
+
+- **Quarantine Pipeline**: Uploaded files are isolated outside the public directory tree with random hash identifiers and MIME validation.
+- **Credential Storage**: Passwords are salted and hashed using `bcrypt` prior to database persistence.
+- **Token Security**: Stateless JWT verification with configurable token expiration and origin CORS verification.
+- **Header Hardening**: HTTP security headers configured via `helmet`.
+- **Input Sanitization**: CSV parsing implements column white-listing to prevent injection attacks and memory exhaustion.
+
+---
+
+## Verification & Testing
+
+Execute frontend linting and production build verification:
+
+```bash
+# Frontend linting
+npm --prefix Frontend run lint
+
+# Production compilation
+npm --prefix Frontend run build
+
+# Backend tests / health check
+npm --prefix backend test
+```
+
+---
+
+## License
+
+This project is licensed under the MIT License.
