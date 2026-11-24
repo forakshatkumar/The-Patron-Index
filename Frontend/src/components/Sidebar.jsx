@@ -1,21 +1,13 @@
-import { NavLink, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { NavLink } from 'react-router-dom'
 import logoImg from '../assets/logo.png'
 
 function Sidebar ({ isOpen = true, onClose }) {
-  const navigate = useNavigate()
-  const { logout, demoMode } = useAuth()
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: '▦' },
     { name: 'Customers & Segments', path: '/customers', icon: '◉' },
     { name: 'Transactions', path: '/transactions', icon: '↔' },
     { name: 'Analytics', path: '/analytics', icon: '⌁' }
   ]
-
-  const signOut = () => {
-    logout()
-    navigate('/login', { replace: true })
-  }
 
   const handleNavClick = () => {
     if (window.innerWidth <= 768 && onClose) {
@@ -57,32 +49,6 @@ function Sidebar ({ isOpen = true, onClose }) {
           </NavLink>
         ))}
       </nav>
-
-      <div className='sidebar-bottom'>
-        <NavLink to='/import' onClick={handleNavClick} className='import-button'>
-          <span>＋</span>
-          Import Data
-        </NavLink>
-        <NavLink
-          to='/settings'
-          onClick={handleNavClick}
-          className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}
-        >
-          <span className='sidebar-icon'>⚙</span>
-          <span>Settings</span>
-        </NavLink>
-        <button type='button' className='sidebar-link sidebar-logout' onClick={signOut}>
-          <span className='sidebar-icon'>↪</span>
-          <span>{demoMode ? 'Exit Demo' : 'Sign Out'}</span>
-        </button>
-        <div className='sidebar-user'>
-          <div className='sidebar-avatar'>PI</div>
-          <div className='sidebar-user-info'>
-            <strong>{demoMode ? 'Demo Business' : 'Business Account'}</strong>
-            <span>{demoMode ? 'Demo Mode' : 'Secure Session'}</span>
-          </div>
-        </div>
-      </div>
     </aside>
   )
 }

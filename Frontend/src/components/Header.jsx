@@ -164,13 +164,13 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
                 </div>
               </div>
 
-              {/* Account Tier Summary */}
+              {/* Account Workspace Summary */}
               <div className='dropdown-tier-card'>
                 <div className='tier-label-group'>
                   <span className='tier-name'>{user?.organization || 'Brew & Bites'}</span>
-                  <span className='tier-tag'>PRO SUITE</span>
+                  <span className='tier-tag'>ENTERPRISE</span>
                 </div>
-                <span className='tier-sub'>Active Enterprise Workspace</span>
+                <span className='tier-sub'>Active Workspace</span>
               </div>
 
               <div className='dropdown-divider' />
