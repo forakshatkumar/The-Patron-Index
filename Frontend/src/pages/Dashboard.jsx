@@ -54,8 +54,14 @@ function Dashboard () {
   return (
     <div className='page'>
       <div className='page-heading'>
-        <div><h2>Business Overview</h2><p>Track customer activity, revenue and customer value.</p></div>
-        <div className='page-actions'><Link to='/import' className='secondary-button'>Import Data</Link><Link to='/customers' className='primary-button'>View Customers</Link></div>
+        <div>
+          <h2>Business Overview</h2>
+          <p>Track customer activity, revenue and customer value.</p>
+        </div>
+        <div className='page-actions'>
+          <Link to='/import' className='secondary-button'>Import Data</Link>
+          <Link to='/customers' className='primary-button'>View Customers</Link>
+        </div>
       </div>
 
       {error && <div className='info-banner'>{error}</div>}
@@ -69,22 +75,137 @@ function Dashboard () {
       </div>
 
       <div className='dashboard-grid'>
-        <section className='card dashboard-large-card'><div className='card-header'><div><h3>Revenue Trend</h3><p>Revenue performance over the last 6 months</p></div></div><RevenueChart data={revenueData} /></section>
-        <section className='card'><div className='card-header'><div><h3>Customer Segments</h3><p>Distribution of your customer base</p></div><Link to='/segments' className='text-button'>View all</Link></div>
-          <div className='segment-list'>{segments.map(segment => <div className='segment-summary-row' key={segment.id || segment.name}><SegmentBadge segment={segment.name} /><div className='segment-summary-right'><strong>{Number(segment.customers || 0).toLocaleString()}</strong><span>{segment.percentage}%</span></div></div>)}</div>
+        <section className='card dashboard-large-card'>
+          <div className='card-header'>
+            <div>
+              <h3>Revenue Trend</h3>
+              <p>Revenue performance over the last 6 months</p>
+            </div>
+          </div>
+          <RevenueChart data={revenueData} />
+        </section>
+        <section className='card'>
+          <div className='card-header'>
+            <div>
+              <h3>Customer Segments</h3>
+              <p>Distribution of your customer base</p>
+            </div>
+            <Link to='/segments' className='text-button'>View all</Link>
+          </div>
+          <div className='segment-list'>
+            {segments.map(segment => (
+              <div className='segment-summary-row' key={segment.id || segment.name}>
+                <SegmentBadge segment={segment.name} />
+                <div className='segment-summary-right'>
+                  <strong>{Number(segment.customers || 0).toLocaleString()}</strong>
+                  <span>{segment.percentage}%</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
       </div>
 
       <div className='dashboard-grid'>
-        <section className='card dashboard-large-card'><div className='card-header'><div><h3>Purchase Activity</h3><p>New and repeat customer purchases</p></div></div>
-          <div className='activity-chart'>{purchaseActivity.map(item => <div className='activity-column' key={item.month}><div className='activity-bars'><div className='activity-bar new-bar' style={{ height: `${item.newCustomers / 2}px` }}></div><div className='activity-bar repeat-bar' style={{ height: `${item.repeatCustomers / 2}px` }}></div></div><span>{item.month}</span></div>)}</div>
-          <div className='chart-legend'><span><i className='legend-dot new-dot'></i>New Customers</span><span><i className='legend-dot repeat-dot'></i>Repeat Customers</span></div>
+        <section className='card dashboard-large-card'>
+          <div className='card-header'>
+            <div>
+              <h3>Purchase Activity</h3>
+              <p>New and repeat customer purchases</p>
+            </div>
+          </div>
+          <div className='activity-chart'>
+            {purchaseActivity.map((item, index) => (
+              <div className='activity-column' key={item.month}>
+                <div className='activity-bars'>
+                  <div
+                    className='activity-bar new-bar'
+                    style={{
+                      height: `${item.newCustomers / 2}px`,
+                      '--delay': `${index * 0.08}s`
+                    }}
+                    title={`New Customers: ${item.newCustomers}`}
+                  />
+                  <div
+                    className='activity-bar repeat-bar'
+                    style={{
+                      height: `${item.repeatCustomers / 2}px`,
+                      '--delay': `${index * 0.08 + 0.04}s`
+                    }}
+                    title={`Repeat Customers: ${item.repeatCustomers}`}
+                  />
+                </div>
+                <span>{item.month}</span>
+              </div>
+            ))}
+          </div>
+          <div className='chart-legend'>
+            <span><i className='legend-dot new-dot' />New Customers</span>
+            <span><i className='legend-dot repeat-dot' />Repeat Customers</span>
+          </div>
         </section>
-        <section className='card'><div className='card-header'><div><h3>Key Insights</h3><p>Important changes in your business</p></div></div><div className='insight-list'>{dashboardInsights.map(insight => <div className={`insight-item ${insight.type}`} key={insight.id}><span className='insight-icon'>{insight.type === 'warning' ? '!' : '✓'}</span><p>{insight.title}</p></div>)}</div></section>
+
+        <section className='card'>
+          <div className='card-header'>
+            <div>
+              <h3>Key Insights</h3>
+              <p>Important changes in your business</p>
+            </div>
+          </div>
+          <div className='insight-list'>
+            {dashboardInsights.map(insight => (
+              <div className={`insight-item ${insight.type}`} key={insight.id}>
+                <span className='insight-icon'>{insight.type === 'warning' ? '!' : '✓'}</span>
+                <p>{insight.title}</p>
+              </div>
+            ))}
+          </div>
+        </section>
       </div>
 
-      <section className='card'><div className='card-header'><div><h3>Recent Customers</h3><p>Recently active customers</p></div><Link to='/customers' className='text-button'>View all customers</Link></div>
-        <div className='table-wrapper'><table className='data-table'><thead><tr><th>Customer</th><th>Segment</th><th>Total Spending</th><th>Purchases</th><th>Patron Index</th><th>Status</th></tr></thead><tbody>{recentCustomers.map(customer => <tr key={customer.id}><td><Link to={`/customers/${customer.id}`} className='customer-link'><strong>{customer.name}</strong><span>{customer.id}</span></Link></td><td><SegmentBadge segment={customer.segment} /></td><td>₹{Number(customer.totalSpending || 0).toLocaleString()}</td><td>{customer.totalPurchases}</td><td><strong>{customer.patronIndex}</strong></td><td><span className={`status-badge ${customer.status === 'Active' ? 'status-active' : customer.status === 'At Risk' ? 'status-risk' : 'status-inactive'}`}>{customer.status}</span></td></tr>)}</tbody></table></div>
+      <section className='card'>
+        <div className='card-header'>
+          <div>
+            <h3>Recent Customers</h3>
+            <p>Recently active customers</p>
+          </div>
+          <Link to='/customers' className='text-button'>View all customers</Link>
+        </div>
+        <div className='table-wrapper'>
+          <table className='data-table'>
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Segment</th>
+                <th>Total Spending</th>
+                <th>Purchases</th>
+                <th>Patron Index</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentCustomers.map(customer => (
+                <tr key={customer.id}>
+                  <td>
+                    <Link to={`/customers/${customer.id}`} className='customer-link'>
+                      <strong>{customer.name}</strong>
+                      <span>{customer.id}</span>
+                    </Link>
+                  </td>
+                  <td><SegmentBadge segment={customer.segment} /></td>
+                  <td>₹{Number(customer.totalSpending || 0).toLocaleString()}</td>
+                  <td>{customer.totalPurchases}</td>
+                  <td><strong>{customer.patronIndex}</strong></td>
+                  <td>
+                    <span className={`status-badge ${customer.status === 'Active' ? 'status-active' : customer.status === 'At Risk' ? 'status-risk' : 'status-inactive'}`}>
+                      {customer.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   )

@@ -53,7 +53,7 @@ function Analytics () {
           </div>
 
           <div className='analytics-segment-list'>
-            {segmentData.map(segment => (
+            {segmentData.map((segment, index) => (
               <div key={segment.id} className='analytics-segment-row'>
                 <span>{segment.name}</span>
 
@@ -61,9 +61,10 @@ function Analytics () {
                   <div
                     className='progress-fill'
                     style={{
-                      width: `${segment.percentage}%`
+                      width: `${segment.percentage}%`,
+                      '--delay': `${index * 0.08}s`
                     }}
-                  ></div>
+                  />
                 </div>
 
                 <strong>{segment.percentage}%</strong>
@@ -80,22 +81,26 @@ function Analytics () {
           </div>
 
           <div className='activity-chart analytics-activity'>
-            {purchaseActivity.map(item => (
+            {purchaseActivity.map((item, index) => (
               <div key={item.month} className='activity-column'>
                 <div className='activity-bars'>
                   <div
                     className='activity-bar new-bar'
                     style={{
-                      height: `${item.newCustomers / 2}px`
+                      height: `${item.newCustomers / 2}px`,
+                      '--delay': `${index * 0.08}s`
                     }}
-                  ></div>
+                    title={`New Customers: ${item.newCustomers}`}
+                  />
 
                   <div
                     className='activity-bar repeat-bar'
                     style={{
-                      height: `${item.repeatCustomers / 2}px`
+                      height: `${item.repeatCustomers / 2}px`,
+                      '--delay': `${index * 0.08 + 0.04}s`
                     }}
-                  ></div>
+                    title={`Repeat Customers: ${item.repeatCustomers}`}
+                  />
                 </div>
 
                 <span>{item.month}</span>
