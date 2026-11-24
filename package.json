@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "postinstall": "npm --prefix backend install",
-    "build": "npm --prefix backend install",
+    "build": "cd Frontend && npm install && npm run build",
     "start": "node backend/src/server.js"
   }
 }
