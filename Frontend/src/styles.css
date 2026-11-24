@@ -507,10 +507,10 @@ a {
 
 .top-header {
   height: 80px;
-  background: rgba(255, 255, 255, 0.76);
+  background: transparent;
   backdrop-filter: blur(18px) saturate(180%);
   -webkit-backdrop-filter: blur(18px) saturate(180%);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.75);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.75);
   padding: 0 28px;
   display: flex;
   align-items: center;
@@ -518,7 +518,7 @@ a {
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: 0 4px 20px rgba(11, 35, 69, 0.03);
+  box-shadow: none;
 }
 
 .header-left {
@@ -5641,26 +5641,22 @@ button:active:not(:disabled),
 .navbar-docker {
   display: inline-flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.74);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.9);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
   border-radius: 9999px;
-  padding: 5px 8px;
-  box-shadow: 0 8px 24px rgba(11, 35, 69, 0.08),
-              0 1px 2px rgba(11, 35, 69, 0.04),
-              inset 0 1px 1px rgba(255, 255, 255, 0.95);
-  gap: 3px;
+  padding: 0;
+  box-shadow: none;
+  gap: 8px;
   position: relative;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .navbar-docker:hover {
-  background: rgba(255, 255, 255, 0.90);
-  box-shadow: 0 12px 32px rgba(8, 102, 245, 0.12),
-              0 2px 4px rgba(11, 35, 69, 0.04),
-              inset 0 1px 1px #ffffff;
-  border-color: #ffffff;
+  background: transparent;
+  box-shadow: none;
+  border-color: transparent;
 }
 
 .docker-nav-group,

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useLocation, useNavigate, Link, NavLink } from 'react-router-dom'
+import { useLocation, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import logoImg from '../assets/logo.png'
 
@@ -168,77 +168,9 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
         </div>
       </div>
 
-      {/* Top-Right Docker Capsule: Buttons & Icons Stored in Dock Style */}
+      {/* Top-Right Action Controls */}
       <div className='header-right'>
-        <nav className='navbar-docker' aria-label='Quick navigation dock'>
-          {/* Quick Page Icons Group */}
-          <div className='docker-nav-group'>
-            <NavLink
-              to='/dashboard'
-              className={({ isActive }) => `docker-item ${isActive ? 'docker-item-active' : ''}`}
-              aria-label='Dashboard'
-            >
-              <span className='docker-icon'>
-                <svg width='17' height='17' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-                  <rect x='3' y='3' width='7' height='7' rx='1.5' />
-                  <rect x='14' y='3' width='7' height='7' rx='1.5' />
-                  <rect x='14' y='14' width='7' height='7' rx='1.5' />
-                  <rect x='3' y='14' width='7' height='7' rx='1.5' />
-                </svg>
-              </span>
-              <span className='docker-tooltip'>Dashboard</span>
-              <span className='docker-running-dot' />
-            </NavLink>
-
-            <NavLink
-              to='/customers'
-              className={({ isActive }) => `docker-item ${isActive ? 'docker-item-active' : ''}`}
-              aria-label='Customers & Segments'
-            >
-              <span className='docker-icon'>
-                <svg width='17' height='17' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-                  <circle cx='12' cy='12' r='9' />
-                  <circle cx='12' cy='12' r='3.5' fill='currentColor' />
-                </svg>
-              </span>
-              <span className='docker-tooltip'>Customers</span>
-              <span className='docker-running-dot' />
-            </NavLink>
-
-            <NavLink
-              to='/transactions'
-              className={({ isActive }) => `docker-item ${isActive ? 'docker-item-active' : ''}`}
-              aria-label='Transactions'
-            >
-              <span className='docker-icon'>
-                <svg width='17' height='17' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-                  <polyline points='17 8 21 12 17 16' />
-                  <line x1='3' y1='12' x2='21' y2='12' />
-                  <polyline points='7 16 3 12 7 8' />
-                </svg>
-              </span>
-              <span className='docker-tooltip'>Transactions</span>
-              <span className='docker-running-dot' />
-            </NavLink>
-
-            <NavLink
-              to='/analytics'
-              className={({ isActive }) => `docker-item ${isActive ? 'docker-item-active' : ''}`}
-              aria-label='Analytics'
-            >
-              <span className='docker-icon'>
-                <svg width='17' height='17' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-                  <polyline points='22 12 18 12 15 21 9 3 6 12 2 12' />
-                </svg>
-              </span>
-              <span className='docker-tooltip'>Analytics</span>
-              <span className='docker-running-dot' />
-            </NavLink>
-          </div>
-
-          {/* Dock Separator */}
-          <span className='docker-divider' />
-
+        <nav className='navbar-docker' aria-label='Action controls'>
           {/* Action Buttons Group */}
           <div className='docker-controls-group'>
             {/* Notification Bell Icon & Interactive Dropdown Menu */}
