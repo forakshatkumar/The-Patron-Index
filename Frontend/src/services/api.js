@@ -2,7 +2,19 @@ const API_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ?
 
 export const getToken = () => localStorage.getItem('patron_token')
 export const saveToken = token => localStorage.setItem('patron_token', token)
-export const removeToken = () => localStorage.removeItem('patron_token')
+export const removeToken = () => {
+  localStorage.removeItem('patron_token')
+  localStorage.removeItem('patron_user')
+}
+
+export const getUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('patron_user') || 'null')
+  } catch {
+    return null
+  }
+}
+export const saveUser = user => localStorage.setItem('patron_user', JSON.stringify(user))
 
 async function request(path, options = {}) {
   const token = getToken()
@@ -43,7 +55,8 @@ export async function loginUser(email, password) {
     method: 'POST',
     body: JSON.stringify({ email, password })
   })
-  saveToken(data.token)
+  if (data.token) saveToken(data.token)
+  if (data.user) saveUser(data.user)
   return data
 }
 
@@ -52,9 +65,8 @@ export async function registerUser(user) {
     method: 'POST',
     body: JSON.stringify(user)
   })
-  if (data.token) {
-    saveToken(data.token)
-  }
+  if (data.token) saveToken(data.token)
+  if (data.user) saveUser(data.user)
   return data
 }
 
@@ -63,9 +75,8 @@ export async function googleLogin(credential) {
     method: 'POST',
     body: JSON.stringify({ credential })
   })
-  if (data.token) {
-    saveToken(data.token)
-  }
+  if (data.token) saveToken(data.token)
+  if (data.user) saveUser(data.user)
   return data
 }
 
