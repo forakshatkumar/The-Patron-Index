@@ -82,17 +82,19 @@ a {
 }
 
 .app-content {
-  margin-left: 245px;
-  width: calc(100% - 245px);
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   position: relative;
-  transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1), width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .app-layout.sidebar-closed .app-content {
   margin-left: 0;
+  margin-right: 0;
   width: 100%;
 }
 
@@ -185,36 +187,48 @@ a {
 }
 
 /* =========================
-   SIDEBAR
+   SIDEBAR (Right-Sliding Drawer)
 ========================= */
 
 .sidebar {
   position: fixed;
-  left: 0;
+  right: 0;
+  left: auto;
   top: 0;
   bottom: 0;
-  width: 245px;
+  width: 275px;
   background: linear-gradient(180deg, #0b2345 0%, #071933 100%);
   color: white;
-  padding: 20px 16px;
+  padding: 22px 18px;
   display: flex;
   flex-direction: column;
   z-index: 100;
-  box-shadow: 4px 0 24px rgba(11, 35, 69, 0.12);
+  box-shadow: -6px 0 32px rgba(11, 35, 69, 0.28);
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transform: translateX(0);
 }
 
 .app-layout.sidebar-closed .sidebar {
-  transform: translateX(-100%);
+  transform: translateX(100%);
+}
+
+.app-layout.sidebar-open .sidebar {
+  transform: translateX(0);
 }
 
 .sidebar-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(11, 35, 69, 0.4);
+  background: rgba(11, 35, 69, 0.45);
   backdrop-filter: blur(2px);
   z-index: 95;
-  display: none;
+  display: block;
+  animation: backdropFadeIn 0.25s ease-out;
+}
+
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .sidebar-brand-wrapper {
@@ -245,15 +259,25 @@ a {
 }
 
 .sidebar-close-btn {
-  display: none;
-  background: transparent;
-  border: none;
-  color: #94a3b8;
-  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+  font-size: 16px;
   cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  transition: color 0.2s, background 0.2s;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sidebar-close-btn:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
 }
 
 .sidebar-close-btn:hover {
@@ -1955,12 +1979,12 @@ a {
 
 @media (max-width: 768px) {
   .sidebar {
-    width: 260px;
-    box-shadow: 6px 0 28px rgba(11, 35, 69, 0.28);
+    width: 275px;
+    box-shadow: -6px 0 28px rgba(11, 35, 69, 0.35);
   }
 
   .app-layout.sidebar-closed .sidebar {
-    transform: translateX(-100%);
+    transform: translateX(100%);
   }
 
   .app-layout.sidebar-open .sidebar {
@@ -1972,11 +1996,12 @@ a {
   }
 
   .sidebar-close-btn {
-    display: block;
+    display: inline-flex;
   }
 
   .app-content {
     margin-left: 0 !important;
+    margin-right: 0 !important;
     width: 100% !important;
   }
 

@@ -4,22 +4,17 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 
 function Layout () {
-  const [sidebarOpen, setSidebarOpen] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return window.innerWidth > 950
-    }
-    return true
-  })
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth <= 768) {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && sidebarOpen) {
         setSidebarOpen(false)
       }
     }
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [sidebarOpen])
 
   const toggleSidebar = () => {
     setSidebarOpen(prev => !prev)

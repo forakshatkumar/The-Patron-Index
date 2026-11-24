@@ -10,7 +10,7 @@ function Sidebar ({ isOpen = true, onClose }) {
   ]
 
   const handleNavClick = () => {
-    if (window.innerWidth <= 768 && onClose) {
+    if (onClose) {
       onClose()
     }
   }
