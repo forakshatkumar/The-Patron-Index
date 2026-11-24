@@ -1798,8 +1798,16 @@ a {
    SETTINGS
 ========================= */
 
+.settings-container {
+  max-width: 780px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .settings-card {
-  max-width: 750px;
+  max-width: 780px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .settings-form {
@@ -1858,8 +1866,16 @@ a {
    UPLOAD
 ========================= */
 
+.import-container {
+  max-width: 850px;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .upload-card {
   max-width: 850px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .upload-area {
