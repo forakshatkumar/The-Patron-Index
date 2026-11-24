@@ -1,6 +1,6 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useMemo, useState } from 'react'
-import { loginUser, removeToken, getToken } from '../services/api'
+import { loginUser, registerUser, removeToken, getToken } from '../services/api'
 
 const AuthContext = createContext(null)
 
@@ -13,6 +13,20 @@ export function AuthProvider ({ children }) {
     setToken(data.token)
     setDemoMode(false)
     localStorage.removeItem('patron_demo')
+    return data
+  }
+
+  const register = async (userData) => {
+    const data = await registerUser(userData)
+    if (data.token) {
+      setToken(data.token)
+      setDemoMode(false)
+      localStorage.removeItem('patron_demo')
+      return data
+    }
+    if (userData.email && userData.password) {
+      return await login(userData.email, userData.password)
+    }
     return data
   }
 
@@ -30,7 +44,8 @@ export function AuthProvider ({ children }) {
     setDemoMode(false)
   }
 
-  const value = useMemo(() => ({ token, demoMode, isAuthenticated: Boolean(token || demoMode), login, logout, enterDemo }), [token, demoMode])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const value = useMemo(() => ({ token, demoMode, isAuthenticated: Boolean(token || demoMode), login, register, logout, enterDemo }), [token, demoMode])
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 

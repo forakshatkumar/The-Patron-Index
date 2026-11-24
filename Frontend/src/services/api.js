@@ -40,10 +40,16 @@ export async function loginUser(email, password) {
   return data
 }
 
-export const registerUser = user => request('/auth/register', {
-  method: 'POST',
-  body: JSON.stringify(user)
-})
+export async function registerUser(user) {
+  const data = await request('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(user)
+  })
+  if (data.token) {
+    saveToken(data.token)
+  }
+  return data
+}
 
 export const getDashboardSummary = () => request('/dashboard/summary')
 export const getCustomers = () => request('/customers')

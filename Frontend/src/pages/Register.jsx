@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { registerUser } from '../services/api'
+import { useAuth } from '../context/AuthContext'
 import logoImg from '../assets/logo.png'
 import './Auth.css'
 
 function Register () {
   const navigate = useNavigate()
+  const { register } = useAuth()
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'analyst' })
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
@@ -20,12 +21,12 @@ function Register () {
     setError('')
     setLoading(true)
     try {
-      await registerUser({
+      await register({
         ...form,
         email: form.email.trim().toLowerCase(),
         name: form.name.trim()
       })
-      navigate('/login', { replace: true, state: { email: form.email.trim(), registered: true } })
+      navigate('/dashboard', { replace: true })
     } catch (err) {
       setError(err.message)
     } finally {

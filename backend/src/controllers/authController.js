@@ -31,9 +31,25 @@ const register = async (req, res) => {
             role: role || "analyst"
         });
 
+        const token = jwt.sign(
+            {
+                userId: user._id,
+                role: user.role
+            },
+            process.env.JWT_SECRET || 'my_secret_key_123',
+            { expiresIn: '24h' }
+        );
+
         res.status(201).json({
             message: "User registered successfully",
-            userId: user._id
+            token,
+            userId: user._id,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role
+            }
         });
 
     } catch (error) {
