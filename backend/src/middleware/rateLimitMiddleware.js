@@ -6,6 +6,7 @@ const authLimiter = rateLimit({
   max: 20, // 20 attempts per IP per 15 minutes
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     message: 'Too many authentication attempts from this IP. Please try again after 15 minutes.'
   }
@@ -17,6 +18,7 @@ const uploadLimiter = rateLimit({
   max: 30,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     message: 'Upload limit reached. Please wait before uploading more files.'
   }
@@ -28,10 +30,10 @@ const apiLimiter = rateLimit({
   max: 400,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false },
   message: {
     message: 'Too many requests from this client. Please slow down.'
   }
 });
 
 module.exports = { authLimiter, uploadLimiter, apiLimiter };
-

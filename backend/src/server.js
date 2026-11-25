@@ -16,6 +16,9 @@ const { apiLimiter, authLimiter, uploadLimiter } = require('./middleware/rateLim
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Trust reverse proxy (Render, Cloudflare, Vercel) for client IP & X-Forwarded-For resolution
+app.set('trust proxy', 1);
+
 // Security: Helmet header hardening
 app.use(helmet({
   contentSecurityPolicy: false, // Let frontend handle its own CSP or allow cross-origin API calls
