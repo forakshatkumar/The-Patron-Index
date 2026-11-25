@@ -1,149 +1,63 @@
 # The Patron Index
+### Where Buyers Become Insight
 
-Customer Intelligence & Behavioral Analytics Platform
+**The Patron Index** is a customer intelligence and business analytics platform designed to help businesses understand customer behaviour and make smarter, data-driven decisions.
 
-The Patron Index is an enterprise-grade customer intelligence platform designed to transform raw transaction records into behavioral cohorts, actionable RFM metrics, and normalized loyalty ratings. Built for high-volume customer analytics, the platform combines real-time data ingestion with automated cohort discovery, predictive retention scoring, and an interactive executive dashboard.
+The platform analyses historical customer purchase data and transforms it into meaningful insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement and improve customer retention.
 
----
+## Problem Statement
 
-## Architecture Overview
+Businesses collect large amounts of customer purchase data but often struggle to understand and organize it effectively.
 
-```mermaid
-flowchart LR
-    subgraph ClientLayer["Presentation Layer"]
-        Dashboard["Executive Dashboard (React 19)"]
-        Analytics["Cohort Visualizer & SVG Charts"]
-    end
+Without proper customer analysis, it becomes difficult to identify loyal, high-value, inactive and at-risk customers. This can lead to missed business opportunities and ineffective customer engagement strategies.
 
-    subgraph ServiceLayer["Application & Security Gateway"]
-        Gateway["API Gateway (Express REST)"]
-        AuthService["Auth Manager (OAuth 2.0 / JWT)"]
-        Quarantine["File Sanitization & Quarantine"]
-    end
+## Our Solution
 
-    subgraph EngineLayer["Intelligence & Persistence"]
-        RFMEngine["RFM Calculation & Scoring Engine"]
-        Database[("Transactional Store (MongoDB)")]
-        MLService["Behavioral Analysis Services"]
-    end
+The Patron Index provides a simple and intelligent platform where users can upload their customer transaction data in CSV format. The system processes and validates the uploaded data, analyses purchasing behaviour and categorizes customers into meaningful segments.
 
-    ClientLayer -->|Encrypted HTTPS / WSS| ServiceLayer
-    ServiceLayer --> EngineLayer
-```
+It also provides an interactive dashboard with visual analytics, customer scores and actionable business recommendations.
 
----
+## Key Features
 
-## Enterprise Capabilities
+- **CSV Data Upload:** Upload customer transaction data easily.
+- **Data Validation:** Detect missing values, duplicate records and invalid data.
+- **Customer Segmentation:** Categorize customers into VIP, Loyal, Regular, New, Occasional, At-Risk and Inactive segments.
+- **Patron Index Score:** Calculate a customer score out of 100 based on recency, purchase frequency, monetary value and loyalty.
+- **Interactive Dashboard:** Visualize customer statistics, revenue trends and purchasing patterns.
+- **Customer Analytics:** Explore individual customer profiles, spending habits and purchase history.
+- **AI-Powered Recommendations:** Generate meaningful suggestions based on customer behaviour and analytical findings.
+- **Secure Data Processing:** Validate uploaded files and protect business and customer information.
 
-| Capability | Architecture | Function |
-| :--- | :--- | :--- |
-| **RFM Cohort Engine** | Quantile-weighted recency, frequency, and monetary analytics | Automatically segments users into VIP, Loyal, Regular, New, Occasional, At-Risk, and Inactive cohorts |
-| **Patron Index Scoring** | 0-100 normalized composite loyalty algorithm | Yields deterministic, explainable customer lifetime health metrics |
-| **Streamlined Ingestion** | Streaming parser with memory-bounded validation and quarantine isolation | Sanitizes and processes multi-thousand transaction batches with schema validation |
-| **Identity Federation** | Hybrid token verification supporting Google OAuth 2.0 and JWT | Provides secure session management with audit trail attribution |
-| **Executive Visualizations** | Responsive SVG trendline animations, dynamic activity charts, and segment distribution tracking | Delivers real-time customer intelligence without client-side rendering bottlenecks |
+## How It Works
 
----
+1. **Sign Up / Login:** Create an account and set up your business profile.
+2. **Upload Data:** Import customer transaction data through a CSV file.
+3. **Data Validation:** Identify and review errors or inconsistencies.
+4. **Data Processing:** Clean and analyse valid customer records.
+5. **Customer Segmentation:** Classify customers based on their purchasing behaviour.
+6. **Generate Insights:** Calculate Patron Index Scores and display analytics.
+7. **Get Recommendations:** Receive useful suggestions to improve customer engagement and business performance.
 
-## Scoring & Classification Methodology
+## Technology Stack
 
-```mermaid
-sequenceDiagram
-    participant Source as Transaction Pipeline
-    participant Ingest as Sanitization Gate
-    participant Scoring as RFM Matrix Engine
-    participant Store as Customer Intelligence Record
+| Component | Technologies |
+|---|---|
+| Frontend | React.js, Tailwind CSS |
+| Backend | Node.js, Express.js |
+| Database | MongoDB |
+| Machine Learning | Python, Pandas, Scikit-learn |
+| ML API | FastAPI |
+| Analytics & Visualization | Chart.js |
+| Security | Malware Detection and File Validation |
+| Version Control | Git and GitHub |
 
-    Source->>Ingest: Stream Transaction Batches
-    Ingest->>Scoring: Extract Verified Ledger
-    Note over Scoring: Calculate Recency (Days since last interaction)<br/>Calculate Frequency (Normalized order velocity)<br/>Calculate Monetary Value (Total lifetime expenditure)
-    Scoring->>Store: Generate Patron Index (0-100) & Cohort Tags
-```
+## Project Objective
 
-### Cohort Definitions
+Our goal is to make customer intelligence accessible to businesses of all sizes by transforming raw transaction data into understandable insights without requiring advanced technical knowledge.
 
-- **VIP**: Top-percentile lifetime value and high purchase frequency within active engagement windows.
-- **Loyal**: Sustained repeat purchasers exhibiting steady transaction intervals and high retention probability.
-- **Regular**: Consistent baseline buyers representing stable, predictable revenue.
-- **New**: First-time buyer records identified within the initial 30-day lifecycle window.
-- **Occasional**: Sporadic purchase frequency requiring automated re-engagement triggers.
-- **At-Risk**: High historical value with lapsed purchase recency exceeding 90 days.
-- **Inactive**: Zero recorded purchasing activity beyond 180 days.
+**The Patron Index bridges the gap between customer data and smarter business decisions.**
 
 ---
 
-## Transaction Ingestion Schema
-
-Bulk customer transaction logs can be ingested via the web workspace or automated via `POST /api/customers/import`.
-
-| Column | Format | Validation | Description |
-| :--- | :--- | :--- | :--- |
-| `customer_id` | String / UUID | Required | Unique business identifier |
-| `name` | String | Required | Full customer or entity name |
-| `purchase_date` | ISO 8601 / YYYY-MM-DD | Required | Timestamp of settled transaction |
-| `amount` | Decimal / Float | Required | Settled currency amount |
-| `email` | RFC 5322 Email | Optional | Communication address |
-| `product` | String | Optional | Purchased SKU, line item, or service description |
-
----
-
-## API Reference
-
-### Identity & Authentication
-
-| Method | Endpoint | Access | Purpose |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/api/auth/register` | Public | Account registration |
-| `POST` | `/api/auth/login` | Public | Credential authentication with JWT issuance |
-| `POST` | `/api/auth/google` | Public | Google Identity OAuth token verification |
-| `GET` | `/api/health` | Public | Gateway uptime and cluster health check |
-
-### Analytics & Customer Intelligence
-
-All protected endpoints require authorization header: `Authorization: Bearer <JWT_TOKEN>`
-
-| Method | Endpoint | Purpose |
-| :--- | :--- | :--- |
-| `GET` | `/api/dashboard/summary` | Retrieve aggregated portfolio metrics and revenue velocity |
-| `GET` | `/api/customers` | Query segmented customer registry with pagination, search, and cohort filters |
-| `GET` | `/api/customers/:id` | Fetch unified 360-degree customer profile and behavioral logs |
-| `POST` | `/api/customers` | Programmatically insert or update a customer record |
-| `POST` | `/api/customers/import` | Multi-part batch transaction ingestion and cohort recalculation |
-| `POST` | `/api/scan/upload` | File quarantine and integrity analysis buffer |
-| `GET` | `/api/scan/:id` | Query quarantine assessment status |
-
----
-
-## Security & Compliance Architecture
-
-- **Quarantine Pipeline**: Ingested files are buffered in isolated quarantine storage with randomized cryptographic identifiers prior to parsing.
-- **Cryptographic Standards**: Authentication passwords utilize adaptive `bcrypt` hashing with individual salts.
-- **Session Integrity**: Stateless JSON Web Tokens (JWT) verified against secret rotation policies.
-- **Network Defense**: HTTP header hardening via `helmet` and strict cross-origin resource sharing (CORS) enforcement.
-- **Input Neutralization**: High-throughput CSV streams execute strict column whitelisting to eliminate code execution and buffer overflow vectors.
-
----
-
-## Deployment & Running
-
-### Frontend Service
-
-```bash
-cd Frontend
-npm install
-npm run dev
-```
-
-### Backend API Service
-
-```bash
-cd backend
-npm install
-npm run dev
-```
-
----
-
-## License
-
-Proprietary enterprise software. All rights reserved.
+**Developed by Team CodeGoblins**  
+Prasunex Innovathon 2026
