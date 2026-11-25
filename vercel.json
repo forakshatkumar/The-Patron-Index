@@ -1,22 +1,57 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "framework": null,
-  "installCommand": "npm ci --include=dev && npm ci --prefix Frontend --include=dev",
-  "buildCommand": "npm run build",
-  "outputDirectory": "Frontend/dist",
-  "functions": {
-    "api/patron.js": {
-      "maxDuration": 60
+  "services": {
+    "frontend": {
+      "root": "Frontend",
+      "framework": "vite",
+      "installCommand": "npm ci --include=dev",
+      "buildCommand": "npm run build",
+      "outputDirectory": "dist",
+      "rewrites": [
+        {
+          "source": "/(.*)",
+          "destination": "/index.html"
+        }
+      ]
+    },
+    "patron-index-backend": {
+      "root": "backend",
+      "framework": "express",
+      "entrypoint": "vercel-app.js",
+      "installCommand": "npm ci --omit=dev",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "patron-index-ml",
+          "format": "url",
+          "env": "MALWARE_SCAN_URL"
+        }
+      ]
+    },
+    "patron-index-ml": {
+      "root": "ml",
+      "framework": "fastapi",
+      "entrypoint": "main:app"
     }
   },
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/patron?__patron_path=:path*"
+      "source": "/api",
+      "destination": {
+        "service": "patron-index-backend"
+      }
     },
     {
-      "source": "/((?!api(?:/|$)).*)",
-      "destination": "/index.html"
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "patron-index-backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
     }
   ]
 }
