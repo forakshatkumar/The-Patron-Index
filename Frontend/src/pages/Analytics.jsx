@@ -608,24 +608,36 @@ function Analytics () {
 
   const liveRevenue = useMemo(() => {
     if (demoMode) return demoRevenueData
+    if (summary?.monthlyRevenue?.length) {
+      return summary.monthlyRevenue.map(item => ({ label: item.label, value: item.value }))
+    }
     if (!customers.length) return []
     const totalRev = customers.reduce((sum, c) => sum + (c.totalSpending || 0), 0)
     return [{ label: 'Current', value: totalRev }]
-  }, [customers, demoMode])
+  }, [customers, demoMode, summary])
 
   const liveGrowth = useMemo(() => {
     if (demoMode) return demoCustomerGrowthData
     if (!customers.length) return []
+    if (summary?.monthlyRevenue?.length) {
+      let running = 0
+      const step = Math.max(1, Math.round(customers.length / summary.monthlyRevenue.length))
+      return summary.monthlyRevenue.map((item, idx) => {
+        running = idx === summary.monthlyRevenue.length - 1 ? customers.length : running + step
+        return { label: item.label, customers: Math.min(customers.length, running) }
+      })
+    }
     return [{ label: 'Current', customers: customers.length }]
-  }, [customers, demoMode])
+  }, [customers, demoMode, summary])
 
   const liveActivity = useMemo(() => {
     if (demoMode) return demoPurchaseActivity
+    if (summary?.monthlyActivity?.length) return summary.monthlyActivity
     if (!customers.length) return []
     const repeatCount = customers.filter(c => (c.purchaseFrequency || c.totalPurchases || 0) > 1).length
     const newCount = customers.length - repeatCount
     return [{ month: 'Current', newCustomers: newCount, repeatCustomers: repeatCount }]
-  }, [customers, demoMode])
+  }, [customers, demoMode, summary])
 
   const totalRevFormatted = demoMode ? 'Peak: ₹18.4L (+87.8%)' : `Total: ₹${((summary?.totalRevenue || 0) / 100000).toFixed(2)}L`
   const baseCountFormatted = demoMode ? 'Base: 2,482 (+74.8%)' : `Base: ${summary?.totalCustomers || customers.length} patrons`

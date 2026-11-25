@@ -101,9 +101,11 @@ function ImportData () {
                 <span>Scan Status<strong>{result.scan?.status || 'completed'}</strong></span>
                 <span>Classification<strong>Complete</strong></span>
               </div>
-              <p style={{ marginTop: 12 }}>
-                <Link className='text-button' to='/customers'>View classified customers →</Link>
-              </p>
+              <div style={{ marginTop: 14, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <Link className='primary-button' to='/customers' style={{ padding: '8px 16px', fontSize: 13 }}>View Classified Customers →</Link>
+                <Link className='secondary-button' to='/dashboard' style={{ padding: '8px 16px', fontSize: 13 }}>View Dashboard Trends</Link>
+                <Link className='secondary-button' to='/transactions' style={{ padding: '8px 16px', fontSize: 13 }}>View Transactions</Link>
+              </div>
             </div>
           )}
           <div className='upload-actions'>

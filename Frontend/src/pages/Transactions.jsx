@@ -1,16 +1,40 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { getTransactions } from '../services/api'
 import { transactions as demoTransactions } from '../data/mockData'
 
 function Transactions () {
   const { demoMode } = useAuth()
+  const [dbTransactions, setDbTransactions] = useState([])
+  const [loading, setLoading] = useState(!demoMode)
   const [search, setSearch] = useState('')
   const [payment, setPayment] = useState('All')
 
-  const rawTransactions = useMemo(() => {
-    return demoMode ? demoTransactions : []
+  useEffect(() => {
+    if (demoMode) return
+    getTransactions()
+      .then(data => {
+        setDbTransactions(data.transactions || [])
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [demoMode])
+
+  const rawTransactions = useMemo(() => {
+    if (demoMode) return demoTransactions
+    return dbTransactions.map(t => ({
+      id: t.transactionId || t._id,
+      customerId: t.customerId,
+      customerName: t.customerName || t.customerId,
+      amount: Number(t.amount || 0),
+      date: t.date,
+      product: t.product || 'Standard Purchase',
+      category: t.category || 'General',
+      paymentMethod: t.paymentMethod || 'UPI',
+      status: t.status || 'Completed'
+    }))
+  }, [demoMode, dbTransactions])
 
   const filteredTransactions = useMemo(() => {
     return rawTransactions.filter(transaction => {
@@ -73,7 +97,13 @@ function Transactions () {
             </thead>
 
             <tbody>
-              {filteredTransactions.length > 0 ? (
+              {loading ? (
+                <tr>
+                  <td colSpan='8' style={{ textAlign: 'center', padding: '40px' }} className='muted-text'>
+                    Loading transactions...
+                  </td>
+                </tr>
+              ) : filteredTransactions.length > 0 ? (
                 filteredTransactions.map(transaction => (
                   <tr key={transaction.id}>
                     <td>{transaction.id}</td>

@@ -100,4 +100,7 @@ export function importCustomerCsv(file) {
   return request('/customers/import', { method: 'POST', body: formData })
 }
 
+export const getTransactions = () => request('/transactions')
+export const getCustomerTransactions = id => request(`/transactions/customer/${encodeURIComponent(id)}`)
+
 export const getScan = id => request(`/scan/${encodeURIComponent(id)}`)

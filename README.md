@@ -1,63 +1,104 @@
 # The Patron Index
 ### Where Buyers Become Insight
 
-**The Patron Index** is a customer intelligence and business analytics platform designed to help businesses understand customer behaviour and make smarter, data-driven decisions.
+**The Patron Index** is an enterprise-grade customer intelligence and business analytics platform designed to help modern businesses understand customer behavior and make smarter, data-driven decisions.
 
-The platform analyses historical customer purchase data and transforms it into meaningful insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement and improve customer retention.
+The platform analyses historical customer purchase data and transforms it into meaningful predictive insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement, and improve customer retention without relying on synthetic or made-up data.
 
-## Problem Statement
+---
 
-Businesses collect large amounts of customer purchase data but often struggle to understand and organize it effectively.
+## 🌐 Live Deployments
 
-Without proper customer analysis, it becomes difficult to identify loyal, high-value, inactive and at-risk customers. This can lead to missed business opportunities and ineffective customer engagement strategies.
+- **Frontend Application (Vercel):** [https://the-patron-index.vercel.app/](https://the-patron-index.vercel.app/)
+- **Backend API Service (Render):** [https://the-patron-index-backend.onrender.com/](https://the-patron-index-backend.onrender.com/)
 
-## Our Solution
+---
 
-The Patron Index provides a simple and intelligent platform where users can upload their customer transaction data in CSV format. The system processes and validates the uploaded data, analyses purchasing behaviour and categorizes customers into meaningful segments.
+## 🚀 Key Features
 
-It also provides an interactive dashboard with visual analytics, customer scores and actionable business recommendations.
+- **CSV Data Import & Validation:** Upload customer purchase and transaction records in CSV format with instant client-side pre-validation and server-side virus/malware scanning.
+- **Strict Multi-Tenant Isolation:** Zero data leakage. Every business user's customers, transactions, and scan metrics are strictly isolated to their own authenticated workspace.
+- **RFM Customer Segmentation:** Automatically classifies customers into 7 distinct behavioral cohorts: **VIP**, **Loyal**, **Regular**, **New**, **Occasional**, **At-Risk**, and **Inactive**.
+- **Patron Index Scoring:** Calculates an adaptive loyalty index (0–100) combining Recency (35%), Frequency (30%), and Monetary value (35%).
+- **Interactive Executive Dashboard:** Real-time visibility into customer counts, active revenue, customer cohorts, recent customers, and monthly revenue trends.
+- **Customer Directory & Profiling:** Detailed patron registry with search, filtering, patron score distribution, and individual purchase history.
+- **Transactions Ledger:** Complete transaction ledger tracking transaction IDs, customer names, dates, amounts, categories, and payment methods.
+- **Customizable Business Profile:** Dynamic business settings (Business Name, Industry, Location) that seamlessly customize the workspace and profile cards across the app.
+- **Google OAuth 2.0 & JWT Authentication:** Secure login using Google One Tap / Sign-In or encrypted email credentials.
 
-## Key Features
+---
 
-- **CSV Data Upload:** Upload customer transaction data easily.
-- **Data Validation:** Detect missing values, duplicate records and invalid data.
-- **Customer Segmentation:** Categorize customers into VIP, Loyal, Regular, New, Occasional, At-Risk and Inactive segments.
-- **Patron Index Score:** Calculate a customer score out of 100 based on recency, purchase frequency, monetary value and loyalty.
-- **Interactive Dashboard:** Visualize customer statistics, revenue trends and purchasing patterns.
-- **Customer Analytics:** Explore individual customer profiles, spending habits and purchase history.
-- **AI-Powered Recommendations:** Generate meaningful suggestions based on customer behaviour and analytical findings.
-- **Secure Data Processing:** Validate uploaded files and protect business and customer information.
-
-## How It Works
-
-1. **Sign Up / Login:** Create an account and set up your business profile.
-2. **Upload Data:** Import customer transaction data through a CSV file.
-3. **Data Validation:** Identify and review errors or inconsistencies.
-4. **Data Processing:** Clean and analyse valid customer records.
-5. **Customer Segmentation:** Classify customers based on their purchasing behaviour.
-6. **Generate Insights:** Calculate Patron Index Scores and display analytics.
-7. **Get Recommendations:** Receive useful suggestions to improve customer engagement and business performance.
-
-## Technology Stack
+## 🛠️ Technology Stack
 
 | Component | Technologies |
 |---|---|
-| Frontend | React.js, Tailwind CSS |
-| Backend | Node.js, Express.js |
-| Database | MongoDB |
-| Machine Learning | Python, Pandas, Scikit-learn |
-| ML API | FastAPI |
-| Analytics & Visualization | Chart.js |
-| Security | Malware Detection and File Validation |
-| Version Control | Git and GitHub |
-
-## Project Objective
-
-Our goal is to make customer intelligence accessible to businesses of all sizes by transforming raw transaction data into understandable insights without requiring advanced technical knowledge.
-
-**The Patron Index bridges the gap between customer data and smarter business decisions.**
+| **Frontend** | React 18, Vite, React Router 6, CSS Modules / Custom Tokens |
+| **Backend** | Node.js, Express.js, Mongoose, JWT, Helmet, Rate Limiter |
+| **Database** | MongoDB Atlas (Multi-Tenant Document Store) |
+| **Machine Learning** | Python, FastAPI, LightGBM, Scikit-learn, Isotonic Calibration |
+| **Security** | DDE / Formula Injection Sanitizer, Malware File Isolation, Helmet CSP |
+| **Hosting & CI/CD** | Vercel (Frontend), Render (Backend), Git / GitHub |
 
 ---
+
+## 🔌 API Endpoints
+
+### Authentication (`/api/auth`)
+- `POST /api/auth/register` - Create a new user account.
+- `POST /api/auth/login` - Authenticate with email and password.
+- `POST /api/auth/google` - Verify Google OAuth credentials.
+
+### Customers (`/api/customers`)
+- `GET /api/customers` - Retrieve authenticated user's customers with RFM classifications.
+- `POST /api/customers` - Add a new customer to the user's registry.
+- `GET /api/customers/:id` - Fetch single customer details and predictions.
+- `POST /api/customers/import` - Bulk import customers and transactions from CSV.
+
+### Transactions (`/api/transactions`)
+- `GET /api/transactions` - Fetch customer transactions for the authenticated user.
+- `GET /api/transactions/customer/:id` - Fetch transactions for a specific customer.
+
+### Dashboard & Analytics (`/api/dashboard`)
+- `GET /api/dashboard/summary` - Aggregate metrics, active patrons, segment distribution, and monthly revenue.
+
+### Security Scanner (`/api/scan`)
+- `POST /api/scan/upload` - Secure file upload with quarantine and risk assessment.
+- `GET /api/scan/:id` - Query scan verdict and risk score.
+
+---
+
+## 💻 Local Development Setup
+
+### 1. Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- MongoDB Atlas database URI
+
+### 2. Backend Setup
+```bash
+cd backend
+npm install
+# Configure your .env file:
+# PORT=5000
+# MONGO_URI=your_mongodb_connection_string
+# JWT_SECRET=your_jwt_secret
+# GOOGLE_CLIENT_ID=your_google_client_id
+npm run dev
+```
+
+### 3. Frontend Setup
+```bash
+cd Frontend
+npm install
+# Configure Frontend/.env if needed:
+# VITE_API_URL=http://localhost:5000/api
+# VITE_GOOGLE_CLIENT_ID=your_google_client_id
+npm run dev
+```
+
+---
+
+## 👥 Project Information
 
 **Developed by Team CodeGoblins**  
 Prasunex Innovathon 2026

@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import SegmentBadge from '../components/SegmentBadge'
 import RevenueChart from '../components/RevenueChart'
 import { useAuth } from '../context/AuthContext'
-import { getCustomer } from '../services/api'
+import { getCustomer, getCustomerTransactions } from '../services/api'
 import { normalizeCustomer } from '../services/customerMapper'
 import { customers as demoCustomers, transactions, customerInsights, customerSpendingHistory } from '../data/mockData'
 
@@ -11,24 +11,52 @@ function CustomerProfile () {
   const { id } = useParams()
   const { demoMode } = useAuth()
   const [customer, setCustomer] = useState(demoMode ? demoCustomers.find(item => item.id === id) : null)
+  const [liveTransactions, setLiveTransactions] = useState([])
   const [loading, setLoading] = useState(!demoMode)
   const [error, setError] = useState('')
 
   useEffect(() => {
     if (demoMode) return
-    getCustomer(id).then(data => setCustomer(normalizeCustomer(data))).catch(err => setError(err.message)).finally(() => setLoading(false))
+    getCustomer(id)
+      .then(data => setCustomer(normalizeCustomer(data)))
+      .catch(err => setError(err.message))
+      .finally(() => setLoading(false))
+
+    getCustomerTransactions(id)
+      .then(data => setLiveTransactions(data.transactions || []))
+      .catch(() => {})
   }, [demoMode, id])
+
+  const customerTransactions = useMemo(() => {
+    if (demoMode) return transactions.filter(t => t.customerId === customer?.id)
+    return liveTransactions.map(t => ({
+      id: t.transactionId || t._id,
+      date: t.date,
+      product: t.product || 'Standard Purchase',
+      category: t.category || 'General',
+      amount: Number(t.amount || 0)
+    }))
+  }, [demoMode, customer, liveTransactions])
+
+  const insights = useMemo(() => {
+    if (demoMode && customerInsights[customer?.id]) {
+      return customerInsights[customer.id]
+    }
+    return [customer?.recommendation || 'Monitor this customer and personalize future offers.']
+  }, [demoMode, customer])
+
+  const spendingData = useMemo(() => {
+    if (demoMode && customerSpendingHistory[customer?.id]) {
+      return customerSpendingHistory[customer.id]
+    }
+    if (customerTransactions.length > 0) {
+      return customerTransactions.map(t => ({ month: t.date, value: t.amount }))
+    }
+    return [{ month: 'Current', value: customer?.totalSpending || 0 }]
+  }, [demoMode, customer, customerTransactions])
 
   if (loading) return <div className='page'><div className='empty-state'><h2>Loading customer...</h2></div></div>
   if (!customer) return <div className='page'><div className='empty-state'><h2>{error || 'Customer not found'}</h2><Link to='/customers' className='primary-button'>Back to Customers</Link></div></div>
-
-  const customerTransactions = demoMode ? transactions.filter(t => t.customerId === customer.id) : []
-  const insights = demoMode && customerInsights[customer.id]
-    ? customerInsights[customer.id]
-    : [customer.recommendation || 'Monitor this customer and personalize future offers.']
-  const spendingData = demoMode && customerSpendingHistory[customer.id]
-    ? customerSpendingHistory[customer.id]
-    : [{ month: 'Current', value: customer.totalSpending }]
 
   return (
     <div className='page'>

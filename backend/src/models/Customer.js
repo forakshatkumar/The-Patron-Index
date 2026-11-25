@@ -5,7 +5,6 @@ const customerSchema = new mongoose.Schema(
         customerId: {
             type: String,
             required: true,
-            unique: true,
             trim: true,
             index: true
         },
@@ -46,6 +45,7 @@ const customerSchema = new mongoose.Schema(
     }
 );
 
+customerSchema.index({ user: 1, customerId: 1 });
 customerSchema.index({ createdAt: -1 });
 customerSchema.index({ totalSpent: -1 });
 

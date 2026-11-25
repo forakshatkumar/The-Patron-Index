@@ -8,6 +8,7 @@ const authRoutes = require('./routes/auth');
 const scanRoutes = require('./routes/scan');
 const customerRoutes = require('./routes/customers');
 const dashboardRoutes = require('./routes/dashboard');
+const transactionRoutes = require('./routes/transactions');
 const errorMiddleware = require('./middleware/errorMiddleware');
 const sanitizeMiddleware = require('./middleware/sanitizeMiddleware');
 const { apiLimiter, authLimiter, uploadLimiter } = require('./middleware/rateLimitMiddleware');
@@ -80,6 +81,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/scan', scanRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/transactions', transactionRoutes);
 
 // Central error handling
 app.use(errorMiddleware);

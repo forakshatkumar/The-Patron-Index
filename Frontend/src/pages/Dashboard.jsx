@@ -52,10 +52,11 @@ function Dashboard () {
 
   const liveRevenueData = useMemo(() => {
     if (demoMode) return revenueData
+    if (summary?.monthlyRevenue?.length) return summary.monthlyRevenue
     if (!customers.length) return []
     const totalRev = customers.reduce((sum, c) => sum + (c.totalSpending || 0), 0)
     return [{ label: 'Total', value: totalRev }]
-  }, [customers, demoMode])
+  }, [customers, demoMode, summary])
 
   const insights = useMemo(() => {
     if (demoMode) return dashboardInsights
@@ -78,7 +79,11 @@ function Dashboard () {
     return list.length ? list : [{ id: 1, type: 'info', title: 'Customer records are synchronized with database.' }]
   }, [demoMode, summary])
 
-  const activityList = demoMode ? purchaseActivity : []
+  const activityList = useMemo(() => {
+    if (demoMode) return purchaseActivity
+    if (summary?.monthlyActivity?.length) return summary.monthlyActivity
+    return []
+  }, [demoMode, summary])
 
   return (
     <div className='page'>
