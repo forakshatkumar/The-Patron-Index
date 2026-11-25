@@ -1,15 +1,22 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm ci --include=dev && npm ci --prefix Frontend --include=dev",
   "buildCommand": "npm run build",
   "outputDirectory": "Frontend/dist",
+  "functions": {
+    "api/patron.js": {
+      "maxDuration": 60
+    }
+  },
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://the-patron-index-backend.onrender.com/api/:path*"
+      "destination": "/api/patron?__patron_path=:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api(?:/|$)).*)",
       "destination": "/index.html"
     }
-  ],
-  "installCommand": "npm ci --prefix Frontend --include=dev"
+  ]
 }

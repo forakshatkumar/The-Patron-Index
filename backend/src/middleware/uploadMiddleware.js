@@ -1,17 +1,7 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-
-const quarantineDir = path.join(process.cwd(), 'uploads', 'quarantine');
-fs.mkdirSync(quarantineDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, quarantineDir),
-  filename: (req, file, cb) => {
-    const uniqueName = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueName + path.extname(file.originalname).toLowerCase());
-  }
-});
+// Files are held in memory for the duration of the request, never on a deployment filesystem.
+const storage = multer.memoryStorage();
 
 const allowedExtensions = [
   '.csv', '.xlsx', '.xls', '.txt', '.pdf', '.doc', '.docx', '.zip', '.exe', '.dll'
@@ -25,6 +15,6 @@ const fileFilter = (req, file, cb) => {
 
 module.exports = multer({
   storage,
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { files: 1, fileSize: 4 * 1024 * 1024 },
   fileFilter
 });

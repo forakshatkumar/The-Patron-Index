@@ -1,18 +1,17 @@
 const createAuditLog = require('../utils/auditLogger');
 const ScanRecord = require('../models/ScanRecord');
 const crypto = require('crypto');
-const fs = require('fs');
 const path = require('path');
 
 
 /**
  * Perform asynchronous heuristic static analysis or ML risk prediction
  */
-async function queryMlService(filePath, originalName) {
+async function queryMlService(buffer, originalName) {
   if (!process.env.MALWARE_SCAN_URL) return null;
   try {
     const data = new FormData();
-    data.append('file', new Blob([await fs.promises.readFile(filePath)]), originalName);
+    data.append('file', new Blob([buffer]), originalName);
     const response = await fetch(new URL('/predict', process.env.MALWARE_SCAN_URL), { method: 'POST', body: data, signal: AbortSignal.timeout(15000) });
     if (!response.ok) return null;
     const parsed = await response.json();
@@ -61,7 +60,7 @@ const uploadScan = async (req, res, next) => {
     const extension = path.extname(safeFileName).toLowerCase();
     const isBusinessDataset = ['.csv', '.xlsx', '.xls'].includes(extension);
 
-    // Initial record in quarantine
+    // Initial scan record
     const scan = await ScanRecord.create({
       scanId: crypto.randomUUID(),
       fileName: safeFileName,
@@ -78,13 +77,13 @@ const uploadScan = async (req, res, next) => {
       action: 'FILE_UPLOADED',
       resource: 'ScanRecord',
       resourceId: scan._id.toString(),
-      details: `File ${safeFileName} uploaded to quarantine`,
+      details: `File ${safeFileName} received for validation`,
       ipAddress: req.ip
     });
 
     if (!isBusinessDataset) {
       // Asynchronously invoke ML scanner or heuristic fallback
-      const mlResult = await queryMlService(req.file.path, safeFileName);
+      const mlResult = await queryMlService(req.file.buffer, safeFileName);
       if (mlResult) {
         scan.status = 'completed';
         scan.riskScore = mlResult.riskScore;
@@ -110,8 +109,6 @@ const uploadScan = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-  } finally {
-    if (req.file?.path) fs.unlink(req.file.path, () => {});
   }
 };
 

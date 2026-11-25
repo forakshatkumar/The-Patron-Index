@@ -24,7 +24,7 @@ function ImportData () {
     setValidation(null); setResult(null)
     if (!file) return setError('Please choose a CSV file first.')
     if (!file.name.toLowerCase().endsWith('.csv')) return setError('Customer import currently supports CSV files only.')
-    if (file.size > 10 * 1024 * 1024) return setError('File size cannot exceed 10 MB.')
+    if (file.size > 4 * 1024 * 1024) return setError('File size cannot exceed 4 MB.')
 
     const version = selectionVersion.current
     const reader = new FileReader()
@@ -74,7 +74,7 @@ function ImportData () {
           <div className='upload-area' onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); select(e.dataTransfer.files?.[0]) }}>
             <div className='upload-icon'>↑</div>
             <h3>Upload Purchase Data</h3>
-            <p>Drag and drop a CSV or choose a file. Maximum 10 MB; up to 10,000 purchase rows.</p>
+            <p>Drag and drop a CSV or choose a file. Maximum 4 MB; up to 10,000 purchase rows.</p>
             <label className='file-button'>
               Choose CSV File
               <input type='file' accept='.csv,text/csv' className='visually-hidden' disabled={loading} onChange={selectFile} />

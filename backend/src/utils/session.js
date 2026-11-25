@@ -3,7 +3,7 @@ const Session = require('../models/Session');
 const NAME = 'patron_session';
 const TTL = 30 * 24 * 60 * 60 * 1000;
 const digest = token => crypto.createHash('sha256').update(token).digest('hex');
-const cookieOptions = () => ({ httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' });
+const cookieOptions = () => ({ httpOnly: true, secure: process.env.NODE_ENV === 'production' || Boolean(process.env.VERCEL), sameSite: 'lax', path: '/' });
 function readCookie(req) {
   const value = (req.headers.cookie || '').split(';').map(s => s.trim()).find(s => s.startsWith(`${NAME}=`))?.slice(NAME.length + 1);
   return /^[a-f0-9]{64}$/.test(value || '') ? value : null;

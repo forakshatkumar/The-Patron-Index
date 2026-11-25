@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth');
@@ -17,7 +17,7 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const mongoose = require('mongoose');
 
-// Trust reverse proxy (Render, Cloudflare, Vercel) for client IP & X-Forwarded-For resolution
+// Trust the deployment reverse proxy for client IP resolution
 app.set('trust proxy', process.env.NODE_ENV === 'production' ? 1 : false);
 
 // Security: Helmet header hardening
@@ -33,18 +33,22 @@ const allowedOrigins = process.env.FRONTEND_URL
   ? process.env.FRONTEND_URL.split(',').map(u => u.trim().replace(/\/$/, '')).filter(Boolean)
   : ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', 'http://localhost:3000'];
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow non-browser requests (e.g. mobile apps, curl, server-to-server) or matching origins
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(Object.assign(new Error('Origin not allowed'), { status: 403 }));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Patron-Request']
+// Same-origin requests need no CORS, but browsers send Origin on writes.
+const knownVercelOrigins = [process.env.VERCEL_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL]
+  .filter(Boolean).map(host => `https://${host}`);
+app.use(cors((req, callback) => {
+  const origin = req.get('origin');
+  const host = req.get('host');
+  const sameOrigin = Boolean(process.env.VERCEL && host && origin === `https://${host}`);
+  if (origin && !sameOrigin && !allowedOrigins.includes(origin) && !knownVercelOrigins.includes(origin)) {
+    return callback(Object.assign(new Error('Origin not allowed'), { status: 403 }));
+  }
+  callback(null, {
+    origin: origin || false,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Patron-Request']
+  });
 }));
 
 // Require a non-simple header on cookie-capable writes to prevent cross-site form requests.
@@ -81,13 +85,26 @@ app.get('/', (req, res) => {
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/api/health', async (req, res) => {
+  if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+    try { await connectDB(); } catch { /* Report unavailable without exposing credentials. */ }
+  }
   const ready = mongoose.connection.readyState === 1;
   res.status(ready ? 200 : 503).json({
     status: ready ? 'ok' : 'unavailable',
     service: 'backend',
     timestamp: new Date().toISOString()
   });
+});
+
+// Cold starts do not run startServer(). Establish the database before business routes.
+app.use('/api', async (req, res, next) => {
+  if (!process.env.VERCEL && process.env.NODE_ENV !== 'production') return next();
+  try { await connectDB(); next(); }
+  catch {
+    console.error('Database unavailable; check MONGO_URI and Atlas network access.');
+    res.status(503).json({ message: 'Database unavailable. Please try again shortly.' });
+  }
 });
 
 // Primary route mounting
@@ -127,7 +144,7 @@ async function ensureDefaultAccounts () {
 let server;
 
 async function startServer () {
-  if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) throw new Error('FRONTEND_URL must be configured in production');
+  if (process.env.NODE_ENV === 'production' && !process.env.VERCEL && !process.env.FRONTEND_URL) throw new Error('FRONTEND_URL must be configured in production');
   await connectDB();
   if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_DEMO_ACCOUNT === 'true') await ensureDefaultAccounts();
   server = app.listen(PORT, '0.0.0.0', () => {

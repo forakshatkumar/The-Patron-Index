@@ -142,7 +142,7 @@ export default function Landing () {
     const timer = setTimeout(() => setDonutLoaded(true), 50)
 
     // Pre-warm backend on Render to eliminate cold-start delay
-    const apiBase = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api')
+    const apiBase = '/api'
     fetch(`${apiBase}/health`).catch(() => {})
 
     return () => clearTimeout(timer)
