@@ -131,6 +131,7 @@ function InteractiveRevenueChart ({ data = [] }) {
             <g
               key={pt.label}
               onMouseEnter={() => setActivePoint(pt)}
+              onClick={() => setActivePoint(pt)}
               className='animated-chart-point'
               style={{
                 cursor: 'pointer',
@@ -499,6 +500,17 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
                     columnIndex: index,
                     isNew: true
                   })}
+                  onClick={() => setHoveredBar(prev => (prev?.columnIndex === index && prev?.isNew) ? null : {
+                    item,
+                    type: 'New',
+                    typeLabel: 'New Customers',
+                    count: item.newCustomers,
+                    total: totalCohort,
+                    sharePct: Math.round((item.newCustomers / totalCohort) * 100),
+                    color: '#10B981',
+                    columnIndex: index,
+                    isNew: true
+                  })}
                   title={`${item.month}: ${item.newCustomers} New Customers`}
                 />
 
@@ -510,6 +522,17 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
                     animationDelay: `${index * 0.08 + 0.04}s`
                   }}
                   onMouseEnter={() => setHoveredBar({
+                    item,
+                    type: 'Repeat',
+                    typeLabel: 'Repeat Customers',
+                    count: item.repeatCustomers,
+                    total: totalCohort,
+                    sharePct: Math.round((item.repeatCustomers / totalCohort) * 100),
+                    color: '#118DFF',
+                    columnIndex: index,
+                    isNew: false
+                  })}
+                  onClick={() => setHoveredBar(prev => (prev?.columnIndex === index && !prev?.isNew) ? null : {
                     item,
                     type: 'Repeat',
                     typeLabel: 'Repeat Customers',

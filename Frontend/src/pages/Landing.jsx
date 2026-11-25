@@ -14,7 +14,9 @@ import {
   LayoutDashboard,
   PieChart,
   Lightbulb,
-  TrendingUp
+  TrendingUp,
+  Menu,
+  X
 } from 'lucide-react'
 import logoImg from '../assets/logo.png'
 import './Landing.css'
@@ -99,6 +101,37 @@ export default function Landing () {
   const [timelineProgress, setTimelineProgress] = useState(0)
   const [isLaptopOpen, setIsLaptopOpen] = useState(false)
   const laptopSectionRef = useRef(null)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+      }
+    }
+    const handleResize = () => {
+      if (window.innerWidth >= 840 && mobileMenuOpen) {
+        setMobileMenuOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('resize', handleResize)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [mobileMenuOpen])
+
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileMenuOpen])
 
   useEffect(() => {
     // Ensure the landing page loads at the very top so only the hero section is visible initially
@@ -115,14 +148,23 @@ export default function Landing () {
     return () => clearTimeout(timer)
   }, [])
 
-  // GSAP ScrollTrigger Integration for smooth, physics-based scroll animations
+  // GSAP ScrollTrigger Integration with responsive matchMedia & reduced-motion support
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    const mm = gsap.matchMedia(landingRef)
+
+    mm.add({
+      isDesktop: '(min-width: 1025px)',
+      isTablet: '(min-width: 768px) and (max-width: 1024px)',
+      isMobile: '(max-width: 767px)',
+      reduceMotion: '(prefers-reduced-motion: reduce)'
+    }, (context) => {
+      const { reduceMotion, isMobile } = context.conditions
+
       // 1. Scroll-Linked 3D Laptop Flap: opens as user scrolls into view, shuts when scrolling back up
       if (laptopSectionRef.current) {
         ScrollTrigger.create({
           trigger: laptopSectionRef.current,
-          start: 'top 85%',
+          start: isMobile ? 'top 90%' : 'top 85%',
           end: 'bottom 15%',
           onEnter: () => setIsLaptopOpen(true),
           onLeaveBack: () => setIsLaptopOpen(false),
@@ -141,7 +183,7 @@ export default function Landing () {
       if (stepsContainerRef.current) {
         ScrollTrigger.create({
           trigger: stepsContainerRef.current,
-          start: 'top 75%',
+          start: isMobile ? 'top 85%' : 'top 75%',
           end: 'bottom 25%',
           scrub: 0.25,
           onUpdate: (self) => {
@@ -150,64 +192,76 @@ export default function Landing () {
         })
       }
 
-      // 3. Staggered Scroll Entrance for About Benefits
-      gsap.from('.benefit', {
-        scrollTrigger: {
-          trigger: '.benefits',
-          start: 'top 85%',
-          toggleActions: 'play none none none'
-        },
-        y: 28,
-        opacity: 0,
-        duration: 0.7,
-        stagger: 0.14,
-        ease: 'power2.out'
-      })
-
-      // 4. Staggered Entrance for Timeline Step Articles
-      if (stepsContainerRef.current) {
-        gsap.from('.steps article.step', {
+      if (!reduceMotion) {
+        // 3. Staggered Scroll Entrance for About Benefits
+        gsap.from('.benefit', {
           scrollTrigger: {
-            trigger: stepsContainerRef.current,
-            start: 'top 80%',
+            trigger: '.benefits',
+            start: 'top 85%',
             toggleActions: 'play none none none'
           },
-          y: 25,
+          y: isMobile ? 18 : 28,
           opacity: 0,
-          duration: 0.8,
-          stagger: 0.18,
+          duration: 0.7,
+          stagger: 0.14,
           ease: 'power2.out'
         })
+
+        // 4. Staggered Entrance for Timeline Step Articles
+        if (stepsContainerRef.current) {
+          gsap.from('.steps article.step', {
+            scrollTrigger: {
+              trigger: stepsContainerRef.current,
+              start: isMobile ? 'top 85%' : 'top 80%',
+              toggleActions: 'play none none none'
+            },
+            y: isMobile ? 16 : 25,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.16,
+            ease: 'power2.out'
+          })
+        }
+
+        // 5. Powerful Features Section Reveal
+        gsap.from('.feature-explorer', {
+          scrollTrigger: {
+            trigger: '#features',
+            start: isMobile ? 'top 88%' : 'top 82%',
+            toggleActions: 'play none none none'
+          },
+          y: isMobile ? 20 : 32,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power3.out'
+        })
+
+        // 6. Call To Action Banner Reveal
+        gsap.from('.cta', {
+          scrollTrigger: {
+            trigger: '.cta',
+            start: 'top 85%',
+            toggleActions: 'play none none none'
+          },
+          y: isMobile ? 18 : 28,
+          opacity: 0,
+          duration: 0.8,
+          ease: 'power3.out'
+        })
       }
+    })
 
-      // 5. Powerful Features Section Reveal
-      gsap.from('.feature-explorer', {
-        scrollTrigger: {
-          trigger: '#features',
-          start: 'top 82%',
-          toggleActions: 'play none none none'
-        },
-        y: 32,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out'
-      })
+    const handleRefresh = () => {
+      ScrollTrigger.refresh()
+    }
+    window.addEventListener('resize', handleRefresh)
+    window.addEventListener('orientationchange', handleRefresh)
 
-      // 6. Call To Action Banner Reveal
-      gsap.from('.cta', {
-        scrollTrigger: {
-          trigger: '.cta',
-          start: 'top 85%',
-          toggleActions: 'play none none none'
-        },
-        y: 28,
-        opacity: 0,
-        duration: 0.8,
-        ease: 'power3.out'
-      })
-    }, landingRef)
-
-    return () => ctx.revert()
+    return () => {
+      window.removeEventListener('resize', handleRefresh)
+      window.removeEventListener('orientationchange', handleRefresh)
+      mm.revert()
+    }
   }, [])
 
   const currentOverview = previewData[overviewRange]
@@ -255,16 +309,70 @@ export default function Landing () {
           <img src={logoImg} alt='The Patron Index' />
           <span>The Patron Index</span>
         </a>
-        <nav aria-label='Main navigation'>
+        <nav className='desktop-nav' aria-label='Main navigation'>
           <a href='#home'>Home</a>
           <a href='#features'>Features</a>
           <a href='#about'>About</a>
+          <a href='#how'>How It Works</a>
         </nav>
-        <div className='actions'>
+        <div className='actions desktop-actions'>
           <Link to='/login' className='btn outline'>Login</Link>
           <Link to='/register' className='btn'>Sign Up</Link>
         </div>
+
+        {/* Mobile Hamburger Toggle Button (< 840px) */}
+        <button
+          type='button'
+          className='mobile-menu-toggle'
+          aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-expanded={mobileMenuOpen}
+          aria-controls='mobile-navigation-drawer'
+          onClick={() => setMobileMenuOpen(prev => !prev)}
+        >
+          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+        </button>
       </header>
+
+      {/* Mobile Navigation Drawer & Backdrop (< 840px) */}
+      {mobileMenuOpen && (
+        <div
+          className='mobile-nav-backdrop'
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden='true'
+        />
+      )}
+      <div
+        id='mobile-navigation-drawer'
+        className={`mobile-nav-drawer ${mobileMenuOpen ? 'is-open' : ''}`}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <div className='mobile-nav-header'>
+          <div className='brand'>
+            <img src={logoImg} alt='The Patron Index' />
+            <span>The Patron Index</span>
+          </div>
+          <button
+            type='button'
+            className='mobile-nav-close'
+            aria-label='Close navigation menu'
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <X size={20} />
+          </button>
+        </div>
+
+        <nav className='mobile-nav-links' aria-label='Mobile navigation'>
+          <a href='#home' onClick={() => setMobileMenuOpen(false)}>Home</a>
+          <a href='#features' onClick={() => setMobileMenuOpen(false)}>Features</a>
+          <a href='#about' onClick={() => setMobileMenuOpen(false)}>About</a>
+          <a href='#how' onClick={() => setMobileMenuOpen(false)}>How It Works</a>
+        </nav>
+
+        <div className='mobile-nav-actions'>
+          <Link to='/login' className='btn outline mobile-btn' onClick={() => setMobileMenuOpen(false)}>Login</Link>
+          <Link to='/register' className='btn mobile-btn-primary' onClick={() => setMobileMenuOpen(false)}>Sign Up Free &rarr;</Link>
+        </div>
+      </div>
 
       {/* Main Content */}
       <main>
@@ -373,6 +481,7 @@ export default function Landing () {
                                   strokeDashoffset={donutLoaded ? offset : 0}
                                   onMouseEnter={() => setActiveSegment(idx)}
                                   onMouseLeave={() => setActiveSegment(null)}
+                                  onClick={() => setActiveSegment(prev => prev === idx ? null : idx)}
                                 >
                                   <title>{`${seg.name}: ${seg.pct}% (${seg.count} customers)`}</title>
                                 </circle>
@@ -407,6 +516,7 @@ export default function Landing () {
                               className={isActive ? 'active' : ''}
                               onMouseEnter={() => setActiveSegment(idx)}
                               onMouseLeave={() => setActiveSegment(null)}
+                              onClick={() => setActiveSegment(prev => prev === idx ? null : idx)}
                               role='button'
                               tabIndex={0}
                               aria-label={`${seg.name}: ${seg.pct}%`}

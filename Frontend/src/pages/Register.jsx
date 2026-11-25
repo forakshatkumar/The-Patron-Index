@@ -56,10 +56,11 @@ function Register () {
         const btnEl = document.getElementById('google-btn-register')
         if (btnEl) {
           btnEl.innerHTML = ''
+          const btnWidth = Math.max(220, Math.min(360, (btnEl.parentElement?.clientWidth || window.innerWidth) - 8))
           window.google.accounts.id.renderButton(btnEl, {
             theme: 'outline',
             size: 'large',
-            width: 360,
+            width: btnWidth,
             text: 'signup_with',
             shape: 'rectangular',
             logo_alignment: 'left'

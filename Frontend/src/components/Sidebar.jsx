@@ -54,6 +54,20 @@ function Sidebar ({ isOpen = true, onClose }) {
 
   return (
     <aside className={`sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
+      <div className='sidebar-brand-wrapper'>
+        <div className='sidebar-brand'>
+          <h2>The Patron Index</h2>
+          <span>Workspace</span>
+        </div>
+        <button
+          type='button'
+          className='sidebar-close-btn'
+          onClick={onClose}
+          aria-label='Close sidebar'
+        >
+          ✕
+        </button>
+      </div>
       <div className='sidebar-section-label'>WORKSPACE</div>
       <nav className='sidebar-nav'>
         {navItems.map(item => (

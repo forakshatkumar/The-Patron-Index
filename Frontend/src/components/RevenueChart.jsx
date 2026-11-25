@@ -89,6 +89,16 @@ function RevenueChart ({ data = [] }) {
               className={`chart-point ${activePoint?.label === point.label ? 'active' : ''}`}
               style={{ animationDelay: `${0.2 + idx * 0.08}s` }}
               onMouseEnter={() => setActivePoint(point)}
+              onClick={() => setActivePoint(prev => prev?.label === point.label ? null : point)}
+            />
+            {/* Enlarged touch target */}
+            <circle
+              cx={point.x}
+              cy={point.y}
+              r='18'
+              fill='transparent'
+              style={{ cursor: 'pointer' }}
+              onClick={() => setActivePoint(prev => prev?.label === point.label ? null : point)}
             />
           </g>
         ))}

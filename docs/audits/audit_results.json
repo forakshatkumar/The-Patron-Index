@@ -1,0 +1,1326 @@
+{
+  "overflowChecks": [
+    {
+      "page": "landing",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "compact-mobile-320x568",
+      "width": 320,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "android-small-360x640",
+      "width": 360,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "iphone-se-375x667",
+      "width": 375,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "standard-mobile-390x844",
+      "width": 390,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "large-android-412x915",
+      "width": 412,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "large-iphone-430x932",
+      "width": 430,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "mobile-landscape-667x375",
+      "width": 667,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "mobile-landscape-844x390",
+      "width": 844,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "small-tablet-600x960",
+      "width": 600,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "tablet-portrait-768x1024",
+      "width": 768,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "tablet-portrait-820x1180",
+      "width": 820,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "tablet-landscape-1024x768",
+      "width": 1024,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "landing",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "login",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "register",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "dashboard",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customers",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "customer-profile",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "transactions",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "analytics",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "settings",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    },
+    {
+      "page": "import",
+      "viewport": "standard-desktop-1440x900",
+      "width": 1440,
+      "hasOverflow": false,
+      "excess": 0
+    }
+  ],
+  "desktopRegressions": [
+    {
+      "page": "landing",
+      "resolution": "1280x800",
+      "baseSize": 73099,
+      "postSize": 77814,
+      "deltaPct": "6.45",
+      "passed": false
+    },
+    {
+      "page": "login",
+      "resolution": "1280x800",
+      "baseSize": 418586,
+      "postSize": 418088,
+      "deltaPct": "0.12",
+      "passed": true
+    },
+    {
+      "page": "register",
+      "resolution": "1280x800",
+      "baseSize": 411959,
+      "postSize": 412083,
+      "deltaPct": "0.03",
+      "passed": true
+    },
+    {
+      "page": "dashboard",
+      "resolution": "1280x800",
+      "baseSize": 335802,
+      "postSize": 336070,
+      "deltaPct": "0.08",
+      "passed": true
+    },
+    {
+      "page": "customers",
+      "resolution": "1280x800",
+      "baseSize": 373885,
+      "postSize": 374063,
+      "deltaPct": "0.05",
+      "passed": true
+    },
+    {
+      "page": "customer-profile",
+      "resolution": "1280x800",
+      "baseSize": 452198,
+      "postSize": 452253,
+      "deltaPct": "0.01",
+      "passed": true
+    },
+    {
+      "page": "transactions",
+      "resolution": "1280x800",
+      "baseSize": 328879,
+      "postSize": 328871,
+      "deltaPct": "0.00",
+      "passed": true
+    },
+    {
+      "page": "analytics",
+      "resolution": "1280x800",
+      "baseSize": 362019,
+      "postSize": 362413,
+      "deltaPct": "0.11",
+      "passed": true
+    },
+    {
+      "page": "settings",
+      "resolution": "1280x800",
+      "baseSize": 393041,
+      "postSize": 393084,
+      "deltaPct": "0.01",
+      "passed": true
+    },
+    {
+      "page": "import",
+      "resolution": "1280x800",
+      "baseSize": 332753,
+      "postSize": 332857,
+      "deltaPct": "0.03",
+      "passed": true
+    },
+    {
+      "page": "landing",
+      "resolution": "1366x768",
+      "baseSize": 76022,
+      "postSize": 80651,
+      "deltaPct": "6.09",
+      "passed": false
+    },
+    {
+      "page": "login",
+      "resolution": "1366x768",
+      "baseSize": 427951,
+      "postSize": 428472,
+      "deltaPct": "0.12",
+      "passed": true
+    },
+    {
+      "page": "register",
+      "resolution": "1366x768",
+      "baseSize": 423181,
+      "postSize": 423615,
+      "deltaPct": "0.10",
+      "passed": true
+    },
+    {
+      "page": "dashboard",
+      "resolution": "1366x768",
+      "baseSize": 344741,
+      "postSize": 345186,
+      "deltaPct": "0.13",
+      "passed": true
+    },
+    {
+      "page": "customers",
+      "resolution": "1366x768",
+      "baseSize": 384090,
+      "postSize": 384384,
+      "deltaPct": "0.08",
+      "passed": true
+    },
+    {
+      "page": "customer-profile",
+      "resolution": "1366x768",
+      "baseSize": 464381,
+      "postSize": 464092,
+      "deltaPct": "0.06",
+      "passed": true
+    },
+    {
+      "page": "transactions",
+      "resolution": "1366x768",
+      "baseSize": 328821,
+      "postSize": 328721,
+      "deltaPct": "0.03",
+      "passed": true
+    },
+    {
+      "page": "analytics",
+      "resolution": "1366x768",
+      "baseSize": 362853,
+      "postSize": 363743,
+      "deltaPct": "0.25",
+      "passed": true
+    },
+    {
+      "page": "settings",
+      "resolution": "1366x768",
+      "baseSize": 404099,
+      "postSize": 403943,
+      "deltaPct": "0.04",
+      "passed": true
+    },
+    {
+      "page": "import",
+      "resolution": "1366x768",
+      "baseSize": 343561,
+      "postSize": 343402,
+      "deltaPct": "0.05",
+      "passed": true
+    },
+    {
+      "page": "landing",
+      "resolution": "1440x900",
+      "baseSize": 78919,
+      "postSize": 83409,
+      "deltaPct": "5.69",
+      "passed": false
+    },
+    {
+      "page": "login",
+      "resolution": "1440x900",
+      "baseSize": 526213,
+      "postSize": 526177,
+      "deltaPct": "0.01",
+      "passed": true
+    },
+    {
+      "page": "register",
+      "resolution": "1440x900",
+      "baseSize": 521271,
+      "postSize": 521541,
+      "deltaPct": "0.05",
+      "passed": true
+    },
+    {
+      "page": "dashboard",
+      "resolution": "1440x900",
+      "baseSize": 399853,
+      "postSize": 399832,
+      "deltaPct": "0.01",
+      "passed": true
+    },
+    {
+      "page": "customers",
+      "resolution": "1440x900",
+      "baseSize": 429163,
+      "postSize": 429090,
+      "deltaPct": "0.02",
+      "passed": true
+    },
+    {
+      "page": "customer-profile",
+      "resolution": "1440x900",
+      "baseSize": 552318,
+      "postSize": 552390,
+      "deltaPct": "0.01",
+      "passed": true
+    },
+    {
+      "page": "transactions",
+      "resolution": "1440x900",
+      "baseSize": 406110,
+      "postSize": 406187,
+      "deltaPct": "0.02",
+      "passed": true
+    },
+    {
+      "page": "analytics",
+      "resolution": "1440x900",
+      "baseSize": 423117,
+      "postSize": 424464,
+      "deltaPct": "0.32",
+      "passed": true
+    },
+    {
+      "page": "settings",
+      "resolution": "1440x900",
+      "baseSize": 494907,
+      "postSize": 494843,
+      "deltaPct": "0.01",
+      "passed": true
+    },
+    {
+      "page": "import",
+      "resolution": "1440x900",
+      "baseSize": 431274,
+      "postSize": 431340,
+      "deltaPct": "0.02",
+      "passed": true
+    },
+    {
+      "page": "landing",
+      "resolution": "1536x864",
+      "baseSize": 78958,
+      "postSize": 83367,
+      "deltaPct": "5.58",
+      "passed": false
+    },
+    {
+      "page": "login",
+      "resolution": "1536x864",
+      "baseSize": 538417,
+      "postSize": 537941,
+      "deltaPct": "0.09",
+      "passed": true
+    },
+    {
+      "page": "register",
+      "resolution": "1536x864",
+      "baseSize": 533658,
+      "postSize": 533139,
+      "deltaPct": "0.10",
+      "passed": true
+    },
+    {
+      "page": "dashboard",
+      "resolution": "1536x864",
+      "baseSize": 398769,
+      "postSize": 398606,
+      "deltaPct": "0.04",
+      "passed": true
+    },
+    {
+      "page": "customers",
+      "resolution": "1536x864",
+      "baseSize": 434998,
+      "postSize": 434928,
+      "deltaPct": "0.02",
+      "passed": true
+    },
+    {
+      "page": "customer-profile",
+      "resolution": "1536x864",
+      "baseSize": 556310,
+      "postSize": 556578,
+      "deltaPct": "0.05",
+      "passed": true
+    },
+    {
+      "page": "transactions",
+      "resolution": "1536x864",
+      "baseSize": 402525,
+      "postSize": 402238,
+      "deltaPct": "0.07",
+      "passed": true
+    },
+    {
+      "page": "analytics",
+      "resolution": "1536x864",
+      "baseSize": 423533,
+      "postSize": 425134,
+      "deltaPct": "0.38",
+      "passed": true
+    },
+    {
+      "page": "settings",
+      "resolution": "1536x864",
+      "baseSize": 499474,
+      "postSize": 499030,
+      "deltaPct": "0.09",
+      "passed": true
+    },
+    {
+      "page": "import",
+      "resolution": "1536x864",
+      "baseSize": 437515,
+      "postSize": 437431,
+      "deltaPct": "0.02",
+      "passed": true
+    },
+    {
+      "page": "landing",
+      "resolution": "1920x1080",
+      "baseSize": 82565,
+      "postSize": 87009,
+      "deltaPct": "5.38",
+      "passed": false
+    },
+    {
+      "page": "login",
+      "resolution": "1920x1080",
+      "baseSize": 820265,
+      "postSize": 820003,
+      "deltaPct": "0.03",
+      "passed": true
+    },
+    {
+      "page": "register",
+      "resolution": "1920x1080",
+      "baseSize": 816991,
+      "postSize": 817283,
+      "deltaPct": "0.04",
+      "passed": true
+    },
+    {
+      "page": "dashboard",
+      "resolution": "1920x1080",
+      "baseSize": 599560,
+      "postSize": 599014,
+      "deltaPct": "0.09",
+      "passed": true
+    },
+    {
+      "page": "customers",
+      "resolution": "1920x1080",
+      "baseSize": 647206,
+      "postSize": 647549,
+      "deltaPct": "0.05",
+      "passed": true
+    },
+    {
+      "page": "customer-profile",
+      "resolution": "1920x1080",
+      "baseSize": 794034,
+      "postSize": 794129,
+      "deltaPct": "0.01",
+      "passed": true
+    },
+    {
+      "page": "transactions",
+      "resolution": "1920x1080",
+      "baseSize": 652420,
+      "postSize": 652242,
+      "deltaPct": "0.03",
+      "passed": true
+    },
+    {
+      "page": "analytics",
+      "resolution": "1920x1080",
+      "baseSize": 638492,
+      "postSize": 640120,
+      "deltaPct": "0.25",
+      "passed": true
+    },
+    {
+      "page": "settings",
+      "resolution": "1920x1080",
+      "baseSize": 737959,
+      "postSize": 737672,
+      "deltaPct": "0.04",
+      "passed": true
+    },
+    {
+      "page": "import",
+      "resolution": "1920x1080",
+      "baseSize": 682752,
+      "postSize": 682662,
+      "deltaPct": "0.01",
+      "passed": true
+    }
+  ],
+  "mobileInteractions": [
+    {
+      "test": "Mobile menu toggle opens drawer",
+      "passed": true
+    },
+    {
+      "test": "Mobile menu close button closes drawer",
+      "passed": true
+    }
+  ]
+}
