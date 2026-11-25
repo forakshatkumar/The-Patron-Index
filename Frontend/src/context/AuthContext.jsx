@@ -18,7 +18,6 @@ export function AuthProvider ({ children }) {
         return
       }
       const data = await getMe()
-      removeToken()
       setUser(data.user)
     } catch (e) {
       if (e.status === 401) { removeToken(); setUser(null) }
