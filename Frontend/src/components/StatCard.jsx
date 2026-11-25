@@ -25,7 +25,7 @@ function StatCard ({
               positive ? 'stat-change positive' : 'stat-change negative'
             }
           >
-            {positive ? '↑' : '↓'} {change}
+            {change}
           </span>
         )}
 

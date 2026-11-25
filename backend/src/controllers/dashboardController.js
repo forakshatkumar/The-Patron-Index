@@ -58,7 +58,7 @@ const getDashboardSummary = async (req, res, next) => {
         { $match: { ...scanFilter, riskScore: { $ne: null } } },
         { $group: { _id: null, averageRiskScore: { $avg: '$riskScore' } } }
       ]),
-      Transaction.find(txnFilter).sort({ date: 1, createdAt: 1 }).limit(1000).lean()
+      Transaction.find({ ...txnFilter, source: { $ne: 'summary' }, product: { $ne: 'Direct Order' } }).select('date customerId amount transactionId customerName category paymentMethod status').sort({ date: 1, createdAt: 1 }).lean()
     ]);
 
     const totals = customerTotals[0] || { totalRevenue: 0, activeCustomers: 0, returningCustomers: 0 };
@@ -77,7 +77,7 @@ const getDashboardSummary = async (req, res, next) => {
       const d = new Date(t.date);
       if (Number.isNaN(d.getTime())) continue;
       const monthKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-      const monthLabel = MONTH_NAMES[d.getMonth()];
+      const monthLabel = `${MONTH_NAMES[d.getMonth()]} ${String(d.getFullYear()).slice(-2)}`;
       const entry = monthlyMap.get(monthKey) || {
         month: monthLabel,
         key: monthKey,
@@ -90,29 +90,24 @@ const getDashboardSummary = async (req, res, next) => {
     }
 
     const sortedMonthKeys = Array.from(monthlyMap.keys()).sort();
-    let monthlyRevenue = sortedMonthKeys.map(k => {
+    const monthlyRevenue = sortedMonthKeys.map(k => ({ label: monthlyMap.get(k).month, value: Number(monthlyMap.get(k).value.toFixed(2)) }));
+    // Count first recorded purchase month, rather than estimating with fixed ratios.
+    const seen = new Set();
+    const monthlyGrowth = [];
+    const monthlyActivity = sortedMonthKeys.map(k => {
       const item = monthlyMap.get(k);
-      return { label: item.month, value: Number(item.value.toFixed(2)) };
+      let newCustomers = 0, repeatCustomers = 0;
+      for (const id of item.customers) {
+        if (seen.has(id)) repeatCustomers++;
+        else { newCustomers++; seen.add(id); }
+      }
+      monthlyGrowth.push({ label: item.month, customers: seen.size });
+      return { month: item.month, newCustomers, repeatCustomers };
     });
-
-    let monthlyActivity = sortedMonthKeys.map(k => {
-      const item = monthlyMap.get(k);
-      const totalInMonth = item.customers.size;
-      return {
-        month: item.month,
-        newCustomers: Math.ceil(totalInMonth * 0.6) || 1,
-        repeatCustomers: Math.floor(totalInMonth * 0.4)
-      };
-    });
-
-    // Fallback if no transactions exist but customer revenue exists
-    if (!monthlyRevenue.length && totals.totalRevenue > 0) {
-      monthlyRevenue = [{ label: 'Current', value: Number(totals.totalRevenue || 0) }];
-    }
 
     res.json({
       totalCustomers,
-      activeCustomers: totals.activeCustomers,
+      activeCustomers: predictions.filter(p => p.segment && p.segment !== 'Inactive' && p.segment !== 'At-Risk').length,
       highValueCustomers,
       returningCustomers: totals.returningCustomers,
       totalRevenue: Number(totals.totalRevenue || 0),
@@ -120,6 +115,7 @@ const getDashboardSummary = async (req, res, next) => {
       segmentDistribution,
       monthlyRevenue,
       monthlyActivity,
+      monthlyGrowth,
       recentTransactions: transactions.slice(-5).reverse(),
       security: {
         totalScans,

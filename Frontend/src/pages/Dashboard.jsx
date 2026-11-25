@@ -20,6 +20,7 @@ function Dashboard () {
   const [summary, setSummary] = useState(null)
   const [customers, setCustomers] = useState(demoMode ? demoCustomers : [])
   const [error, setError] = useState('')
+  const [period, setPeriod] = useState('6')
 
   useEffect(() => {
     if (demoMode) return
@@ -53,9 +54,7 @@ function Dashboard () {
   const liveRevenueData = useMemo(() => {
     if (demoMode) return revenueData
     if (summary?.monthlyRevenue?.length) return summary.monthlyRevenue
-    if (!customers.length) return []
-    const totalRev = customers.reduce((sum, c) => sum + (c.totalSpending || 0), 0)
-    return [{ label: 'Total', value: totalRev }]
+    return []
   }, [customers, demoMode, summary])
 
   const insights = useMemo(() => {
@@ -89,7 +88,7 @@ function Dashboard () {
     <div className='page'>
       <div className='page-heading'>
         <div>
-          <h2>Business Overview</h2>
+          <h2>Business overview</h2>
           <p>Track customer activity, revenue and customer value.</p>
         </div>
         <div className='page-actions'>
@@ -113,11 +112,11 @@ function Dashboard () {
           <div className='card-header'>
             <div>
               <h3>Revenue Trend</h3>
-              <p>Revenue performance across customer base</p>
+              <p>Revenue from recorded transactions</p>
             </div>
           </div>
           {liveRevenueData.length > 0 ? (
-            <RevenueChart data={liveRevenueData} />
+            <><label className='premium-chart-filter'>Months <select aria-label='Revenue period' value={period} onChange={e=>setPeriod(e.target.value)}><option value='6'>Last 6 recorded</option><option value='12'>Last 12 recorded</option><option value='all'>All recorded</option></select></label><RevenueChart data={period==='all' ? liveRevenueData : liveRevenueData.slice(-Number(period))} /></>
           ) : (
             <div className='empty-state' style={{ padding: '40px 20px', textAlign: 'center' }}>
               <p className='muted-text'>No revenue records found yet. Import customer transactions to view trends.</p>
@@ -169,7 +168,7 @@ function Dashboard () {
                       <div
                         className='activity-bar new-bar'
                         style={{
-                          height: `${item.newCustomers / 2}px`,
+                          height: `${(item.newCustomers / Math.max(1,...activityList.flatMap(x=>[x.newCustomers,x.repeatCustomers]))) * 120}px`,
                           '--delay': `${index * 0.08}s`
                         }}
                         title={`New Customers: ${item.newCustomers}`}
@@ -177,7 +176,7 @@ function Dashboard () {
                       <div
                         className='activity-bar repeat-bar'
                         style={{
-                          height: `${item.repeatCustomers / 2}px`,
+                          height: `${(item.repeatCustomers / Math.max(1,...activityList.flatMap(x=>[x.newCustomers,x.repeatCustomers]))) * 120}px`,
                           '--delay': `${index * 0.08 + 0.04}s`
                         }}
                         title={`Repeat Customers: ${item.repeatCustomers}`}

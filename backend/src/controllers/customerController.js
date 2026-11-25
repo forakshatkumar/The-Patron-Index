@@ -147,6 +147,7 @@ const createCustomer = async (req, res, next) => {
         customerName: customer.name,
         amount: customer.totalSpent,
         date: new Date().toISOString().split('T')[0],
+        source: 'summary',
         product: 'Direct Order',
         category: 'Sales',
         paymentMethod: 'UPI',
@@ -245,8 +246,8 @@ const importCustomers = async (req, res, next) => {
       }
       grouped.set(id, current);
 
-      if (req.user?.userId) {
-        const txnDate = row.purchase_date || new Date().toISOString().split('T')[0];
+      if (req.user?.userId && row.purchase_date && !Number.isNaN(purchaseDate.getTime()) && Number.isFinite(amount)) {
+        const txnDate = purchaseDate.toISOString().split('T')[0];
         const txnId = String(row.transaction_id || `TXN-${Math.floor(100000 + Math.random() * 900000)}`);
         await Transaction.create({
           transactionId: txnId,

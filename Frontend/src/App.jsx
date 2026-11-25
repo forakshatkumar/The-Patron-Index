@@ -1,24 +1,32 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
-import Landing from './pages/Landing'
-import Dashboard from './pages/Dashboard'
-import Customers from './pages/Customers'
-import CustomerProfile from './pages/CustomerProfile'
-import Transactions from './pages/Transactions'
-import Analytics from './pages/Analytics'
-import Settings from './pages/Settings'
-import ImportData from './pages/ImportData'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import NotFound from './pages/NotFound'
+import { useAuth } from './context/AuthContext'
+const Landing = lazy(() => import('./pages/Landing'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
+const Customers = lazy(() => import('./pages/Customers'))
+const CustomerProfile = lazy(() => import('./pages/CustomerProfile'))
+const Transactions = lazy(() => import('./pages/Transactions'))
+const Analytics = lazy(() => import('./pages/Analytics'))
+const Settings = lazy(() => import('./pages/Settings'))
+const ImportData = lazy(() => import('./pages/ImportData'))
+const Login = lazy(() => import('./pages/Login'))
+const Register = lazy(() => import('./pages/Register'))
+const NotFound = lazy(() => import('./pages/NotFound'))
 
+const Profile = lazy(() => import('./pages/Profile'))
+function PublicPage ({ children }) {
+  const { loading, isAuthenticated } = useAuth()
+  if (loading) return <div className='session-state' aria-busy='true'><div className='session-skeleton'/></div>
+  return isAuthenticated ? <Navigate to='/dashboard' replace/> : children
+}
 function App () {
   return (
-    <Routes>
-      <Route path='/' element={<Landing />} />
-      <Route path='/login' element={<Login />} />
-      <Route path='/register' element={<Register />} />
+    <Suspense fallback={<div className="session-state" aria-busy="true"><div className="session-skeleton"/></div>}><Routes>
+      <Route path='/' element={<PublicPage><Landing /></PublicPage>} />
+      <Route path='/login' element={<PublicPage><Login /></PublicPage>} />
+      <Route path='/register' element={<PublicPage><Register /></PublicPage>} />
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/customers' element={<Customers />} />
@@ -26,11 +34,12 @@ function App () {
         <Route path='/segments' element={<Navigate to='/customers' replace />} />
         <Route path='/transactions' element={<Transactions />} />
         <Route path='/analytics' element={<Analytics />} />
+        <Route path='/profile' element={<Profile />} />
         <Route path='/settings' element={<Settings />} />
         <Route path='/import' element={<ImportData />} />
       </Route>
       <Route path='*' element={<NotFound />} />
-    </Routes>
+    </Routes></Suspense>
   )
 }
 

@@ -15,7 +15,7 @@ function sanitizeValue(value) {
   const cleanObj = {};
   for (const [key, val] of Object.entries(value)) {
     // Strip keys starting with $ or containing . which could manipulate Mongo queries
-    if (key.startsWith('$') || key.includes('.')) {
+    if (key.startsWith('$') || key.includes('.') || ['__proto__','constructor','prototype'].includes(key)) {
       continue;
     }
     cleanObj[key] = sanitizeValue(val);
@@ -28,7 +28,7 @@ const sanitizeMiddleware = (req, res, next) => {
     req.body = sanitizeValue(req.body);
   }
   if (req.query && typeof req.query === 'object') {
-    req.query = sanitizeValue(req.query);
+    Object.defineProperty(req, 'query', { value: sanitizeValue(req.query), configurable: true, writable: true });
   }
   if (req.params && typeof req.params === 'object') {
     req.params = sanitizeValue(req.params);

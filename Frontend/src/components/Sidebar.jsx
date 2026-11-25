@@ -1,89 +1,13 @@
-import { NavLink } from 'react-router-dom'
-
-function Sidebar ({ isOpen = true, onClose }) {
-  const navItems = [
-    {
-      name: 'Dashboard',
-      path: '/dashboard',
-      icon: (
-        <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-          <rect x='3' y='3' width='7' height='7' rx='1.5' />
-          <rect x='14' y='3' width='7' height='7' rx='1.5' />
-          <rect x='14' y='14' width='7' height='7' rx='1.5' />
-          <rect x='3' y='14' width='7' height='7' rx='1.5' />
-        </svg>
-      )
-    },
-    {
-      name: 'Customers & Segments',
-      path: '/customers',
-      icon: (
-        <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-          <circle cx='12' cy='12' r='9' />
-          <circle cx='12' cy='12' r='3.5' fill='currentColor' />
-        </svg>
-      )
-    },
-    {
-      name: 'Transactions',
-      path: '/transactions',
-      icon: (
-        <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-          <polyline points='17 8 21 12 17 16' />
-          <line x1='3' y1='12' x2='21' y2='12' />
-          <polyline points='7 16 3 12 7 8' />
-        </svg>
-      )
-    },
-    {
-      name: 'Analytics',
-      path: '/analytics',
-      icon: (
-        <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'>
-          <polyline points='22 12 18 12 15 21 9 3 6 12 2 12' />
-        </svg>
-      )
-    }
-  ]
-
-  const handleNavClick = () => {
-    if (onClose) {
-      onClose()
-    }
-  }
-
-  return (
-    <aside className={`sidebar ${isOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-      <div className='sidebar-brand-wrapper'>
-        <div className='sidebar-brand'>
-          <h2>The Patron Index</h2>
-          <span>Workspace</span>
-        </div>
-        <button
-          type='button'
-          className='sidebar-close-btn'
-          onClick={onClose}
-          aria-label='Close sidebar'
-        >
-          ✕
-        </button>
-      </div>
-      <div className='sidebar-section-label'>WORKSPACE</div>
-      <nav className='sidebar-nav'>
-        {navItems.map(item => (
-          <NavLink
-            key={item.path}
-            to={item.path}
-            onClick={handleNavClick}
-            className={({ isActive }) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}
-          >
-            <span className='sidebar-icon'>{item.icon}</span>
-            <span>{item.name}</span>
-          </NavLink>
-        ))}
-      </nav>
-    </aside>
-  )
+import { NavLink, Link } from 'react-router-dom'
+import { LayoutDashboard, Users, ArrowLeftRight, ChartNoAxesCombined, Settings, Upload, X } from 'lucide-react'
+import logo from '../assets/logo.png'
+export default function Sidebar ({ onClose }) {
+  const items = [[LayoutDashboard,'Overview','/dashboard'],[Users,'Customers & Segments','/customers'],[ArrowLeftRight,'Transactions','/transactions'],[ChartNoAxesCombined,'Analytics','/analytics']]
+  const item = ([Icon,label,to]) => <NavLink key={to} to={to} onClick={onClose} title={label} aria-label={label} className={({isActive}) => `sidebar-link ${isActive ? 'sidebar-link-active' : ''}`}><Icon size={19}/><span>{label}</span></NavLink>
+  return <aside className='sidebar premium-sidebar' aria-label='Workspace navigation'>
+    <Link to='/dashboard' onClick={onClose} className='premium-brand'><img src={logo} alt=''/><span>The Patron Index<small>Workspace</small></span></Link>
+    <button className='mobile-close' onClick={onClose} aria-label='Close navigation'><X size={20}/></button>
+    <div className='sidebar-section-label'>WORKSPACE</div><nav className='sidebar-nav'>{items.map(item)}</nav>
+    <div className='premium-sidebar-bottom'><Link to='/import' onClick={onClose} title='Import data' aria-label='Import data' className='premium-import'><Upload size={18}/><span>Import data</span></Link><nav>{item([Settings,'Settings','/settings'])}</nav></div>
+  </aside>
 }
-
-export default Sidebar

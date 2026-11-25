@@ -10,7 +10,7 @@ function RevenueChart ({ data = [] }) {
   const width = 700
   const height = 260
 
-  const paddingLeft = 45
+  const paddingLeft = 74
   const paddingRight = 20
   const paddingTop = 25
   const paddingBottom = 40
@@ -19,12 +19,12 @@ function RevenueChart ({ data = [] }) {
   const chartHeight = height - paddingTop - paddingBottom
 
   const values = data.map(item => item.value)
-  const maximum = Math.max(...values)
-  const minimum = Math.min(...values)
+  const maximum = Math.max(1,...values)
+  const minimum = Math.min(0,...values)
   const range = maximum - minimum || 1
 
   const points = data.map((item, index) => {
-    const x = paddingLeft + (index / (data.length - 1 || 1)) * chartWidth
+    const x = paddingLeft + (data.length === 1 ? .5 : index / (data.length - 1)) * chartWidth
     const normalized = (item.value - minimum) / range
     const y = paddingTop + chartHeight - normalized * chartHeight
     return {
@@ -62,14 +62,13 @@ function RevenueChart ({ data = [] }) {
         {[0, 1, 2, 3].map(line => {
           const y = paddingTop + (line / 3) * chartHeight
           return (
-            <line
-              key={line}
+            <g key={line}><text x={paddingLeft-8} y={y+4} textAnchor="end" className="chart-label">₹{Math.round(maximum - line/3*range).toLocaleString("en-IN")}</text><line
               x1={paddingLeft}
               x2={width - paddingRight}
               y1={y}
               y2={y}
               className='chart-grid-line'
-            />
+            /></g>
           )
         })}
 
@@ -98,6 +97,7 @@ function RevenueChart ({ data = [] }) {
               r='18'
               fill='transparent'
               style={{ cursor: 'pointer' }}
+              onMouseEnter={() => setActivePoint(point)}
               onClick={() => setActivePoint(prev => prev?.label === point.label ? null : point)}
             />
           </g>

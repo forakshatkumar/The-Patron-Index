@@ -31,7 +31,7 @@ export function PowerBIDonut ({
     <div className='powerbi-donut-container'>
       <div className='powerbi-chart-header'>
         <div>
-          <h4>Segment Portfolio Composition</h4>
+          <h4>Customer Distribution</h4>
           <span className='powerbi-sub'>Interactive breakdown by customer volume & share</span>
         </div>
         {activeSegment !== 'All' && (
@@ -148,7 +148,7 @@ export function PowerBIDonut ({
                 <strong className='powerbi-center-value'>
                   {totalCustomers.toLocaleString()}
                 </strong>
-                <span className='powerbi-center-meta'>Active Cohorts</span>
+                <span className='powerbi-center-meta'>Customers</span>
               </>
             )}
           </div>
@@ -199,7 +199,7 @@ export function PowerBIBarChart ({
     <div className='powerbi-barchart-container'>
       <div className='powerbi-chart-header'>
         <div>
-          <h4>Cohort Economic Contribution</h4>
+          <h4>Customer Spending by Segment</h4>
           <span className='powerbi-sub'>
             {isSpending ? 'Average customer spend (₹) per segment' : 'Revenue contribution percentage (%)'}
           </span>
@@ -216,7 +216,7 @@ export function PowerBIBarChart ({
       <div className='powerbi-bar-canvas' onMouseLeave={() => setHoveredIndex(null)}>
         {segments.map((seg, idx) => {
           const val = isSpending ? (seg.averageSpending || 0) : (seg.revenueContribution || 0)
-          const heightPct = Math.max(8, Math.round((val / maxValue) * 100))
+          const heightPct = Math.max(0, (val / maxValue) * 100)
           const isSelected = activeSegment === seg.name
           const isHovered = hoveredIndex === idx
           const color = POWER_BI_COLORS[seg.name]?.base || '#118DFF'

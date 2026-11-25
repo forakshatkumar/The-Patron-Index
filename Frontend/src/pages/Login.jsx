@@ -19,7 +19,7 @@ function Login () {
 
   useEffect(() => {
     // Pre-warm backend on Render to eliminate cold-start lag
-    const apiBase = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api')
+    const apiBase = '/api'
     fetch(`${apiBase}/health`).catch(() => {})
   }, [])
 

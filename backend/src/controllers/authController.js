@@ -1,23 +1,18 @@
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const createAuditLog = require('../utils/auditLogger');
 
-function getJwtSecret() {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    if (process.env.NODE_ENV === 'production') {
-      throw new Error('FATAL: JWT_SECRET environment variable is missing in production');
-    }
-    return 'patron_index_dev_secret_key_secure_2026';
-  }
-  return secret;
+const { issue, revoke, clear, readCookie } = require('../utils/session');
+const Session = require('../models/Session');
+function publicUser(user) {
+  const { _id, name, email, role, avatar, businessName, industry, location, phone, bio, createdAt, preferences } = user;
+  return { id: _id, name, email, role, avatar, businessName, industry, location, phone, bio, createdAt, preferences };
 }
 
 // Register user
 const register = async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     if (!name || typeof name !== 'string' || !name.trim()) {
       return res.status(400).json({ message: 'Name is required' });
@@ -47,17 +42,10 @@ const register = async (req, res, next) => {
       name: name.trim(),
       email: normalizedEmail,
       password: hashedPassword,
-      role: role === 'admin' ? 'admin' : 'analyst'
+      role: 'analyst'
     });
 
-    const token = jwt.sign(
-      {
-        userId: user._id.toString(),
-        role: user.role
-      },
-      getJwtSecret(),
-      { expiresIn: '24h' }
-    );
+    await issue(req, res, user);
 
     await createAuditLog({
       userId: user._id,
@@ -70,14 +58,8 @@ const register = async (req, res, next) => {
 
     res.status(201).json({
       message: 'Account created successfully',
-      token,
       userId: user._id,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      user: publicUser(user)
     });
   } catch (error) {
     next(error);
@@ -112,14 +94,7 @@ const login = async (req, res, next) => {
       });
     }
 
-    const token = jwt.sign(
-      {
-        userId: user._id.toString(),
-        role: user.role
-      },
-      getJwtSecret(),
-      { expiresIn: '24h' }
-    );
+    await issue(req, res, user);
 
     await createAuditLog({
       userId: user._id,
@@ -132,13 +107,7 @@ const login = async (req, res, next) => {
 
     res.json({
       message: 'Login successful',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role
-      }
+      user: publicUser(user)
     });
   } catch (error) {
     next(error);
@@ -166,8 +135,8 @@ const googleAuth = async (req, res, next) => {
     }
 
     const { email, name, sub: googleId, picture: avatar } = payload;
-    if (!email) {
-      return res.status(400).json({ message: 'No email associated with Google account' });
+    if (!email || String(payload.email_verified) !== 'true') {
+      return res.status(400).json({ message: 'A verified Google email is required' });
     }
 
     const normalizedEmail = String(email).trim().toLowerCase();
@@ -195,35 +164,60 @@ const googleAuth = async (req, res, next) => {
         details: `User created via Google OAuth: ${normalizedEmail}`,
         ipAddress: req.ip
       });
+    } else if (user.googleId && user.googleId !== googleId) {
+      return res.status(401).json({ message: 'Google account mismatch' });
     } else if (!user.googleId) {
       user.googleId = googleId;
       if (avatar && !user.avatar) user.avatar = avatar;
       await user.save();
     }
 
-    const token = jwt.sign(
-      {
-        userId: user._id.toString(),
-        role: user.role
-      },
-      getJwtSecret(),
-      { expiresIn: '24h' }
-    );
+    await issue(req, res, user);
 
     res.json({
       message: 'Google authentication successful',
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        avatar: user.avatar
-      }
+      user: publicUser(user)
     });
   } catch (error) {
     next(error);
   }
 };
 
-module.exports = { register, login, googleAuth };
+const me = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(401).json({ message: 'Account unavailable' });
+    // Migrate valid legacy bearer credentials to a persistent cookie.
+    if (!readCookie(req)) await issue(req, res, user);
+    res.set('Cache-Control', 'no-store').json({ user: publicUser(user) });
+  } catch (error) { next(error); }
+};
+const updateProfile = async (req, res, next) => {
+  try {
+    const patch = {};
+    for (const [key, max] of Object.entries({ name: 100, businessName: 120, industry: 100, location: 120, phone: 40, bio: 500 })) {
+      if (req.body[key] === undefined) continue;
+      if (typeof req.body[key] !== 'string' || req.body[key].length > max || (key === 'name' && !req.body[key].trim())) return res.status(400).json({ message: `Invalid ${key}` });
+      patch[key] = req.body[key].trim();
+    }
+    if (req.body.avatar !== undefined) {
+      const value = req.body.avatar;
+      if (typeof value !== 'string' || value.length > 350000 || (value && !/^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/.test(value))) return res.status(400).json({ message: 'Invalid profile image' });
+      patch.avatar = value;
+    }
+    if (req.body.preferences !== undefined) {
+      const p = req.body.preferences;
+      if (!p || !['light','dark','system'].includes(p.theme) || typeof p.reducedMotion !== 'boolean' || typeof p.notifications !== 'boolean') return res.status(400).json({ message: 'Invalid preferences' });
+      patch.preferences = { theme: p.theme, reducedMotion: p.reducedMotion, notifications: p.notifications };
+    }
+    const user = await User.findByIdAndUpdate(req.user.userId, { $set: patch }, { new: true, runValidators: true });
+    res.json({ user: publicUser(user) });
+  } catch (error) { next(error); }
+};
+const logout = async (req, res, next) => {
+  try { await revoke(req); clear(res); res.json({ message: 'Signed out' }); } catch (error) { next(error); }
+};
+const logoutAll = async (req, res, next) => {
+  try { await Session.deleteMany({ user: req.user.userId }); clear(res); res.json({ message: 'All sessions signed out' }); } catch (error) { next(error); }
+};
+module.exports = { register, login, googleAuth, me, updateProfile, logout, logoutAll };

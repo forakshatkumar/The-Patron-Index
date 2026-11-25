@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema(
   {
+    source: { type: String, enum: ['transaction', 'summary'], default: 'transaction' },
     transactionId: {
       type: String,
       required: true,

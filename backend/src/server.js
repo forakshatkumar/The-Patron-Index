@@ -40,9 +40,17 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Patron-Request']
 }));
 
+// Require a non-simple header on cookie-capable writes to prevent cross-site form requests.
+app.use('/api', (req, res, next) => {
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.headers['x-patron-request'] !== '1' && !req.headers.authorization?.startsWith('Bearer ')) {
+    return res.status(403).json({ message: 'Request verification failed' });
+  }
+  next();
+});
+app.use('/api', (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
 // Request body size limits and input sanitization
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
@@ -112,7 +120,7 @@ let server;
 
 async function startServer () {
   await connectDB();
-  await ensureDefaultAccounts();
+  if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_DEMO_ACCOUNT === 'true') await ensureDefaultAccounts();
   server = app.listen(PORT, () => {
     console.log(`Backend server running securely on port ${PORT}`);
   });

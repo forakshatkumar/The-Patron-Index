@@ -29,7 +29,7 @@ function CustomerProfile () {
 
   const customerTransactions = useMemo(() => {
     if (demoMode) return transactions.filter(t => t.customerId === customer?.id)
-    return liveTransactions.map(t => ({
+    return liveTransactions.filter(t => t.source !== 'summary' && t.product !== 'Direct Order' && t.date && !Number.isNaN(Date.parse(t.date))).map(t => ({
       id: t.transactionId || t._id,
       date: t.date,
       product: t.product || 'Standard Purchase',
@@ -52,7 +52,7 @@ function CustomerProfile () {
     if (customerTransactions.length > 0) {
       return customerTransactions.map(t => ({ month: t.date, value: t.amount }))
     }
-    return [{ month: 'Current', value: customer?.totalSpending || 0 }]
+    return []
   }, [demoMode, customer, customerTransactions])
 
   if (loading) return <div className='page'><div className='empty-state'><h2>Loading customer...</h2></div></div>
