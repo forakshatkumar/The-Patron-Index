@@ -27,12 +27,17 @@ async function performRequest(path, options = {}) {
   }
   if (token) headers.Authorization = `Bearer ${token}`
 
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'same-origin' })
+  let response
+  try {
+    response = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'same-origin', cache: 'no-store', signal: options.signal || AbortSignal.timeout(65000) })
+  } catch (cause) {
+    throw new Error(cause.name === 'TimeoutError' ? 'The server took too long to respond. Try again shortly.' : 'Unable to reach the API. Check your connection and whether the backend is running.', { cause })
+  }
   let data
   try {
     data = await response.json()
   } catch {
-    data = {}
+    data = null
   }
 
   if (response.status === 401 && !['/auth/login','/auth/register','/auth/google','/auth/me'].includes(path)) {
@@ -43,15 +48,16 @@ async function performRequest(path, options = {}) {
   }
 
   if (!response.ok) {
-    const error = new Error(data.message || `Request failed (${response.status})`)
+    const error = new Error(data?.message || ([502, 503, 504].includes(response.status) ? 'Backend unavailable. Check the API service and try again.' : `Request failed (${response.status})`))
     error.status = response.status
     throw error
   }
+  if (!data || typeof data !== 'object') throw new Error('The API returned an unexpected response. Check the API proxy configuration.')
   return data
 }
 
 function request(path, options = {}) {
-  if (options.method && options.method !== 'GET') return performRequest(path, options)
+  if (options.method && options.method !== 'GET') { inflight.clear(); return performRequest(path, options) }
   if (inflight.has(path)) return inflight.get(path)
   const pending = performRequest(path, options).finally(() => { if (inflight.get(path) === pending) inflight.delete(path) })
   inflight.set(path, pending)

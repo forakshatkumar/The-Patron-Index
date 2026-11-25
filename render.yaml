@@ -5,7 +5,7 @@ services:
     runtime: node
     plan: free
     rootDir: backend
-    buildCommand: npm install
+    buildCommand: npm ci --omit=dev
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
@@ -16,6 +16,10 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: MONGO_URI
+        sync: false
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: GOOGLE_CLIENT_ID
         sync: false
       - key: FRONTEND_URL
         sync: false

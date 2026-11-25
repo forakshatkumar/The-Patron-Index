@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuth } from './context/AuthContext'
@@ -21,6 +21,7 @@ function PublicPage ({ children }) {
   if (loading) return <div className='session-state' aria-busy='true'><div className='session-skeleton'/></div>
   return isAuthenticated ? <Navigate to='/dashboard' replace/> : children
 }
+function CustomerDetailRoute () { const { id } = useParams(); return <CustomerProfile key={id} /> }
 function App () {
   return (
     <Suspense fallback={<div className="session-state" aria-busy="true"><div className="session-skeleton"/></div>}><Routes>
@@ -30,7 +31,7 @@ function App () {
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/customers' element={<Customers />} />
-        <Route path='/customers/:id' element={<CustomerProfile />} />
+        <Route path='/customers/:id' element={<CustomerDetailRoute />} />
         <Route path='/segments' element={<Navigate to='/customers' replace />} />
         <Route path='/transactions' element={<Transactions />} />
         <Route path='/analytics' element={<Analytics />} />

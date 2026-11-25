@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { importCustomerCsv, uploadScan } from '../services/api'
@@ -10,20 +10,26 @@ function ImportData () {
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const selectionVersion = useRef(0)
   const requiredColumns = ['customer_id', 'name', 'purchase_date', 'amount']
 
-  const selectFile = event => {
-    const selected = event.target.files?.[0]
+  const select = selected => {
+    if (loading) return
+    selectionVersion.current++
     setFile(selected || null); setValidation(null); setResult(null); setError('')
   }
 
+  const selectFile = event => select(event.target.files?.[0])
   const validate = () => {
+    setValidation(null); setResult(null)
     if (!file) return setError('Please choose a CSV file first.')
     if (!file.name.toLowerCase().endsWith('.csv')) return setError('Customer import currently supports CSV files only.')
     if (file.size > 10 * 1024 * 1024) return setError('File size cannot exceed 10 MB.')
 
+    const version = selectionVersion.current
     const reader = new FileReader()
     reader.onload = event => {
+      if (version !== selectionVersion.current) return
       const lines = String(event.target.result || '').split(/\r?\n/).filter(line => line.trim())
       if (lines.length < 2) return setError('CSV must contain a header and at least one row.')
       const headers = lines[0].split(',').map(h => h.replaceAll('"', '').trim().toLowerCase())
@@ -31,11 +37,12 @@ function ImportData () {
       if (missing.length) return setError(`Missing required columns: ${missing.join(', ')}`)
       setError(''); setValidation({ rows: lines.length - 1, headers })
     }
+    reader.onerror = () => { if (version === selectionVersion.current) setError('Could not read this file. Choose it again.') }
     reader.readAsText(file)
   }
 
   const processFile = async () => {
-    if (!validation || !file) return
+    if (!validation || !file || loading || result) return
     setLoading(true); setError(''); setResult(null)
     try {
       if (demoMode) {
@@ -43,7 +50,7 @@ function ImportData () {
         setResult({ scan: { status: 'completed', decision: 'allow' }, importedCustomers: Math.max(1, Math.round(validation.rows / 2)), processedRows: validation.rows, demo: true })
       } else {
         const scan = await uploadScan(file)
-        if (scan.decision === 'block') throw new Error('Security validation blocked this file.')
+        if (scan.decision !== 'allow') throw new Error('The upload requires review and has not been imported.')
         const imported = await importCustomerCsv(file)
         setResult({ scan, ...imported })
       }
@@ -64,13 +71,13 @@ function ImportData () {
           </div>
         </div>
         <section className='card upload-card'>
-          <div className='upload-area'>
+          <div className='upload-area' onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); select(e.dataTransfer.files?.[0]) }}>
             <div className='upload-icon'>↑</div>
             <h3>Upload Purchase Data</h3>
-            <p>CSV columns: customer_id, name, purchase_date and amount. Email and product are optional.</p>
+            <p>Drag and drop a CSV or choose a file. Maximum 10 MB; up to 10,000 purchase rows.</p>
             <label className='file-button'>
               Choose CSV File
-              <input type='file' accept='.csv,text/csv' hidden onChange={selectFile} />
+              <input type='file' accept='.csv,text/csv' className='visually-hidden' disabled={loading} onChange={selectFile} />
             </label>
             {file && (
               <div className='selected-file'>
@@ -85,11 +92,11 @@ function ImportData () {
               {requiredColumns.map(column => <code key={column}>{column}</code>)}
             </div>
           </div>
-          {error && <div className='upload-error'>{error}</div>}
+          {error && <div className='upload-error' role='alert'>{error}</div>}
           {validation && (
             <div className='validation-success'>
               <h3>Local Validation Passed</h3>
-              <p>{validation.rows} purchase rows detected. Ready for secure backend processing.</p>
+              <p>{validation.rows} physical lines detected (quoted multiline fields may differ). The server validates each data row.</p>
             </div>
           )}
           {result && (
@@ -97,7 +104,7 @@ function ImportData () {
               <h3>Import Complete</h3>
               <p>{result.demo ? 'Demo processing complete.' : `${result.importedCustomers} customers classified from ${result.processedRows} purchase rows.`}</p>
               <div className='validation-details'>
-                <span>Security<strong>{result.scan?.decision || 'allow'}</strong></span>
+                <span>Upload<strong>{result.scan?.decision === 'allow' ? 'Accepted' : 'Review'}</strong></span>
                 <span>Scan Status<strong>{result.scan?.status || 'completed'}</strong></span>
                 <span>Classification<strong>Complete</strong></span>
               </div>
@@ -109,8 +116,8 @@ function ImportData () {
             </div>
           )}
           <div className='upload-actions'>
-            <button className='secondary-button' onClick={validate}>Validate File</button>
-            <button className='primary-button' disabled={!validation || loading} onClick={processFile}>
+            <button className='secondary-button' disabled={!file || loading || !!result} onClick={validate}>Validate File</button>
+            <button className='primary-button' disabled={!validation || loading || !!result} onClick={processFile}>
               {loading ? 'Processing...' : 'Secure Upload & Classify'}
             </button>
           </div>

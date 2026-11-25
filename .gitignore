@@ -9,3 +9,6 @@ dist/
 .DS_Store
 
 .npmrc
+
+.env.*
+!.env.example

@@ -10,7 +10,8 @@ const {
   customerStatus
 } = require('../utils/customerScoring');
 
-const MAX_CSV_ROWS = 10000;
+const { parseCsv } = require('../utils/parseCsv');
+const crypto = require('crypto');
 
 function daysSince(dateValue) {
   if (!dateValue) return 0;
@@ -20,67 +21,8 @@ function daysSince(dateValue) {
   return Math.max(0, Math.floor((now - date) / 86400000));
 }
 
-/**
- * Sanitize string against CSV Formula Injection (DDE attacks)
- * Disallows or prefixes unquoted formulas starting with =, +, -, @, \t, \r
- */
-function sanitizeCsvValue(val) {
-  if (typeof val !== 'string') return val;
-  const trimmed = val.trim();
-  if (/^[=+\-@\t\r]/.test(trimmed)) {
-    return `'${trimmed}`;
-  }
-  return trimmed;
-}
-
-function parseCsv(text) {
-  const lines = String(text || '')
-    .replace(/^\uFEFF/, '')
-    .split(/\r?\n/)
-    .filter(line => line.trim());
-
-  if (lines.length < 2) throw new Error('CSV file must contain a header and at least one data row');
-  if (lines.length > MAX_CSV_ROWS + 1) {
-    throw new Error(`CSV exceeds maximum limit of ${MAX_CSV_ROWS} rows`);
-  }
-
-  const splitLine = line => {
-    const values = [];
-    let current = '';
-    let quoted = false;
-    for (let i = 0; i < line.length; i += 1) {
-      const char = line[i];
-      if (char === '"') {
-        if (quoted && line[i + 1] === '"') {
-          current += '"';
-          i += 1;
-        } else {
-          quoted = !quoted;
-        }
-      } else if (char === ',' && !quoted) {
-        values.push(sanitizeCsvValue(current));
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    values.push(sanitizeCsvValue(current));
-    return values;
-  };
-
-  const headers = splitLine(lines[0]).map(h => String(h).toLowerCase().trim().replace(/^'/, ''));
-  const required = ['customer_id', 'name', 'purchase_date', 'amount'];
-  const missing = required.filter(key => !headers.includes(key));
-  if (missing.length) throw new Error(`Missing required columns: ${missing.join(', ')}`);
-
-  return lines.slice(1).map(line => {
-    const values = splitLine(line);
-    return Object.fromEntries(headers.map((header, index) => [header, values[index] ?? '']));
-  });
-}
-
-async function enrichCustomer(customer) {
-  const [features, prediction] = await Promise.all([
+async function enrichCustomer(customer, loaded) {
+  const [features, prediction] = loaded || await Promise.all([
     CustomerFeature.findOne({ customer: customer._id }).lean(),
     CustomerPrediction.findOne({ customer: customer._id }).lean()
   ]);
@@ -120,7 +62,7 @@ async function enrichCustomer(customer) {
 const createCustomer = async (req, res, next) => {
   try {
     const { customerId, name, email, totalSpent = 0, totalOrders = 0 } = req.body;
-    if (!customerId || !name || !email) {
+    if (![customerId, name, email].every(v => typeof v === 'string' && v.trim()) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || !Number.isFinite(Number(totalSpent)) || Number(totalSpent) < 0 || !Number.isInteger(Number(totalOrders)) || Number(totalOrders) < 0) {
       return res.status(400).json({ message: 'customerId, name and email are required' });
     }
 
@@ -142,7 +84,7 @@ const createCustomer = async (req, res, next) => {
 
     if (customer.totalSpent > 0 && req.user?.userId) {
       await Transaction.create({
-        transactionId: `TXN-${Math.floor(100000 + Math.random() * 900000)}`,
+        transactionId: `TXN-${crypto.randomUUID()}`,
         customerId: customer.customerId,
         customerName: customer.name,
         amount: customer.totalSpent,
@@ -150,7 +92,7 @@ const createCustomer = async (req, res, next) => {
         source: 'summary',
         product: 'Direct Order',
         category: 'Sales',
-        paymentMethod: 'UPI',
+        paymentMethod: 'Not specified',
         status: 'Completed',
         user: req.user.userId
       }).catch(err => console.error('Failed to create initial transaction:', err.message));
@@ -195,8 +137,12 @@ const getCustomers = async (req, res, next) => {
   try {
     const isAdmin = req.user?.role === 'admin';
     const filter = (!isAdmin && req.user?.userId) ? { user: req.user.userId } : {};
-    const customers = await Customer.find(filter).sort({ updatedAt: -1 }).limit(1000);
-    const enriched = await Promise.all(customers.map(enrichCustomer));
+    const customers = await Customer.find(filter).sort({ updatedAt: -1 }).lean();
+    const ids = customers.map(c => c._id);
+    const [features, predictions] = await Promise.all([CustomerFeature.find({ customer: { $in: ids } }).lean(), CustomerPrediction.find({ customer: { $in: ids } }).lean()]);
+    const featureMap = new Map(features.map(v => [String(v.customer), v]));
+    const predictionMap = new Map(predictions.map(v => [String(v.customer), v]));
+    const enriched = await Promise.all(customers.map(c => enrichCustomer(c, [featureMap.get(String(c._id)), predictionMap.get(String(c._id))])));
     res.json({ count: enriched.length, customers: enriched });
   } catch (error) {
     next(error);
@@ -219,25 +165,32 @@ const getCustomer = async (req, res, next) => {
   }
 };
 
+const activeImports = new Set();
 const importCustomers = async (req, res, next) => {
+  const owner = req.user.userId;
+  if (activeImports.has(owner)) return res.status(409).json({ message: 'An import is already running for your workspace. Try again after it completes.' });
+  activeImports.add(owner);
   try {
     if (!req.file) return res.status(400).json({ message: 'CSV file is required' });
 
     const rows = parseCsv(req.file.buffer.toString('utf8'));
     const grouped = new Map();
+    const fingerprint = crypto.createHash('sha256').update(req.file.buffer).digest('hex');
+    const operations = [];
 
-    for (const row of rows) {
+    for (const [rowIndex, row] of rows.entries()) {
       const id = String(row.customer_id || '').trim();
       if (!id) continue;
       const amount = Number(row.amount || 0);
       const current = grouped.get(id) || {
         customerId: id,
         name: String(row.name || id).trim(),
-        email: String(row.email || `${id.toLowerCase().replace(/[^a-z0-9]/g, '')}@patron.local`).trim(),
+        email: String(row.email || '').trim(),
         totalSpent: 0,
         totalOrders: 0,
         latestPurchase: null
       };
+      if (row.email) current.email = String(row.email).trim();
       current.totalSpent += Number.isFinite(amount) ? amount : 0;
       current.totalOrders += 1;
       const purchaseDate = new Date(row.purchase_date);
@@ -248,20 +201,34 @@ const importCustomers = async (req, res, next) => {
 
       if (req.user?.userId && row.purchase_date && !Number.isNaN(purchaseDate.getTime()) && Number.isFinite(amount)) {
         const txnDate = purchaseDate.toISOString().split('T')[0];
-        const txnId = String(row.transaction_id || `TXN-${Math.floor(100000 + Math.random() * 900000)}`);
-        await Transaction.create({
-          transactionId: txnId,
-          customerId: id,
-          customerName: String(row.name || id).trim(),
-          amount: Number.isFinite(amount) ? amount : 0,
-          date: String(txnDate).split('T')[0],
-          product: String(row.product || 'Standard Plan').trim(),
-          category: String(row.category || 'Subscription').trim(),
-          paymentMethod: String(row.payment_method || (amount > 10000 ? 'Card' : 'UPI')).trim(),
-          status: 'Completed',
-          user: req.user.userId
-        }).catch(err => console.error('Transaction creation non-critical error:', err.message));
+        const txnId = String(row.transaction_id || `CSV-${fingerprint.slice(0,32)}-${rowIndex}`);
+        const record = {
+          transactionId: txnId, customerId: id, customerName: String(row.name).trim(), amount,
+          date: txnDate, product: String(row.product || 'Not specified').trim(), category: String(row.category || 'Not specified').trim(),
+          paymentMethod: String(row.payment_method || 'Not specified').trim(), status: 'Completed', source: 'transaction', user: req.user.userId
+        };
+        operations.push({ updateOne: { filter: { user: req.user.userId, transactionId: txnId }, update: { $setOnInsert: record }, upsert: true } });
       }
+    }
+
+    // Validate conflicting supplied transaction IDs before writing.
+    const existing = await Transaction.find({ user: req.user.userId, transactionId: { $in: operations.map(o => o.updateOne.filter.transactionId) } }).lean();
+    const byId = new Map(existing.map(t => [t.transactionId, t]));
+    for (const op of operations) {
+      const record = op.updateOne.update.$setOnInsert;
+      const old = byId.get(record.transactionId);
+      if (old && (old.customerId !== record.customerId || old.amount !== record.amount || old.date !== record.date)) return res.status(409).json({ message: `Transaction ID ${record.transactionId} already refers to a different purchase` });
+    }
+    if (operations.length) await Transaction.bulkWrite(operations, { ordered: true });
+    const mongoose = require('mongoose');
+    const totals = await Transaction.aggregate([
+      { $match: { user: new mongoose.Types.ObjectId(req.user.userId), customerId: { $in: [...grouped.keys()] }, source: { $ne: 'summary' }, product: { $ne: 'Direct Order' } } },
+      { $group: { _id: '$customerId', totalSpent: { $sum: '$amount' }, totalOrders: { $sum: 1 }, latestPurchase: { $max: '$date' } } }
+    ]);
+    const history = new Map(totals.map(t => [t._id, t]));
+    for (const item of grouped.values()) {
+      const total = history.get(item.customerId);
+      if (total) Object.assign(item, { totalSpent: total.totalSpent, totalOrders: total.totalOrders, latestPurchase: total.latestPurchase });
     }
 
     let imported = 0;
@@ -269,12 +236,8 @@ const importCustomers = async (req, res, next) => {
       const customer = await Customer.findOneAndUpdate(
         { customerId: item.customerId, user: req.user?.userId },
         {
-          customerId: item.customerId,
-          name: item.name,
-          email: item.email,
-          totalSpent: Number(item.totalSpent.toFixed(2)),
-          totalOrders: item.totalOrders,
-          user: req.user?.userId
+          $set: { customerId: item.customerId, name: item.name, ...(item.email ? { email: item.email } : {}), totalSpent: Number(item.totalSpent.toFixed(2)), totalOrders: item.totalOrders, user: req.user.userId },
+          ...(item.email ? {} : { $setOnInsert: { email: `${item.customerId.toLowerCase().replace(/[^a-z0-9]/g, '') || 'customer'}@patron.local` } })
         },
         { upsert: true, new: true, setDefaultsOnInsert: true }
       );
@@ -325,7 +288,7 @@ const importCustomers = async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-  }
+  } finally { activeImports.delete(owner); }
 };
 
 module.exports = { createCustomer, getCustomers, getCustomer, importCustomers };

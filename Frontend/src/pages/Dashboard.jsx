@@ -61,8 +61,8 @@ function Dashboard () {
     if (demoMode) return dashboardInsights
     if (!summary || summary.totalCustomers === 0) {
       return [
-        { id: 1, type: 'info', title: 'Customer database is ready. Import a CSV file to generate predictive insights.' },
-        { id: 2, type: 'info', title: 'Machine learning segmentation will activate automatically once data is loaded.' }
+        { id: 1, type: 'info', title: 'Customer database is ready. Import a CSV file to generate customer insights.' },
+        { id: 2, type: 'info', title: 'RFM segmentation will run automatically once data is loaded.' }
       ]
     }
     const list = []
@@ -84,6 +84,7 @@ function Dashboard () {
     return []
   }, [demoMode, summary])
 
+  if (!demoMode && !summary) return <div className='page'><div className='card workspace-loading' role={error ? 'alert' : 'status'}>{error || 'Loading your workspace…'}{error && <button className='secondary-button' onClick={() => window.location.reload()}>Try again</button>}</div></div>
   return (
     <div className='page'>
       <div className='page-heading'>
@@ -241,7 +242,7 @@ function Dashboard () {
                 recentCustomers.map(customer => (
                   <tr key={customer.id}>
                     <td>
-                      <Link to={`/customers/${customer.id}`} className='customer-link'>
+                      <Link to={`/customers/${encodeURIComponent(customer.id)}`} className='customer-link'>
                         <strong>{customer.name}</strong>
                         <span>{customer.id}</span>
                       </Link>

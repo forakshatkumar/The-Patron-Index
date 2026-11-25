@@ -18,12 +18,12 @@ const register = async (req, res, next) => {
       return res.status(400).json({ message: 'Name is required' });
     }
 
-    if (!email || typeof email !== 'string' || !email.trim()) {
+    if (!email || typeof email !== 'string' || !email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return res.status(400).json({ message: 'Valid email is required' });
     }
 
-    if (!password || typeof password !== 'string' || password.length < 6) {
-      return res.status(400).json({ message: 'Password must be at least 6 characters in length' });
+    if (!password || typeof password !== 'string' || password.length < 6 || Buffer.byteLength(password, 'utf8') > 72) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters and no more than 72 UTF-8 bytes' });
     }
 
     const normalizedEmail = email.trim().toLowerCase();
@@ -122,15 +122,16 @@ const googleAuth = async (req, res, next) => {
       return res.status(400).json({ message: 'Google credential token is required' });
     }
 
-    const googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`);
+    const expectedClientId = process.env.GOOGLE_CLIENT_ID || '978238561753-daj7ignsgo9lbg31ag5c0ke3lukuarbh.apps.googleusercontent.com';
+    let googleRes;
+    try { googleRes = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${encodeURIComponent(credential)}`, { signal: AbortSignal.timeout(10000) }); } catch { return res.status(503).json({ message: 'Google sign-in is temporarily unavailable. Try again.' }); }
     if (!googleRes.ok) {
       return res.status(401).json({ message: 'Invalid or expired Google credential' });
     }
 
     const payload = await googleRes.json();
-    const expectedClientId = process.env.GOOGLE_CLIENT_ID || '978238561753-daj7ignsgo9lbg31ag5c0ke3lukuarbh.apps.googleusercontent.com';
 
-    if (payload.aud !== expectedClientId) {
+    if (payload.aud !== expectedClientId || !['accounts.google.com', 'https://accounts.google.com'].includes(payload.iss) || !(Number(payload.exp) > Date.now()/1000) || !payload.sub) {
       return res.status(401).json({ message: 'Google token audience mismatch' });
     }
 
@@ -167,6 +168,7 @@ const googleAuth = async (req, res, next) => {
     } else if (user.googleId && user.googleId !== googleId) {
       return res.status(401).json({ message: 'Google account mismatch' });
     } else if (!user.googleId) {
+      if (!normalizedEmail.endsWith('@gmail.com') && !payload.hd) return res.status(409).json({ message: 'Sign in using your existing password for this email.' });
       user.googleId = googleId;
       if (avatar && !user.avatar) user.avatar = avatar;
       await user.save();
@@ -211,6 +213,7 @@ const updateProfile = async (req, res, next) => {
       patch.preferences = { theme: p.theme, reducedMotion: p.reducedMotion, notifications: p.notifications };
     }
     const user = await User.findByIdAndUpdate(req.user.userId, { $set: patch }, { new: true, runValidators: true });
+    if (!user) return res.status(401).json({ message: 'Account unavailable' });
     res.json({ user: publicUser(user) });
   } catch (error) { next(error); }
 };

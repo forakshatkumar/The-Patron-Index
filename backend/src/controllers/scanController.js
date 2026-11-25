@@ -3,43 +3,22 @@ const ScanRecord = require('../models/ScanRecord');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const http = require('http');
+
 
 /**
  * Perform asynchronous heuristic static analysis or ML risk prediction
  */
 async function queryMlService(filePath, originalName) {
-  return new Promise((resolve) => {
-    // If local ML microservice is online at port 8002, query it
-    const req = http.request(
-      {
-        hostname: '127.0.0.1',
-        port: 8002,
-        path: '/predict',
-        method: 'POST',
-        timeout: 2000
-      },
-      (res) => {
-        let rawData = '';
-        res.on('data', (chunk) => { rawData += chunk; });
-        res.on('end', () => {
-          try {
-            const parsed = JSON.parse(rawData);
-            resolve({
-              riskScore: parsed.risk_probability != null ? Math.round(parsed.risk_probability * 100) : null,
-              decision: parsed.verdict === 'REVIEW' ? 'review' : 'allow'
-            });
-          } catch {
-            resolve(null);
-          }
-        });
-      }
-    );
-
-    req.on('error', () => resolve(null));
-    req.on('timeout', () => { req.destroy(); resolve(null); });
-    req.end();
-  });
+  if (!process.env.MALWARE_SCAN_URL) return null;
+  try {
+    const data = new FormData();
+    data.append('file', new Blob([await fs.promises.readFile(filePath)]), originalName);
+    const response = await fetch(new URL('/predict', process.env.MALWARE_SCAN_URL), { method: 'POST', body: data, signal: AbortSignal.timeout(15000) });
+    if (!response.ok) return null;
+    const parsed = await response.json();
+    if (!['REVIEW','ALLOW'].includes(parsed.verdict) || !Number.isFinite(parsed.risk_probability)) return null;
+    return { riskScore: Math.round(parsed.risk_probability * 100), decision: parsed.verdict === 'REVIEW' ? 'review' : 'allow' };
+  } catch { return null; }
 }
 
 const createScan = async (req, res, next) => {
@@ -65,7 +44,7 @@ const createScan = async (req, res, next) => {
 
 const getScan = async (req, res, next) => {
   try {
-    const scan = await ScanRecord.findOne({ scanId: String(req.params.id) });
+    const scan = await ScanRecord.findOne({ scanId: String(req.params.id), uploadedBy: req.user.userId });
     if (!scan) return res.status(404).json({ message: 'Scan not found' });
     res.json({ scan });
   } catch (error) {
@@ -89,7 +68,7 @@ const uploadScan = async (req, res, next) => {
       fileType: req.file.mimetype,
       fileSize: req.file.size,
       status: isBusinessDataset ? 'completed' : 'scanning',
-      riskScore: isBusinessDataset ? 0 : null,
+      riskScore: null,
       decision: isBusinessDataset ? 'allow' : null,
       uploadedBy: req.user.userId
     });
@@ -114,15 +93,15 @@ const uploadScan = async (req, res, next) => {
       } else {
         scan.status = 'completed';
         scan.riskScore = null;
-        scan.decision = 'allow';
+        scan.decision = 'review';
         await scan.save();
       }
     }
 
     res.status(201).json({
       message: isBusinessDataset
-        ? 'File validation passed and upload completed'
-        : 'File uploaded to quarantine and analyzed',
+        ? 'Dataset received; row validation occurs during CSV import'
+        : 'File received; review the scan decision',
       scanId: scan.scanId,
       status: scan.status,
       decision: scan.decision,
@@ -130,8 +109,9 @@ const uploadScan = async (req, res, next) => {
       fileName: scan.fileName
     });
   } catch (error) {
-    if (req.file?.path) fs.unlink(req.file.path, () => {});
     next(error);
+  } finally {
+    if (req.file?.path) fs.unlink(req.file.path, () => {});
   }
 };
 

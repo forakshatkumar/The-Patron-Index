@@ -8,6 +8,9 @@ function Transactions () {
   const { demoMode } = useAuth()
   const [dbTransactions, setDbTransactions] = useState([])
   const [loading, setLoading] = useState(!demoMode)
+  const [error, setError] = useState('')
+  const [page, setPage] = useState(1)
+  const pageSize = 25
   const [search, setSearch] = useState('')
   const [payment, setPayment] = useState('All')
 
@@ -17,7 +20,7 @@ function Transactions () {
       .then(data => {
         setDbTransactions(data.transactions || [])
       })
-      .catch(() => {})
+      .catch(err => setError(err.message))
       .finally(() => setLoading(false))
   }, [demoMode])
 
@@ -31,7 +34,7 @@ function Transactions () {
       date: t.date,
       product: t.product || 'Standard Purchase',
       category: t.category || 'General',
-      paymentMethod: t.paymentMethod || 'UPI',
+      paymentMethod: t.paymentMethod || 'Not specified',
       status: t.status || 'Completed'
     }))
   }, [demoMode, dbTransactions])
@@ -50,6 +53,10 @@ function Transactions () {
     })
   }, [rawTransactions, search, payment])
 
+  const methods = [...new Set(rawTransactions.map(t => t.paymentMethod))].sort()
+  const pageCount = Math.max(1, Math.ceil(filteredTransactions.length / pageSize))
+  const currentPage = Math.min(page, pageCount)
+  const visibleTransactions = filteredTransactions.slice((currentPage - 1) * pageSize, currentPage * pageSize)
   return (
     <div className='page'>
       <div className='page-heading'>
@@ -66,18 +73,18 @@ function Transactions () {
             className='search-input'
             placeholder='Search transaction...'
             value={search}
-            onChange={event => setSearch(event.target.value)}
+            aria-label='Search transactions'
+            onChange={event => { setSearch(event.target.value); setPage(1) }}
           />
 
           <select
             value={payment}
-            onChange={event => setPayment(event.target.value)}
+            aria-label='Payment method'
+            onChange={event => { setPayment(event.target.value); setPage(1) }}
           >
             <option value='All'>All Payment Methods</option>
 
-            <option value='UPI'>UPI</option>
-
-            <option value='Card'>Card</option>
+            {methods.map(method => <option key={method} value={method}>{method}</option>)}
           </select>
         </div>
 
@@ -97,21 +104,21 @@ function Transactions () {
             </thead>
 
             <tbody>
-              {loading ? (
+              {error ? <tr><td colSpan='8' role='alert'>{error} <button className='secondary-button' onClick={() => window.location.reload()}>Try again</button></td></tr> : loading ? (
                 <tr>
                   <td colSpan='8' style={{ textAlign: 'center', padding: '40px' }} className='muted-text'>
                     Loading transactions...
                   </td>
                 </tr>
               ) : filteredTransactions.length > 0 ? (
-                filteredTransactions.map(transaction => (
+                visibleTransactions.map(transaction => (
                   <tr key={transaction.id}>
                     <td>{transaction.id}</td>
 
                     <td>
                       <Link
                         className='customer-link'
-                        to={`/customers/${transaction.customerId}`}
+                        to={`/customers/${encodeURIComponent(transaction.customerId)}`}
                       >
                         <strong>{transaction.customerName}</strong>
                       </Link>
@@ -137,7 +144,7 @@ function Transactions () {
               ) : (
                 <tr>
                   <td colSpan='8' style={{ textAlign: 'center', padding: '40px' }} className='muted-text'>
-                    {demoMode
+                    {demoMode || rawTransactions.length
                       ? 'No transactions match the selected filter.'
                       : <span>No transaction records found in your database. <Link to='/import' className='text-button'>Import CSV Data</Link></span>
                     }
@@ -147,6 +154,7 @@ function Transactions () {
             </tbody>
           </table>
         </div>
+        {!loading && !error && filteredTransactions.length > 0 && <div className='transaction-pagination'><span>{(currentPage-1)*pageSize+1}–{Math.min(currentPage*pageSize,filteredTransactions.length)} of {filteredTransactions.length} transactions</span><div><button className='secondary-button' disabled={currentPage===1} onClick={()=>setPage(currentPage-1)}>Previous</button><button className='secondary-button' disabled={currentPage===pageCount} onClick={()=>setPage(currentPage+1)}>Next</button></div></div>}
       </section>
     </div>
   )

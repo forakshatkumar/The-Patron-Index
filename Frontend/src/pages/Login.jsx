@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import logoImg from '../assets/logo.png'
@@ -14,6 +14,9 @@ function Login () {
   const [success, setSuccess] = useState(() =>
     location.state?.registered ? 'Account created successfully! Please sign in below.' : ''
   )
+  const [showPassword, setShowPassword] = useState(false)
+  const [googleUnavailable, setGoogleUnavailable] = useState(false)
+  const submitting = useRef(false)
   const [loading, setLoading] = useState(false)
   const [isWarmupDelayed, setIsWarmupDelayed] = useState(false)
 
@@ -43,7 +46,8 @@ function Login () {
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: async (response) => {
-            if (response?.credential) {
+            if (response?.credential && !submitting.current) {
+              submitting.current = true
               try {
                 setLoading(true)
                 setError('')
@@ -52,6 +56,7 @@ function Login () {
               } catch (err) {
                 setError(err.message || 'Google sign in failed')
               } finally {
+                submitting.current = false
                 setLoading(false)
               }
             }
@@ -84,14 +89,17 @@ function Login () {
           initGoogle()
         }
       }, 150)
-      return () => clearInterval(interval)
+      const timeout = setTimeout(() => { clearInterval(interval); if (!window.google?.accounts?.id) setGoogleUnavailable(true) }, 8000)
+      return () => { clearInterval(interval); clearTimeout(timeout) }
     }
   }, [loginWithGoogle, navigate])
 
   const submit = async event => {
     event.preventDefault()
+    if (submitting.current) return
     setError('')
     setSuccess('')
+    submitting.current = true
     setLoading(true)
     try {
       await login(email.trim().toLowerCase(), password)
@@ -99,6 +107,7 @@ function Login () {
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.')
     } finally {
+      submitting.current = false
       setLoading(false)
     }
   }
@@ -134,6 +143,7 @@ function Login () {
         <div className='account-ring' />
       </div>
 
+      <aside className='auth-editorial' aria-label='About The Patron Index'><span>THE PATRON INDEX / WORKSPACE</span><h2>Know your customers.<br/>Make better decisions.</h2><p>One workspace for purchase history, customer segments and revenue insights.</p><div className='auth-editorial-line'/><small>Customer intelligence · RFM segmentation · Business analytics</small></aside>
       <section className='account-card' aria-labelledby='account-title'>
         <Link to='/' className='account-brand-link' aria-label='The Patron Index Home'>
           <div className='account-brand'>
@@ -142,7 +152,7 @@ function Login () {
             </span>
             <span>
               The Patron Index
-              <small>Customer Intelligence Platform</small>
+              <small>Where buyers become insight</small>
             </span>
           </div>
         </Link>
@@ -174,10 +184,10 @@ function Login () {
           </div>
 
           <div className='account-field'>
-            <label htmlFor='account-password'>Password</label>
+            <div className='auth-password-label'><label htmlFor='account-password'>Password</label><button type='button' className='auth-show-password' aria-pressed={showPassword} onClick={() => setShowPassword(v => !v)}>{showPassword ? 'Hide' : 'Show'}</button></div>
             <input
               id='account-password'
-              type='password'
+              type={showPassword ? 'text' : 'password'}
               autoComplete='current-password'
               value={password}
               onChange={e => setPassword(e.target.value)}
@@ -199,6 +209,7 @@ function Login () {
         </div>
 
         <div id='google-btn-login' className='google-btn-wrap' />
+        {googleUnavailable && <p className='account-hint' role='status'>Google sign-in is unavailable. You can still use email and password.</p>}
 
         <p className='account-switch'>
           <span>New here? </span>

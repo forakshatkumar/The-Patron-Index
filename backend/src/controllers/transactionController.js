@@ -4,7 +4,7 @@ const getTransactions = async (req, res, next) => {
   try {
     const isAdmin = req.user?.role === 'admin';
     const filter = (!isAdmin && req.user?.userId) ? { user: req.user.userId } : {};
-    const transactions = await Transaction.find(filter).sort({ createdAt: -1 }).limit(1000);
+    const transactions = await Transaction.find(filter).sort({ date: -1, createdAt: -1 }).lean();
     res.json({ count: transactions.length, transactions });
   } catch (error) {
     next(error);

@@ -4,7 +4,7 @@ import Sidebar from './Sidebar'
 import Header from './Header'
 
 export default function Layout () {
-  // Start closed on each new workspace visit; keep the choice during navigation.
+  // Start with the desktop icon rail; keep the expansion choice during navigation.
   const [desktopOpen, setDesktopOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches)
@@ -44,7 +44,7 @@ export default function Layout () {
   }, [open, isMobile])
 
   return <div className={`app-layout premium-layout ${desktopOpen ? 'desktop-open' : ''} ${mobileOpen && isMobile ? 'mobile-open' : ''}`}>
-    <Sidebar sidebarRef={sidebarRef} open={open} onClose={closeMobile} onNavigate={() => { if (isMobile) closeMobile() }} />
+    <Sidebar sidebarRef={sidebarRef} hidden={isMobile && !mobileOpen} onClose={closeMobile} onNavigate={() => { if (isMobile) closeMobile() }} />
     {mobileOpen && isMobile && <button type='button' className='premium-backdrop' aria-label='Close navigation' tabIndex={-1} onClick={closeMobile} />}
     <div className='app-content' inert={isMobile && mobileOpen}><Header onToggleSidebar={toggle} navigationOpen={open} toggleRef={toggleRef} /><main className='page-content'><Outlet /></main></div>
   </div>

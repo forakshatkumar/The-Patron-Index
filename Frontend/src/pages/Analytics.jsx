@@ -592,6 +592,7 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
 function Analytics () {
   const { demoMode } = useAuth()
   const [summary, setSummary] = useState(null)
+  const [error, setError] = useState('')
   const [customers, setCustomers] = useState(demoMode ? [] : [])
 
   useEffect(() => {
@@ -601,7 +602,7 @@ function Analytics () {
         setSummary(summaryData)
         setCustomers((customerData.customers || []).map(normalizeCustomer))
       })
-      .catch(() => {})
+      .catch(err => setError(err.message))
   }, [demoMode])
 
   const SEGMENT_NAMES = useMemo(() => ['VIP', 'Loyal', 'Regular', 'New', 'Occasional', 'At-Risk', 'Inactive'], [])
@@ -650,6 +651,7 @@ function Analytics () {
   const totalRevFormatted = demoMode ? 'Peak: ₹18.4L (+87.8%)' : `Total: ₹${((summary?.totalRevenue || 0) / 100000).toFixed(2)}L`
   const baseCountFormatted = demoMode ? 'Base: 2,482 (+74.8%)' : `Base: ${summary?.totalCustomers || customers.length} patrons`
 
+  if (!demoMode && !summary) return <div className='page'><div className='card workspace-loading' role={error ? 'alert' : 'status'}>{error || 'Loading your workspace…'}{error && <button className='secondary-button' onClick={() => window.location.reload()}>Try again</button>}</div></div>
   return (
     <div className='page analytics-page'>
       <div className='page-heading analytics-heading-animated'>

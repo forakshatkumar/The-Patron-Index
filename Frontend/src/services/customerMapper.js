@@ -12,7 +12,7 @@ export function normalizeCustomer (item = {}) {
   return {
     id: item.customerId || item._id || 'Unknown',
     name: item.name || 'Unknown Customer',
-    email: item.email || '',
+    email: item.email?.endsWith('@patron.local') ? 'Not provided' : (item.email || 'Not provided'),
     phone: item.phone || 'Not provided',
     location: item.location || 'Not provided',
     segment,

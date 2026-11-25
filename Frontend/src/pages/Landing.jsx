@@ -294,7 +294,7 @@ export default function Landing () {
     },
     {
       id: 'feature-panel-3',
-      title: 'AI-Powered Recommendations',
+      title: 'Segment-based Recommendations',
       icon: Sparkles,
       description: 'Get suggestions based on customer behaviour and spot opportunities to improve retention.',
       example: 'Example action · Re-engage at-risk customers'
@@ -344,7 +344,7 @@ export default function Landing () {
       <div
         id='mobile-navigation-drawer'
         className={`mobile-nav-drawer ${mobileMenuOpen ? 'is-open' : ''}`}
-        aria-hidden={!mobileMenuOpen}
+        aria-hidden={!mobileMenuOpen} inert={!mobileMenuOpen}
       >
         <div className='mobile-nav-header'>
           <div className='brand'>
@@ -380,14 +380,15 @@ export default function Landing () {
         <section className='hero'>
           <div className='hero-grid wrap'>
             <div className='hero-copy'>
-              <h1>The Patron Index</h1>
-              <p className='tagline'>Where Buyers Become Insight</p>
-              <p>Turn your business data into powerful customer intelligence. Understand. Segment. Grow.</p>
+              <h1>Where buyers become insight</h1>
+              <p className='tagline'>Know your customers. Grow with confidence.</p>
+              <p>Turn purchase history into customer segments, revenue trends and practical insights — all in one workspace.</p>
               <div className='hero-buttons'>
-                <Link to='/register' className='btn'>Get Started Free</Link>
+                <Link to='/register' className='btn'>Get started</Link><a href='#how' className='btn outline'>See how it works</a>
               </div>
             </div>
-            <div className='dashboard'>
+            <div className='dashboard' aria-label='Illustrative dashboard preview, sample data'>
+              <span className='preview-label'>PRODUCT PREVIEW · SAMPLE DATA</span>
               <span className='blob' aria-hidden='true' />
               <div className='panel'>
                 <div className='panel-head'>
@@ -550,7 +551,7 @@ export default function Landing () {
               <div className='benefit-icon-wrap' aria-hidden='true'>
                 <UploadCloud />
               </div>
-              <span>Upload your CSV data<br />in seconds</span>
+              <span>Upload your CSV data<br />for validation</span>
             </div>
             <div className='benefit'>
               <div className='benefit-icon-wrap' aria-hidden='true'>
@@ -578,7 +579,7 @@ export default function Landing () {
                       <strong>Customer analytics</strong>
                       <span className='live-pill'>
                         <span className='live-dot' />
-                        Live
+                        Preview
                       </span>
                     </div>
                     <select
@@ -737,6 +738,7 @@ export default function Landing () {
           </div>
         </section>
 
+        <section className='marketing-faq wrap' id='faq'><h2>Frequently asked questions</h2><details><summary>What data do I need?</summary><p>A CSV containing customer ID, name, purchase date and amount. Email and product are optional.</p></details><details><summary>How are customers segmented?</summary><p>The platform uses recency, frequency and monetary value to calculate the Patron Index score and classify customers into seven groups.</p></details><details><summary>Can I use my own business data?</summary><p>Yes. Create an account, import your purchase history and explore your own dashboard and customer records.</p></details></section>
         {/* Call to Action Banner */}
         <section className='cta center wrap'>
           <div>
@@ -749,7 +751,7 @@ export default function Landing () {
 
       {/* Footer */}
       <footer className='wrap'>
-        <p className='copyright'>&copy; 2026 The Patron Index. All rights reserved.</p>
+        <p className='copyright'><strong className='footer-brand-tagline'>Where buyers become insight</strong>&copy; 2026 The Patron Index. All rights reserved.</p>
       </footer>
     </div>
   )

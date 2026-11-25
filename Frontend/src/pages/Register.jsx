@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import logoImg from '../assets/logo.png'
@@ -10,6 +10,9 @@ function Register () {
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'analyst' })
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [googleUnavailable, setGoogleUnavailable] = useState(false)
+  const submitting = useRef(false)
   const [loading, setLoading] = useState(false)
   const [isWarmupDelayed, setIsWarmupDelayed] = useState(false)
 
@@ -39,7 +42,8 @@ function Register () {
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: async (response) => {
-            if (response?.credential) {
+            if (response?.credential && !submitting.current) {
+              submitting.current = true
               try {
                 setLoading(true)
                 setError('')
@@ -48,6 +52,7 @@ function Register () {
               } catch (err) {
                 setError(err.message || 'Google sign up failed')
               } finally {
+                submitting.current = false
                 setLoading(false)
               }
             }
@@ -80,17 +85,20 @@ function Register () {
           initGoogle()
         }
       }, 150)
-      return () => clearInterval(interval)
+      const timeout = setTimeout(() => { clearInterval(interval); if (!window.google?.accounts?.id) setGoogleUnavailable(true) }, 8000)
+      return () => { clearInterval(interval); clearTimeout(timeout) }
     }
   }, [loginWithGoogle, navigate])
 
   const submit = async event => {
     event.preventDefault()
+    if (submitting.current) return
     if (!agreed) {
-      setError('You must confirm age eligibility and agree to the Terms of Service and Privacy Policy to register.')
+      setError('Please confirm that you are at least 18 years old.')
       return
     }
     setError('')
+    submitting.current = true
     setLoading(true)
     try {
       await register({
@@ -102,6 +110,7 @@ function Register () {
     } catch (err) {
       setError(err.message)
     } finally {
+      submitting.current = false
       setLoading(false)
     }
   }
@@ -137,6 +146,7 @@ function Register () {
         <div className='account-ring' />
       </div>
 
+      <aside className='auth-editorial' aria-label='About The Patron Index'><span>THE PATRON INDEX / WORKSPACE</span><h2>Know your customers.<br/>Make better decisions.</h2><p>One workspace for purchase history, customer segments and revenue insights.</p><div className='auth-editorial-line'/><small>Customer intelligence · RFM segmentation · Business analytics</small></aside>
       <section className='account-card' aria-labelledby='account-title'>
         <Link to='/' className='account-brand-link' aria-label='The Patron Index Home'>
           <div className='account-brand'>
@@ -145,7 +155,7 @@ function Register () {
             </span>
             <span>
               The Patron Index
-              <small>Customer Intelligence Platform</small>
+              <small>Where buyers become insight</small>
             </span>
           </div>
         </Link>
@@ -191,10 +201,10 @@ function Register () {
           </div>
 
           <div className='account-field'>
-            <label htmlFor='account-password'>Password</label>
+            <div className='auth-password-label'><label htmlFor='account-password'>Password</label><button type='button' className='auth-show-password' aria-pressed={showPassword} onClick={() => setShowPassword(v => !v)}>{showPassword ? 'Hide' : 'Show'}</button></div>
             <input
               id='account-password'
-              type='password'
+              type={showPassword ? 'text' : 'password'}
               autoComplete='new-password'
               minLength={6}
               value={form.password}
@@ -212,9 +222,7 @@ function Register () {
               required
             />
             <span>
-              I confirm I am at least 18 years of age and agree to the{' '}
-              <Link to='/?policy=terms' target='_blank' rel='noreferrer'>Terms of Service</Link> and{' '}
-              <Link to='/?policy=privacy' target='_blank' rel='noreferrer'>Privacy Policy</Link>.
+              I confirm I am at least 18 years of age.
             </span>
           </label>
 
@@ -230,6 +238,7 @@ function Register () {
         </div>
 
         <div id='google-btn-register' className='google-btn-wrap' />
+        {googleUnavailable && <p className='account-hint' role='status'>Google sign-in is unavailable. You can still use email and password.</p>}
 
         <p className='account-switch'>
           <span>Already registered? </span>

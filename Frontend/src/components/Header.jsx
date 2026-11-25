@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Bell, PanelLeft, Settings as SettingsIcon, LogOut } from 'lucide-react'
+import { Bell, PanelLeftOpen, PanelLeftClose, UserRound, LogOut } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 
 export function Avatar ({ user, size = 'small' }) {
-  const initials = (user?.name || 'Patron Index').split(/\s+/).slice(0, 2).map(s => s[0]).join('').toUpperCase()
+  const initials = (user?.name || 'Patron Index').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase()
   return <span className={`premium-avatar ${size}`}>{user?.avatar ? <img src={user.avatar} alt='' referrerPolicy='no-referrer' /> : initials}</span>
 }
 
@@ -12,66 +12,13 @@ export default function Header ({ onToggleSidebar, navigationOpen, toggleRef }) 
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const { user, preferences, logout, demoMode } = useAuth()
+  const [menuError, setMenuError] = useState('')
   const [notifOpen, setNotifOpen] = useState(false)
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const notifRef = useRef(null)
   const profileMenuRef = useRef(null)
 
-  const [businessSettings, setBusinessSettings] = useState(() => {
-    try {
-      const stored = localStorage.getItem('patron-business-settings')
-      if (stored) {
-        const parsed = JSON.parse(stored)
-        const businessName = (parsed.businessName === 'Patron Analytics' || parsed.businessName === 'Enterprise Workspace') ? '' : (parsed.businessName || '')
-        const industry = (parsed.industry === 'Retail & Commerce') ? '' : (parsed.industry || '')
-        const location = (parsed.location === 'New Delhi, India') ? '' : (parsed.location || '')
-        const phone = (parsed.phone === '+91 98765 43210') ? '' : (parsed.phone || '')
-        return {
-          businessName,
-          ownerName: parsed.ownerName || '',
-          email: parsed.email || '',
-          phone,
-          industry,
-          location
-        }
-      }
-    } catch {
-      // fallback
-    }
-    if (user?.businessName || user?.industry) {
-      return {
-        businessName: user.businessName || '',
-        ownerName: user.name || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        industry: user.industry || '',
-        location: user.location || ''
-      }
-    }
-    return null
-  })
-
-  useEffect(() => {
-    const handleSettingsUpdated = (e) => {
-      if (e.detail) {
-        setBusinessSettings(e.detail)
-      } else {
-        try {
-          const stored = localStorage.getItem('patron-business-settings')
-          setBusinessSettings(stored ? JSON.parse(stored) : null)
-        } catch {
-          setBusinessSettings(null)
-        }
-      }
-    }
-    window.addEventListener('patron:settings_updated', handleSettingsUpdated)
-    window.addEventListener('storage', handleSettingsUpdated)
-    return () => {
-      window.removeEventListener('patron:settings_updated', handleSettingsUpdated)
-      window.removeEventListener('storage', handleSettingsUpdated)
-    }
-  }, [])
-
+  const businessSettings = user
   useEffect(() => {
     const close = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
@@ -97,13 +44,13 @@ export default function Header ({ onToggleSidebar, navigationOpen, toggleRef }) 
     businessSettings && (businessSettings.businessName?.trim() || businessSettings.industry?.trim())
   )
 
-  const displayName = businessSettings?.ownerName?.trim() || user?.name || (user?.email ? user.email.split('@')[0] : (demoMode ? 'Demo Account' : 'Authenticated User'))
-  const displayEmail = businessSettings?.email?.trim() || user?.email || (demoMode ? 'demo@patronindex.local' : '')
-  const initials = (displayName || 'Patron Index').split(/\s+/).slice(0, 2).map(s => s[0]).join('').toUpperCase()
+  const displayName = user?.name || (user?.email ? user.email.split('@')[0] : (demoMode ? 'Demo Account' : 'Authenticated User'))
+  const displayEmail = user?.email || (demoMode ? 'demo@patronindex.local' : '')
+  const initials = (displayName || 'Patron Index').trim().split(/\s+/).filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase()
 
-  const handleGoToSettings = () => {
+  const handleGoToProfile = () => {
     setIsProfileOpen(false)
-    navigate('/settings')
+    navigate('/profile')
   }
 
   const handleSignOut = async () => {
@@ -111,8 +58,8 @@ export default function Header ({ onToggleSidebar, navigationOpen, toggleRef }) 
     try {
       await logout()
       navigate('/login', { replace: true })
-    } catch {
-      navigate('/login', { replace: true })
+    } catch (error) {
+      setMenuError(error.message); setIsProfileOpen(true)
     }
   }
 
@@ -133,12 +80,12 @@ export default function Header ({ onToggleSidebar, navigationOpen, toggleRef }) 
           ref={toggleRef}
           type='button'
           className='premium-icon-button'
-          aria-label={navigationOpen ? 'Close navigation' : 'Open navigation'}
+          aria-label={navigationOpen ? 'Collapse navigation' : 'Expand navigation'}
           aria-controls='workspace-navigation'
           aria-expanded={navigationOpen}
           onClick={onToggleSidebar}
         >
-          <PanelLeft size={20} />
+          {navigationOpen ? <PanelLeftClose size={20} /> : <PanelLeftOpen size={20} />}
         </button>
         <span className='premium-breadcrumb'>
           Workspace <span>/</span> <strong>{titles[pathname] || 'Customer profile'}</strong>
@@ -193,7 +140,7 @@ export default function Header ({ onToggleSidebar, navigationOpen, toggleRef }) 
           </button>
 
           {isProfileOpen && (
-            <div className='header-profile-dropdown' role='menu'>
+            <div className='header-profile-dropdown' aria-label='Account actions'>
               <div className='dropdown-account-header'>
                 <div className='dropdown-large-avatar'>
                   {user?.avatar ? (
@@ -242,17 +189,18 @@ export default function Header ({ onToggleSidebar, navigationOpen, toggleRef }) 
               <div className='dropdown-divider' />
 
               <div className='dropdown-actions-menu'>
+                {menuError && <p role='alert' className='account-error'>{menuError}</p>}
                 <button
                   type='button'
                   className='dropdown-menu-item'
-                  onClick={handleGoToSettings}
+                  onClick={handleGoToProfile}
                 >
                   <span className='dropdown-item-icon'>
-                    <SettingsIcon size={16} />
+                    <UserRound size={16} />
                   </span>
                   <div className='dropdown-item-text'>
-                    <strong>Settings</strong>
-                    <span>Manage organization and security</span>
+                    <strong>Your profile</strong>
+                    <span>View personal and business information</span>
                   </div>
                 </button>
 

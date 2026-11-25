@@ -17,14 +17,12 @@ function CustomerProfile () {
 
   useEffect(() => {
     if (demoMode) return
-    getCustomer(id)
-      .then(data => setCustomer(normalizeCustomer(data)))
-      .catch(err => setError(err.message))
-      .finally(() => setLoading(false))
-
-    getCustomerTransactions(id)
-      .then(data => setLiveTransactions(data.transactions || []))
-      .catch(() => {})
+    let current = true
+    Promise.all([getCustomer(id), getCustomerTransactions(id)])
+      .then(([data, transactions]) => { if (current) { setCustomer(normalizeCustomer(data)); setLiveTransactions(transactions.transactions || []) } })
+      .catch(err => { if (current) setError(err.message) })
+      .finally(() => { if (current) setLoading(false) })
+    return () => { current = false }
   }, [demoMode, id])
 
   const customerTransactions = useMemo(() => {

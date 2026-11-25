@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "cd Frontend && npm install && npm run build",
+    "build": "npm --prefix Frontend run build",
     "start": "node backend/src/server.js"
+  },
+  "engines": {
+    "node": "22.x"
   }
 }

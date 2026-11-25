@@ -15,9 +15,10 @@ const { apiLimiter, authLimiter, uploadLimiter } = require('./middleware/rateLim
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const mongoose = require('mongoose');
 
 // Trust reverse proxy (Render, Cloudflare, Vercel) for client IP & X-Forwarded-For resolution
-app.set('trust proxy', 1);
+app.set('trust proxy', process.env.NODE_ENV === 'production' ? 1 : false);
 
 // Security: Helmet header hardening
 app.use(helmet({
@@ -29,7 +30,7 @@ app.use(helmet({
 
 // CORS Configuration
 const allowedOrigins = process.env.FRONTEND_URL
-  ? process.env.FRONTEND_URL.split(',').map(u => u.trim())
+  ? process.env.FRONTEND_URL.split(',').map(u => u.trim().replace(/\/$/, '')).filter(Boolean)
   : ['http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:5173', 'http://localhost:3000'];
 
 app.use(cors({
@@ -38,7 +39,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Cross-Origin Request Blocked by Security Policy'));
+      callback(Object.assign(new Error('Origin not allowed'), { status: 403 }));
     }
   },
   credentials: true,
@@ -63,6 +64,7 @@ app.use(sanitizeMiddleware);
 app.use('/api/', apiLimiter);
 app.use('/api/auth/login', authLimiter);
 app.use('/api/auth/register', authLimiter);
+app.use('/api/auth/google', authLimiter);
 app.use('/api/scan/upload', uploadLimiter);
 app.use('/api/customers/import', uploadLimiter);
 
@@ -80,8 +82,9 @@ app.get('/', (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'ok',
+  const ready = mongoose.connection.readyState === 1;
+  res.status(ready ? 200 : 503).json({
+    status: ready ? 'ok' : 'unavailable',
     service: 'backend',
     timestamp: new Date().toISOString()
   });
@@ -93,6 +96,8 @@ app.use('/api/scan', scanRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/transactions', transactionRoutes);
+
+app.use('/api', (_req, res) => res.status(404).json({ message: 'API route not found' }));
 
 // Central error handling
 app.use(errorMiddleware);
@@ -122,9 +127,10 @@ async function ensureDefaultAccounts () {
 let server;
 
 async function startServer () {
+  if (process.env.NODE_ENV === 'production' && !process.env.FRONTEND_URL) throw new Error('FRONTEND_URL must be configured in production');
   await connectDB();
   if (process.env.NODE_ENV !== 'production' && process.env.ENABLE_DEMO_ACCOUNT === 'true') await ensureDefaultAccounts();
-  server = app.listen(PORT, () => {
+  server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`Backend server running securely on port ${PORT}`);
   });
 }
@@ -142,7 +148,9 @@ const shutdown = () => {
   }
 };
 
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
-
-startServer();
+if (require.main === module) {
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+  startServer().catch(error => { console.error('Backend startup failed:', error.message); process.exit(1); });
+}
+module.exports = { app, startServer };

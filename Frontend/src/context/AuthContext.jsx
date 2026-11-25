@@ -18,6 +18,7 @@ export function AuthProvider ({ children }) {
         return
       }
       const data = await getMe()
+      if (!data.user?.id) throw new Error('Invalid session response')
       setUser(data.user)
     } catch (e) {
       if (e.status === 401) { removeToken(); setUser(null) }
@@ -40,6 +41,7 @@ export function AuthProvider ({ children }) {
   }, [])
   const accept = useCallback(async promise => {
     const data = await promise
+    if (!data.user?.id) throw new Error('Invalid authentication response')
     setUser(data.user); setDemoMode(false); setSessionError(''); setLoading(false)
     localStorage.removeItem('patron_demo'); return data
   }, [])

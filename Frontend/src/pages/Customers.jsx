@@ -226,7 +226,12 @@ function Customers () {
       c.status
     ])
 
-    const csvContent = [headers.join(','), ...rows.map(row => row.map(val => `"${String(val).replace(/"/g, '""')}"`).join(','))].join('\n')
+    const escapeCell = value => {
+      const raw = String(value ?? '')
+      const safe = typeof value === 'string' && /^[\s]*[=+@-]/.test(raw) ? "'" + raw : raw
+      return `"${safe.replace(/"/g, '""')}"`
+    }
+    const csvContent = [headers.join(','), ...rows.map(row => row.map(escapeCell).join(','))].join('\n')
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -425,7 +430,7 @@ function Customers () {
                   return (
                     <tr key={customer.id} className='customer-table-row'>
                       <td>
-                        <Link className='customer-link' to={`/customers/${customer.id}`}>
+                        <Link className='customer-link' to={`/customers/${encodeURIComponent(customer.id)}`}>
                           <strong>{customer.name}</strong>
                           <span className='customer-sub-id'>{customer.id} • {customer.email}</span>
                         </Link>

@@ -3,7 +3,7 @@
 
 **The Patron Index** is an enterprise-grade customer intelligence and business analytics platform designed to help modern businesses understand customer behavior and make smarter, data-driven decisions.
 
-The platform analyses historical customer purchase data and transforms it into meaningful predictive insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement, and improve customer retention without relying on synthetic or made-up data.
+The platform analyses historical customer purchase data and transforms it into explainable RFM insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement, and improve customer retention without relying on synthetic or made-up data.
 
 ---
 
@@ -16,15 +16,15 @@ The platform analyses historical customer purchase data and transforms it into m
 
 ## 🚀 Key Features
 
-- **CSV Data Import & Validation:** Upload customer purchase and transaction records in CSV format with instant client-side pre-validation and server-side virus/malware scanning.
-- **Strict Multi-Tenant Isolation:** Zero data leakage. Every business user's customers, transactions, and scan metrics are strictly isolated to their own authenticated workspace.
+- **CSV Data Import & Validation:** Upload customer purchase and transaction records in CSV format with client-side header checks and server-side row validation.
+- **Workspace data access:** Analyst accounts are scoped to their own records; existing admin accounts retain broader access.
 - **RFM Customer Segmentation:** Automatically classifies customers into 7 distinct behavioral cohorts: **VIP**, **Loyal**, **Regular**, **New**, **Occasional**, **At-Risk**, and **Inactive**.
 - **Patron Index Scoring:** Calculates an adaptive loyalty index (0–100) combining Recency (35%), Frequency (30%), and Monetary value (35%).
 - **Interactive Executive Dashboard:** Real-time visibility into customer counts, active revenue, customer cohorts, recent customers, and monthly revenue trends.
 - **Customer Directory & Profiling:** Detailed patron registry with search, filtering, patron score distribution, and individual purchase history.
 - **Transactions Ledger:** Complete transaction ledger tracking transaction IDs, customer names, dates, amounts, categories, and payment methods.
 - **Customizable Business Profile:** Dynamic business settings (Business Name, Industry, Location) that seamlessly customize the workspace and profile cards across the app.
-- **Google OAuth 2.0 & JWT Authentication:** Secure login using Google One Tap / Sign-In or encrypted email credentials.
+- **Authentication:** Google Sign-In and email/password with hashed passwords and persistent HttpOnly sessions.
 
 ---
 
@@ -32,11 +32,11 @@ The platform analyses historical customer purchase data and transforms it into m
 
 | Component | Technologies |
 |---|---|
-| **Frontend** | React 18, Vite, React Router 6, CSS Modules / Custom Tokens |
+| **Frontend** | React 19, Vite, React Router 7, CSS Modules / Custom Tokens |
 | **Backend** | Node.js, Express.js, Mongoose, JWT, Helmet, Rate Limiter |
 | **Database** | MongoDB Atlas (Multi-Tenant Document Store) |
-| **Machine Learning** | Python, FastAPI, LightGBM, Scikit-learn, Isotonic Calibration |
-| **Security** | DDE / Formula Injection Sanitizer, Malware File Isolation, Helmet CSP |
+| **Machine Learning** | Python, FastAPI, explainable RFM and optional heuristic scanner |
+| **Security** | CSV export formula escaping, upload limits, Helmet, session cookies |
 | **Hosting & CI/CD** | Vercel (Frontend), Render (Backend), Git / GitHub |
 
 ---
@@ -69,15 +69,17 @@ The platform analyses historical customer purchase data and transforms it into m
 
 ## 💻 Local Development Setup
 
+See [PRODUCTION_UPDATE.md](PRODUCTION_UPDATE.md) for exact deployment and verification steps.
+
 ### 1. Prerequisites
-- Node.js (v18 or higher)
+- Node.js 22.x (at least 22.12)
 - npm or yarn
 - MongoDB Atlas database URI
 
 ### 2. Backend Setup
 ```bash
 cd backend
-npm install
+npm ci
 # Configure your .env file:
 # PORT=5000
 # MONGO_URI=your_mongodb_connection_string
@@ -89,9 +91,9 @@ npm run dev
 ### 3. Frontend Setup
 ```bash
 cd Frontend
-npm install
+npm ci
 # Configure Frontend/.env if needed:
-# VITE_API_URL=http://localhost:5000/api
+# PATRON_API_PROXY_TARGET=http://127.0.0.1:5000 (optional)
 # VITE_GOOGLE_CLIENT_ID=your_google_client_id
 npm run dev
 ```

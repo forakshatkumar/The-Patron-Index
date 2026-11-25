@@ -11,7 +11,7 @@ module.exports = async (req, res, next) => {
       if (session) userId = session.user;
     } else if (req.headers.authorization?.startsWith('Bearer ')) {
       // Compatibility for previously issued, unexpired tokens only.
-      const secret = process.env.JWT_SECRET || (process.env.NODE_ENV !== 'production' ? 'patron_index_dev_secret_key_secure_2026' : null);
+      const secret = process.env.JWT_SECRET;
       if (secret) {
         try { userId = jwt.verify(req.headers.authorization.slice(7), secret).userId; } catch { /* invalid token */ }
       }
