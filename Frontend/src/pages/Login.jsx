@@ -15,6 +15,24 @@ function Login () {
     location.state?.registered ? 'Account created successfully! Please sign in below.' : ''
   )
   const [loading, setLoading] = useState(false)
+  const [isWarmupDelayed, setIsWarmupDelayed] = useState(false)
+
+  useEffect(() => {
+    // Pre-warm backend on Render to eliminate cold-start lag
+    const apiBase = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api')
+    fetch(`${apiBase}/health`).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (!loading) return
+    const timer = setTimeout(() => {
+      setIsWarmupDelayed(true)
+    }, 2500)
+    return () => {
+      clearTimeout(timer)
+      setIsWarmupDelayed(false)
+    }
+  }, [loading])
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '978238561753-daj7ignsgo9lbg31ag5c0ke3lukuarbh.apps.googleusercontent.com'
@@ -132,6 +150,12 @@ function Login () {
         <p className='account-copy'>Sign in to access your business dashboard.</p>
 
         {success && <div className='account-status success' role='status'>{success}</div>}
+        {loading && (
+          <div className='account-status loading' role='status'>
+            <span className='auth-spinner' />
+            <span>{isWarmupDelayed ? 'Waking up secure cloud server, please wait a moment...' : 'Signing in...'}</span>
+          </div>
+        )}
 
         <form className='account-form' onSubmit={submit}>
           <div className='account-field'>

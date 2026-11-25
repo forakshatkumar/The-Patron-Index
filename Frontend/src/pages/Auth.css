@@ -421,6 +421,28 @@
   border: 1px solid #f8b4b4;
 }
 
+.account-status.loading {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 12.5px;
+  text-align: center;
+}
+
+.auth-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid #bfdbfe;
+  border-top-color: #1d4ed8;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
 /* Responsive adjustments keeping cards compact and equal */
 @media (max-width: 480px) {
   .account-page-root {

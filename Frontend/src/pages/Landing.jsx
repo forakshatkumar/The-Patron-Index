@@ -107,6 +107,11 @@ export default function Landing () {
     }
     window.scrollTo(0, 0)
     const timer = setTimeout(() => setDonutLoaded(true), 50)
+
+    // Pre-warm backend on Render to eliminate cold-start delay
+    const apiBase = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api')
+    fetch(`${apiBase}/health`).catch(() => {})
+
     return () => clearTimeout(timer)
   }, [])
 

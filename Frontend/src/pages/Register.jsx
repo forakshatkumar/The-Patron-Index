@@ -11,6 +11,24 @@ function Register () {
   const [agreed, setAgreed] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isWarmupDelayed, setIsWarmupDelayed] = useState(false)
+
+  useEffect(() => {
+    // Pre-warm backend on Render to eliminate cold-start lag
+    const apiBase = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api')
+    fetch(`${apiBase}/health`).catch(() => {})
+  }, [])
+
+  useEffect(() => {
+    if (!loading) return
+    const timer = setTimeout(() => {
+      setIsWarmupDelayed(true)
+    }, 2500)
+    return () => {
+      clearTimeout(timer)
+      setIsWarmupDelayed(false)
+    }
+  }, [loading])
 
   useEffect(() => {
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '978238561753-daj7ignsgo9lbg31ag5c0ke3lukuarbh.apps.googleusercontent.com'
@@ -133,6 +151,13 @@ function Register () {
 
         <h1 id='account-title'>Create your account</h1>
         <p className='account-copy'>Start turning buyer behavior into actionable business intelligence.</p>
+
+        {loading && (
+          <div className='account-status loading' role='status'>
+            <span className='auth-spinner' />
+            <span>{isWarmupDelayed ? 'Waking up secure cloud server, please wait a moment...' : 'Creating account...'}</span>
+          </div>
+        )}
 
         <form className='account-form' onSubmit={submit}>
           <div className='account-field-grid'>

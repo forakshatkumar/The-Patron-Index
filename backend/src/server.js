@@ -54,6 +54,18 @@ app.use('/api/auth/register', authLimiter);
 app.use('/api/scan/upload', uploadLimiter);
 app.use('/api/customers/import', uploadLimiter);
 
+// Root API status endpoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    service: 'The Patron Index API',
+    version: '1.0.0',
+    documentation: 'https://the-patron-index.vercel.app',
+    health: '/api/health',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
