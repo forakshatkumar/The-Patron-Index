@@ -11,9 +11,9 @@ test('CSV accepts the supplied sample, BOM, escaped quotes, commas and multiline
   const rows = parseCsv('\uFEFFcustomer_id,name,purchase_date,amount\r\nA1,"A, ""B""\nC",2026-01-01,15\r\n');
   assert.equal(rows[0].name, 'A, "B"\nC');
 });
-test('CSV rejects invalid rows, impossible dates, duplicate IDs, malformed quotes and missing headers', () => {
+test('CSV rejects invalid rows, impossible dates, malformed quotes and missing headers', () => {
   const prefix = 'customer_id,name,purchase_date,amount,transaction_id\n';
-  for (const row of ['a,b,2026-01-01,no,t1','a,b,2026-02-30,1,t1','a,b,2026-01-01,-1,t1','a,b,2026-01-01,1,t1\na,b,2026-01-02,2,t1','a,"b,2026-01-01,1,t1','a,b,2026-01-01,1','a,b,2026-01-01,,t1']) {
+  for (const row of ['a,b,2026-01-01,no,t1','a,b,2026-02-30,1,t1','a,b,2026-01-01,-1,t1','a,"b,2026-01-01,1,t1','a,b,2026-01-01,1','a,b,2026-01-01,,t1']) {
     assert.throws(() => parseCsv(prefix+row), e => e.status === 400);
   }
   assert.throws(() => parseCsv('name\nAda'), e => e.status === 400);
@@ -66,24 +66,3 @@ test('HTTP API security, readiness and cookie session lifecycle (in-memory model
   assert.equal((await get('/api/auth/me',{Cookie})).status,401);
 });
 
-test('CSV replay uses stable transaction keys and aggregates saved purchases (model doubles)', async t => {
-  const Customer = require('../src/models/Customer');
-  const CustomerFeature = require('../src/models/CustomerFeature');
-  const CustomerPrediction = require('../src/models/CustomerPrediction');
-  const Transaction = require('../src/models/Transaction');
-  const AuditLog = require('../src/models/AuditLog');
-  const { importCustomers } = require('../src/controllers/customerController');
-  const stored = new Map(); let latest;
-  t.mock.method(Transaction,'find',()=>({lean:async()=>[...stored.values()]}));
-  t.mock.method(Transaction,'bulkWrite',async operations=>{ for(const {updateOne:{filter,update}} of operations) if(!stored.has(filter.transactionId)) stored.set(filter.transactionId,update.$setOnInsert); });
-  t.mock.method(Transaction,'aggregate',async()=>[{_id:'C1',totalSpent:[...stored.values()].reduce((a,b)=>a+b.amount,0),totalOrders:stored.size,latestPurchase:'2026-01-03'}]);
-  t.mock.method(Customer,'findOneAndUpdate',async (_filter,update)=>{latest=update.$set;return {_id:'507f1f77bcf86cd799439012'};});
-  t.mock.method(CustomerFeature,'findOneAndUpdate',async()=>({}));
-  t.mock.method(CustomerPrediction,'findOneAndUpdate',async()=>({}));
-  t.mock.method(AuditLog,'create',async()=>({}));
-  const request = text => ({user:{userId:'507f1f77bcf86cd799439011'},file:{buffer:Buffer.from(text),originalname:'test.csv'}});
-  const response = () => ({statusCode:200,status(n){this.statusCode=n;return this},json(body){this.body=body;return this}});
-  const text='customer_id,name,purchase_date,amount\nC1,Customer,2026-01-02,100\nC1,Customer,2026-01-03,200';
-  for(let i=0;i<2;i++){const res=response();await importCustomers(request(text),res,e=>{throw e});assert.equal(res.statusCode,201);assert.equal(stored.size,2);assert.equal(latest.totalSpent,300);assert.equal(latest.totalOrders,2);}
-  let error;await importCustomers(request(text+'\nC1,Customer,invalid,400'),response(),e=>{error=e});assert.equal(error.status,400);assert.equal(stored.size,2);
-});

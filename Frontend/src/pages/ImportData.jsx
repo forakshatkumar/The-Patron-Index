@@ -19,7 +19,7 @@ function ImportData () {
     setFile(selected || null); setValidation(null); setResult(null); setError('')
   }
 
-  const selectFile = event => select(event.target.files?.[0])
+  const selectFile = event => { select(event.target.files?.[0]); event.target.value = '' }
   const validate = () => {
     setValidation(null); setResult(null)
     if (!file) return setError('Please choose a CSV file first.')
@@ -47,7 +47,7 @@ function ImportData () {
     try {
       if (demoMode) {
         await new Promise(resolve => setTimeout(resolve, 700))
-        setResult({ scan: { status: 'completed', decision: 'allow' }, importedCustomers: Math.max(1, Math.round(validation.rows / 2)), processedRows: validation.rows, demo: true })
+        setResult({ demo: true })
       } else {
         const scan = await uploadScan(file)
         if (scan.decision !== 'allow') throw new Error('The upload requires review and has not been imported.')
@@ -91,6 +91,7 @@ function ImportData () {
             <div className='required-columns'>
               {requiredColumns.map(column => <code key={column}>{column}</code>)}
             </div>
+            <p style={{ marginTop: 12, fontSize: 13 }}><strong>Recommended:</strong> <code>transaction_id</code> — use the same ID to correct an existing purchase. Repeated customer IDs are welcome. Without a transaction ID, matching purchases from a different file may require review.</p>
           </div>
           {error && <div className='upload-error' role='alert'>{error}</div>}
           {validation && (
@@ -100,20 +101,36 @@ function ImportData () {
             </div>
           )}
           {result && (
-            <div className='validation-success'>
-              <h3>Import Complete</h3>
-              <p>{result.demo ? 'Demo processing complete.' : `${result.importedCustomers} customers classified from ${result.processedRows} purchase rows.`}</p>
-              <div className='validation-details'>
-                <span>Upload<strong>{result.scan?.decision === 'allow' ? 'Accepted' : 'Review'}</strong></span>
-                <span>Scan Status<strong>{result.scan?.status || 'completed'}</strong></span>
-                <span>Classification<strong>Complete</strong></span>
-              </div>
+            <section className={result.demo || result.completion === 'complete' ? 'validation-success' : 'card'} aria-live='polite' style={{ padding: 18, marginTop: 12 }}>
+              <h3>{result.demo ? 'Demo complete' : result.completion === 'partial' ? 'Import complete with issues' : result.completion === 'rejected' ? 'No rows imported' : 'Import complete'}</h3>
+              <p>{result.demo ? 'No data was saved in demo mode.' : result.message || 'The server processed the CSV.'}</p>
+              {!result.demo && (
+                <>
+                  <div className='validation-details' style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12 }}>
+                    {[
+                      ['Rows processed', result.processedRows], ['Rows applied', result.rowsApplied], ['Rows skipped', result.rowsSkipped], ['Rows needing review', result.rowsFailed],
+                      ['Customers created', result.customersCreated], ['Customers updated', result.customersUpdated], ['Purchases added', result.purchasesAdded], ['Purchases corrected', result.purchasesCorrected], ['Customers reconciled', result.customersReconciled]
+                    ].map(([label, value]) => <span key={label}>{label}<strong>{value ?? '—'}</strong></span>)}
+                  </div>
+                  <p style={{ fontSize: 13, marginTop: 12 }}>Customer counts are unique customers; purchase counts are transaction changes. Skipped rows do not increase sales or purchase frequency. Reconciled customers had missing or stale stored totals or classifications.</p>
+                  {result.errors?.length > 0 && (
+                    <div className='upload-error' role='status' style={{ marginTop: 14, maxHeight: 260, overflowY: 'auto' }}>
+                      <strong>Rows requiring review (excluding the header)</strong>
+                      <ul style={{ paddingLeft: 18, marginTop: 8 }}>
+                        {result.errors.map(issue => <li key={issue.row} style={{ marginBottom: 6 }}>Row {issue.row}: {issue.reason}</li>)}
+                      </ul>
+                      {result.errorDetailsOmitted > 0 && <p>{result.errorDetailsOmitted} additional row issues not shown. Import smaller batches to review them.</p>}
+                    </div>
+                  )}
+                </>
+              )}
               <div style={{ marginTop: 14, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
                 <Link className='primary-button' to='/customers' style={{ padding: '8px 16px', fontSize: 13 }}>View Classified Customers →</Link>
                 <Link className='secondary-button' to='/dashboard' style={{ padding: '8px 16px', fontSize: 13 }}>View Dashboard Trends</Link>
                 <Link className='secondary-button' to='/transactions' style={{ padding: '8px 16px', fontSize: 13 }}>View Transactions</Link>
+                <button className='secondary-button' onClick={() => { setResult(null); setError('') }}>Import again</button>
               </div>
-            </div>
+            </section>
           )}
           <div className='upload-actions'>
             <button className='secondary-button' disabled={!file || loading || !!result} onClick={validate}>Validate File</button>

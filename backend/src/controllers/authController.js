@@ -212,7 +212,7 @@ const updateProfile = async (req, res, next) => {
       if (!p || !['light','dark','system'].includes(p.theme) || typeof p.reducedMotion !== 'boolean' || typeof p.notifications !== 'boolean') return res.status(400).json({ message: 'Invalid preferences' });
       patch.preferences = { theme: p.theme, reducedMotion: p.reducedMotion, notifications: p.notifications };
     }
-    const user = await User.findByIdAndUpdate(req.user.userId, { $set: patch }, { new: true, runValidators: true });
+    const user = await User.findByIdAndUpdate(req.user.userId, { $set: patch }, { returnDocument: 'after', runValidators: true });
     if (!user) return res.status(401).json({ message: 'Account unavailable' });
     res.json({ user: publicUser(user) });
   } catch (error) { next(error); }

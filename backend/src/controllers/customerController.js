@@ -10,16 +10,8 @@ const {
   customerStatus
 } = require('../utils/customerScoring');
 
-const { parseCsv } = require('../utils/parseCsv');
+const { runImport } = require('../utils/smartImport');
 const crypto = require('crypto');
-
-function daysSince(dateValue) {
-  if (!dateValue) return 0;
-  const date = new Date(dateValue);
-  if (Number.isNaN(date.getTime())) return 0;
-  const now = new Date();
-  return Math.max(0, Math.floor((now - date) / 86400000));
-}
 
 async function enrichCustomer(customer, loaded) {
   const [features, prediction] = loaded || await Promise.all([
@@ -165,130 +157,28 @@ const getCustomer = async (req, res, next) => {
   }
 };
 
-const activeImports = new Set();
 const importCustomers = async (req, res, next) => {
-  const owner = req.user.userId;
-  if (activeImports.has(owner)) return res.status(409).json({ message: 'An import is already running for your workspace. Try again after it completes.' });
-  activeImports.add(owner);
   try {
     if (!req.file) return res.status(400).json({ message: 'CSV file is required' });
-
-    const rows = parseCsv(req.file.buffer.toString('utf8'));
-    const grouped = new Map();
-    const fingerprint = crypto.createHash('sha256').update(req.file.buffer).digest('hex');
-    const operations = [];
-
-    for (const [rowIndex, row] of rows.entries()) {
-      const id = String(row.customer_id || '').trim();
-      if (!id) continue;
-      const amount = Number(row.amount || 0);
-      const current = grouped.get(id) || {
-        customerId: id,
-        name: String(row.name || id).trim(),
-        email: String(row.email || '').trim(),
-        totalSpent: 0,
-        totalOrders: 0,
-        latestPurchase: null
-      };
-      if (row.email) current.email = String(row.email).trim();
-      current.totalSpent += Number.isFinite(amount) ? amount : 0;
-      current.totalOrders += 1;
-      const purchaseDate = new Date(row.purchase_date);
-      if (!Number.isNaN(purchaseDate.getTime()) && (!current.latestPurchase || purchaseDate > current.latestPurchase)) {
-        current.latestPurchase = purchaseDate;
-      }
-      grouped.set(id, current);
-
-      if (req.user?.userId && row.purchase_date && !Number.isNaN(purchaseDate.getTime()) && Number.isFinite(amount)) {
-        const txnDate = purchaseDate.toISOString().split('T')[0];
-        const txnId = String(row.transaction_id || `CSV-${fingerprint.slice(0,32)}-${rowIndex}`);
-        const record = {
-          transactionId: txnId, customerId: id, customerName: String(row.name).trim(), amount,
-          date: txnDate, product: String(row.product || 'Not specified').trim(), category: String(row.category || 'Not specified').trim(),
-          paymentMethod: String(row.payment_method || 'Not specified').trim(), status: 'Completed', source: 'transaction', user: req.user.userId
-        };
-        operations.push({ updateOne: { filter: { user: req.user.userId, transactionId: txnId }, update: { $setOnInsert: record }, upsert: true } });
-      }
-    }
-
-    // Validate conflicting supplied transaction IDs before writing.
-    const existing = await Transaction.find({ user: req.user.userId, transactionId: { $in: operations.map(o => o.updateOne.filter.transactionId) } }).lean();
-    const byId = new Map(existing.map(t => [t.transactionId, t]));
-    for (const op of operations) {
-      const record = op.updateOne.update.$setOnInsert;
-      const old = byId.get(record.transactionId);
-      if (old && (old.customerId !== record.customerId || old.amount !== record.amount || old.date !== record.date)) return res.status(409).json({ message: `Transaction ID ${record.transactionId} already refers to a different purchase` });
-    }
-    if (operations.length) await Transaction.bulkWrite(operations, { ordered: true });
-    const mongoose = require('mongoose');
-    const totals = await Transaction.aggregate([
-      { $match: { user: new mongoose.Types.ObjectId(req.user.userId), customerId: { $in: [...grouped.keys()] }, source: { $ne: 'summary' }, product: { $ne: 'Direct Order' } } },
-      { $group: { _id: '$customerId', totalSpent: { $sum: '$amount' }, totalOrders: { $sum: 1 }, latestPurchase: { $max: '$date' } } }
-    ]);
-    const history = new Map(totals.map(t => [t._id, t]));
-    for (const item of grouped.values()) {
-      const total = history.get(item.customerId);
-      if (total) Object.assign(item, { totalSpent: total.totalSpent, totalOrders: total.totalOrders, latestPurchase: total.latestPurchase });
-    }
-
-    let imported = 0;
-    for (const item of grouped.values()) {
-      const customer = await Customer.findOneAndUpdate(
-        { customerId: item.customerId, user: req.user?.userId },
-        {
-          $set: { customerId: item.customerId, name: item.name, ...(item.email ? { email: item.email } : {}), totalSpent: Number(item.totalSpent.toFixed(2)), totalOrders: item.totalOrders, user: req.user.userId },
-          ...(item.email ? {} : { $setOnInsert: { email: `${item.customerId.toLowerCase().replace(/[^a-z0-9]/g, '') || 'customer'}@patron.local` } })
-        },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-      );
-
-      const features = {
-        recency: daysSince(item.latestPurchase),
-        frequency: item.totalOrders,
-        monetary: Number(item.totalSpent.toFixed(2)),
-        averageOrderValue: item.totalOrders
-          ? Number((item.totalSpent / item.totalOrders).toFixed(2))
-          : 0
-      };
-      const patronIndex = calculatePatronIndex(features);
-      const segment = classifyCustomer({ ...features, patronIndex });
-
-      await CustomerFeature.findOneAndUpdate(
-        { customer: customer._id },
-        { customer: customer._id, ...features },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-      );
-      await CustomerPrediction.findOneAndUpdate(
-        { customer: customer._id },
-        {
-          customer: customer._id,
-          segment,
-          patronIndex,
-          atRiskProbability: null,
-          recommendation: recommendationFor(segment),
-          modelVersion: 'rfm-v1'
-        },
-        { upsert: true, new: true, setDefaultsOnInsert: true }
-      );
-      imported += 1;
-    }
-
-    await createAuditLog({
-      userId: req.user.userId,
-      action: 'CUSTOMERS_IMPORTED',
-      resource: 'Customer',
-      details: `${imported} customers imported from ${req.file.originalname}`,
-      ipAddress: req.ip
-    });
-
-    res.status(201).json({
-      message: 'Customer data imported and classified successfully',
-      importedCustomers: imported,
-      processedRows: rows.length
+    const result = await runImport(req.file.buffer, req.user.userId);
+    if (result.rowsApplied) await createAuditLog({userId:req.user.userId, action:'CUSTOMERS_IMPORTED',resource:'Customer',details:`${result.rowsApplied} rows applied; ${result.rowsSkipped} skipped; ${result.rowsFailed} rejected`,ipAddress:req.ip});
+    res.status(result.completion === 'rejected' ? 200 : 201).json({
+      ...result,
+      message: result.completion === 'complete' ? 'Import complete' : result.completion === 'partial' ? 'Import completed with rows requiring review' : 'No rows imported; review the reported issues',
+      importedCustomers:result.customersCreated+result.customersUpdated
     });
   } catch (error) {
+    if (error.importIndexSetup) return res.status(503).json({message:error.message});
+    if (error.hasErrorLabel?.('UnknownTransactionCommitResult')) return res.status(503).json({message:'Import outcome could not be confirmed. Retrying the same file is safe; check the results before making further corrections.'});
+    if (error.code === 11000) {
+      // Do not log the duplicate value, raw query, or customer record.
+      const detail=error.message?.match(/collection:\s+([\w.\-]+)\s+index:\s+([\w.\-]+)\s+dup key/i);
+      const keyFields=Object.keys(error.keyPattern||error.errorResponse?.keyPattern||{});
+      console.error('CSV unique constraint conflict',JSON.stringify({code:11000,collection:detail?.[1],index:detail?.[2],keyFields}));
+      return res.status(409).json({message:'A database uniqueness constraint blocked the import. No transaction changes were committed by this request. Ask the administrator to review the import indexes.'});
+    }
     next(error);
-  } finally { activeImports.delete(owner); }
+  }
 };
 
 module.exports = { createCustomer, getCustomers, getCustomer, importCustomers };

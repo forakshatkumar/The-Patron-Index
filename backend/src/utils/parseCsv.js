@@ -1,7 +1,7 @@
 // Parse and validate all rows before any database writes. RFC-style quoted cells.
 const MAX_ROWS = 10000;
 function bad(message) { return Object.assign(new Error(message), { status: 400 }); }
-function parseCsv(text) {
+function parseCsv(text, { collectErrors = false, allowBlankName = false } = {}) {
   const input = String(text || '').replace(/^\uFEFF/, '');
   const records = [];
   let row = [], cell = '', quoted = false, closed = false;
@@ -25,16 +25,19 @@ function parseCsv(text) {
   if (new Set(headers).size !== headers.length || headers.some(v => !v || ['__proto__','constructor','prototype'].includes(v))) throw bad('Invalid or duplicate CSV columns');
   const missing = ['customer_id','name','purchase_date','amount'].filter(k => !headers.includes(k));
   if (missing.length) throw bad(`Missing required columns: ${missing.join(', ')}`);
-  const ids = new Set();
   return records.map((values, i) => {
-    if (values.length !== headers.length) throw bad(`Data row ${i+1}: unexpected column count`);
-    const item = Object.fromEntries(headers.map((key,j) => [key, values[j]]));
-    const amount = Number(item.amount);
-    const date = new Date(item.purchase_date);
-    if (!item.customer_id || !item.name || !item.amount || !Number.isFinite(amount) || amount < 0 || !item.purchase_date || !Number.isFinite(date.getTime())) throw bad(`Data row ${i+1}: provide customer ID, name, valid date and non-negative amount`);
-    if (/^\d{4}-\d{2}-\d{2}$/.test(item.purchase_date) && date.toISOString().slice(0,10) !== item.purchase_date) throw bad(`Data row ${i+1}: invalid calendar date`);
-    if (item.transaction_id) { if (ids.has(item.transaction_id)) throw bad(`Data row ${i+1}: duplicate transaction ID`); ids.add(item.transaction_id); }
-    return item;
+    try {
+      if (values.length !== headers.length) throw bad(`Data row ${i+1}: unexpected column count`);
+      const item = Object.fromEntries(headers.map((key,j) => [key, values[j]]));
+      const amount = Number(item.amount);
+      const date = new Date(item.purchase_date);
+      if (!item.customer_id || (!allowBlankName && !item.name) || !item.amount || !Number.isFinite(amount) || amount < 0 || !item.purchase_date || !Number.isFinite(date.getTime())) throw bad(`Data row ${i+1}: provide customer ID, ${allowBlankName ? '' : 'name, '}valid date and non-negative amount`);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(item.purchase_date) && date.toISOString().slice(0,10) !== item.purchase_date) throw bad(`Data row ${i+1}: invalid calendar date`);
+      return collectErrors ? { row: i+1, data: item } : item;
+    } catch (error) {
+      if (!collectErrors) throw error;
+      return { row: i+1, error: error.message.replace(/^Data row \d+: /, '') };
+    }
   });
 }
 module.exports = { parseCsv, MAX_ROWS };
