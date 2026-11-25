@@ -1,21 +1,48 @@
-import { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Header from './Header'
+
 export default function Layout () {
-  const [collapsed, setCollapsed] = useState(() => localStorage.getItem('patron_sidebar') === 'collapsed')
+  // Start closed on each new workspace visit; keep the choice during navigation.
+  const [desktopOpen, setDesktopOpen] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const toggle = () => {
-    if (window.matchMedia('(max-width: 900px)').matches) setMobileOpen(v => !v)
-    else setCollapsed(v => { localStorage.setItem('patron_sidebar', v ? 'expanded' : 'collapsed'); return !v })
-  }
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches)
+  const toggleRef = useRef(null)
+  const sidebarRef = useRef(null)
+  const { pathname } = useLocation()
+  const open = isMobile ? mobileOpen : desktopOpen
+
   useEffect(() => {
-    const close = e => { if (e.key === 'Escape') setMobileOpen(false) }
-    window.addEventListener('keydown', close); return () => window.removeEventListener('keydown', close)
+    const media = window.matchMedia('(max-width: 900px)')
+    const change = event => { setIsMobile(event.matches); setMobileOpen(false) }
+    media.addEventListener('change', change)
+    return () => media.removeEventListener('change', change)
   }, [])
-  return <div className={`app-layout premium-layout ${collapsed ? 'is-collapsed' : ''} ${mobileOpen ? 'mobile-open' : ''}`}>
-    <Sidebar onClose={() => setMobileOpen(false)} />
-    {mobileOpen && <button className='premium-backdrop' aria-label='Close navigation' onClick={() => setMobileOpen(false)} />}
-    <div className='app-content'><Header onToggleSidebar={toggle} /><main className='page-content'><Outlet /></main></div>
+
+  useEffect(() => { setMobileOpen(false) }, [pathname])
+  const closeMobile = () => { setMobileOpen(false); requestAnimationFrame(() => toggleRef.current?.focus()) }
+  const toggle = () => {
+    if (isMobile) setMobileOpen(value => !value)
+    else setDesktopOpen(value => !value)
+  }
+
+  useEffect(() => {
+    if (!open) return
+    if (isMobile) sidebarRef.current?.querySelector('.mobile-close')?.focus()
+    const close = event => {
+      if (event.key !== 'Escape' || event.defaultPrevented || document.querySelector('dialog[open]')) return
+      if (isMobile) setMobileOpen(false)
+      else setDesktopOpen(false)
+      requestAnimationFrame(() => toggleRef.current?.focus())
+    }
+    document.addEventListener('keydown', close)
+    return () => document.removeEventListener('keydown', close)
+  }, [open, isMobile])
+
+  return <div className={`app-layout premium-layout ${desktopOpen ? 'desktop-open' : ''} ${mobileOpen && isMobile ? 'mobile-open' : ''}`}>
+    <Sidebar sidebarRef={sidebarRef} open={open} onClose={closeMobile} onNavigate={() => { if (isMobile) closeMobile() }} />
+    {mobileOpen && isMobile && <button type='button' className='premium-backdrop' aria-label='Close navigation' tabIndex={-1} onClick={closeMobile} />}
+    <div className='app-content' inert={isMobile && mobileOpen}><Header onToggleSidebar={toggle} navigationOpen={open} toggleRef={toggleRef} /><main className='page-content'><Outlet /></main></div>
   </div>
 }

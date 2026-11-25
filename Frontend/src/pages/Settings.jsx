@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 function Toggle({label,description,checked,onChange,disabled}) {return <div className='preference-row'><div><strong>{label}</strong><p>{description}</p></div><button type='button' className={`premium-switch ${checked?'on':''}`} role='switch' aria-label={label} aria-checked={checked} disabled={disabled} onClick={()=>onChange(!checked)}><span/></button></div>}
 export default function Settings () {
@@ -9,7 +9,6 @@ export default function Settings () {
  return <div className='page premium-settings'><div className='page-heading'><div><h2>Settings</h2><p>Make your workspace work the way you do.</p></div></div>{error&&<p role='alert' className='info-banner'>{error}</p>}
  <section className='card preference-card'><h3>Appearance</h3><div className='preference-row'><div><strong>Theme</strong><p>Choose your preferred workspace appearance.</p></div><select aria-label='Theme' value={preferences.theme} onChange={e=>save({theme:e.target.value})} disabled={busy}><option value='system'>System</option><option value='light'>Light</option><option value='dark'>Dark</option></select></div><Toggle label='Reduced motion' description='Minimize transitions and decorative animation.' checked={preferences.reducedMotion} onChange={v=>save({reducedMotion:v})} disabled={busy}/></section>
  <section className='card preference-card'><h3>Notifications</h3><Toggle label='In-app notification center' description='Show or hide the notification bell in your workspace.' checked={preferences.notifications} onChange={v=>save({notifications:v})} disabled={busy}/></section>
- <section className='card preference-card'><h3>Data & business</h3><div className='preference-row'><div><strong>Customer data</strong><p>Review and export your customer records.</p></div><Link className='secondary-button' to='/customers'>Manage data</Link></div><div className='preference-row'><div><strong>Import data</strong><p>Upload and validate new records.</p></div><Link className='secondary-button' to='/import'>Import</Link></div><div className='preference-row'><div><strong>Currency</strong><p>Current reporting currency</p></div><span>INR (₹)</span></div></section>
  <section className='card preference-card'><h3>Security</h3><div className='preference-row'><div><strong>Session</strong><p>{demoMode?'Demo visit':'Persistent sign-in expires after 30 days.'}</p></div></div>{!demoMode&&<div className='preference-row'><div><strong>Other devices</strong><p>Revoke all active persistent sessions.</p></div><button className='secondary-button' disabled={busy} onClick={()=>signout(true)}>Sign out all devices</button></div>}</section>
  <button className='premium-signout' disabled={busy} onClick={()=>signout(false)}>Sign Out</button>{demoMode&&<p className='muted-text'>Demo preferences are temporary.</p>}</div>
 }
