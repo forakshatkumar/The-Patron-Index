@@ -40,6 +40,17 @@ The platform analyses historical customer purchase data and transforms it into e
 | **Hosting & CI/CD** | Vercel (Frontend), Render (Backend), Git / GitHub |
 
 ---
+## 📊 RFM Analysis Methodology
+
+The Patron Index uses Recency, Frequency, and Monetary (RFM) analysis to evaluate customer behavior and engagement.
+
+- **Recency (35%):** Measures how recently a customer made a purchase.
+- **Frequency (30%):** Evaluates how often a customer makes purchases.
+- **Monetary (35%):** Measures the total monetary value of a customer's purchases.
+
+These metrics help businesses identify valuable customers, recognize potential customer churn, and develop targeted customer retention strategies.
+
+---git diff README.md
 
 ## 🔌 API Endpoints
 
