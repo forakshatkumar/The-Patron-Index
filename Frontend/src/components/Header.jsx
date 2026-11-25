@@ -45,6 +45,37 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
     return DEFAULT_NOTIFICATIONS
   })
 
+  const [businessSettings, setBusinessSettings] = useState(() => {
+    try {
+      const stored = localStorage.getItem('patron-business-settings')
+      if (stored) return JSON.parse(stored)
+    } catch {
+      // fallback
+    }
+    return null
+  })
+
+  useEffect(() => {
+    const handleSettingsUpdated = (e) => {
+      if (e.detail) {
+        setBusinessSettings(e.detail)
+      } else {
+        try {
+          const stored = localStorage.getItem('patron-business-settings')
+          setBusinessSettings(stored ? JSON.parse(stored) : null)
+        } catch {
+          setBusinessSettings(null)
+        }
+      }
+    }
+    window.addEventListener('patron:settings_updated', handleSettingsUpdated)
+    window.addEventListener('storage', handleSettingsUpdated)
+    return () => {
+      window.removeEventListener('patron:settings_updated', handleSettingsUpdated)
+      window.removeEventListener('storage', handleSettingsUpdated)
+    }
+  }, [])
+
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const [isNotificationOpen, setIsNotificationOpen] = useState(false)
   const profileMenuRef = useRef(null)
@@ -140,9 +171,14 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
     }
   }
 
-  // Derive display name and email dynamically from authenticated user
-  const displayName = user?.name || (user?.email ? user.email.split('@')[0] : (demoMode ? 'Demo Account' : 'Authenticated User'))
-  const displayEmail = user?.email || (demoMode ? 'demo@patronindex.local' : '')
+  // Check if business settings have been filled by user
+  const hasBusinessSettings = Boolean(
+    businessSettings && (businessSettings.businessName?.trim() || businessSettings.industry?.trim())
+  )
+
+  // Derive display name and email dynamically from authenticated user and saved business settings
+  const displayName = businessSettings?.ownerName?.trim() || user?.name || (user?.email ? user.email.split('@')[0] : (demoMode ? 'Demo Account' : 'Authenticated User'))
+  const displayEmail = businessSettings?.email?.trim() || user?.email || (demoMode ? 'demo@patronindex.local' : '')
 
   // Get initials for circular avatar
   const initials = displayName
@@ -284,8 +320,34 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
                     <div className='dropdown-user-info'>
                       <strong className='dropdown-user-name'>{displayName}</strong>
                       {displayEmail && <span className='dropdown-user-email'>{displayEmail}</span>}
+                      {hasBusinessSettings && (
+                        <div className='dropdown-badge-row'>
+                          <span className='dropdown-role-pill role-admin'>
+                            {businessSettings.industry?.trim()
+                              ? `${user?.role ? user.role.toUpperCase() : 'ANALYST'} • ${businessSettings.industry.trim().toUpperCase()}`
+                              : `${user?.role ? user.role.toUpperCase() : 'ANALYST'} • BUSINESS`}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
+
+                  {/* Account Workspace Summary - Only visible when user filled in settings */}
+                  {hasBusinessSettings && (
+                    <div className='dropdown-tier-card'>
+                      <div className='tier-label-group'>
+                        <span className='tier-name'>{businessSettings.businessName?.trim() || 'Workspace'}</span>
+                        <span className='tier-tag'>
+                          {businessSettings.industry?.trim() ? businessSettings.industry.trim().toUpperCase() : 'BUSINESS'}
+                        </span>
+                      </div>
+                      <span className='tier-sub'>
+                        {businessSettings.location?.trim()
+                          ? `${businessSettings.location.trim()} • Active Workspace`
+                          : 'Active Workspace'}
+                      </span>
+                    </div>
+                  )}
 
                   <div className='dropdown-divider' />
 

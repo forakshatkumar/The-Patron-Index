@@ -53,6 +53,7 @@ function Settings () {
     event.preventDefault()
 
     localStorage.setItem('patron-business-settings', JSON.stringify(form))
+    window.dispatchEvent(new CustomEvent('patron:settings_updated', { detail: form }))
 
     setMessage('Settings saved successfully.')
 
