@@ -1,10 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import { getCustomers, getDashboardSummary } from '../services/api'
+import { normalizeCustomer } from '../services/customerMapper'
 import {
-  revenueData,
-  customerGrowthData,
-  segmentData,
-  purchaseActivity
+  revenueData as demoRevenueData,
+  customerGrowthData as demoCustomerGrowthData,
+  segmentData as demoSegmentData,
+  purchaseActivity as demoPurchaseActivity
 } from '../data/mockData'
 import { POWER_BI_COLORS } from '../data/chartConstants'
 
@@ -564,6 +567,69 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
 }
 
 function Analytics () {
+  const { demoMode } = useAuth()
+  const [summary, setSummary] = useState(null)
+  const [customers, setCustomers] = useState(demoMode ? [] : [])
+
+  useEffect(() => {
+    if (demoMode) return
+    Promise.all([getDashboardSummary(), getCustomers()])
+      .then(([summaryData, customerData]) => {
+        setSummary(summaryData)
+        setCustomers((customerData.customers || []).map(normalizeCustomer))
+      })
+      .catch(() => {})
+  }, [demoMode])
+
+  const SEGMENT_NAMES = useMemo(() => ['VIP', 'Loyal', 'Regular', 'New', 'Occasional', 'At-Risk', 'Inactive'], [])
+
+  const dynamicSegments = useMemo(() => {
+    if (demoMode) return demoSegmentData
+    if (!customers.length) return []
+    const total = customers.length
+    const totalRevenue = customers.reduce((sum, c) => sum + (c.totalSpending || 0), 0) || 1
+
+    return SEGMENT_NAMES.map((name, index) => {
+      const group = customers.filter(c => c.segment === name)
+      const groupRev = group.reduce((sum, c) => sum + (c.totalSpending || 0), 0)
+      const count = group.length
+      return {
+        id: index + 1,
+        name,
+        customers: count,
+        percentage: Math.round((count / total) * 100),
+        revenueContribution: Math.round((groupRev / totalRevenue) * 100),
+        totalRevenue: groupRev,
+        averageSpending: count ? Math.round(groupRev / count) : 0,
+        purchaseFrequency: count ? Math.round(group.reduce((sum, c) => sum + (c.purchaseFrequency || 0), 0) / count) : 0
+      }
+    })
+  }, [customers, demoMode, SEGMENT_NAMES])
+
+  const liveRevenue = useMemo(() => {
+    if (demoMode) return demoRevenueData
+    if (!customers.length) return []
+    const totalRev = customers.reduce((sum, c) => sum + (c.totalSpending || 0), 0)
+    return [{ label: 'Current', value: totalRev }]
+  }, [customers, demoMode])
+
+  const liveGrowth = useMemo(() => {
+    if (demoMode) return demoCustomerGrowthData
+    if (!customers.length) return []
+    return [{ label: 'Current', customers: customers.length }]
+  }, [customers, demoMode])
+
+  const liveActivity = useMemo(() => {
+    if (demoMode) return demoPurchaseActivity
+    if (!customers.length) return []
+    const repeatCount = customers.filter(c => (c.purchaseFrequency || c.totalPurchases || 0) > 1).length
+    const newCount = customers.length - repeatCount
+    return [{ month: 'Current', newCustomers: newCount, repeatCustomers: repeatCount }]
+  }, [customers, demoMode])
+
+  const totalRevFormatted = demoMode ? 'Peak: ₹18.4L (+87.8%)' : `Total: ₹${((summary?.totalRevenue || 0) / 100000).toFixed(2)}L`
+  const baseCountFormatted = demoMode ? 'Base: 2,482 (+74.8%)' : `Base: ${summary?.totalCustomers || customers.length} patrons`
+
   return (
     <div className='page analytics-page'>
       <div className='page-heading analytics-heading-animated'>
@@ -579,13 +645,19 @@ function Analytics () {
           <div className='card-header-bar'>
             <div>
               <h3>Revenue Growth</h3>
-              <p>Last 6 months performance trajectory</p>
+              <p>Performance trajectory</p>
             </div>
             <span className='analytics-kpi-badge kpi-purple'>
-              Peak: ₹18.4L (+87.8%)
+              {totalRevFormatted}
             </span>
           </div>
-          <InteractiveRevenueChart data={revenueData} />
+          {liveRevenue.length > 0 ? (
+            <InteractiveRevenueChart data={liveRevenue} />
+          ) : (
+            <div className='empty-state' style={{ padding: '60px 20px', textAlign: 'center' }}>
+              <p className='muted-text'>No revenue records found in your database yet. <Link to='/import' className='text-button'>Import CSV Data</Link></p>
+            </div>
+          )}
         </section>
 
         {/* Card 2: Customer Growth */}
@@ -593,13 +665,19 @@ function Analytics () {
           <div className='card-header-bar'>
             <div>
               <h3>Customer Growth</h3>
-              <p>Total expanding active customer portfolio</p>
+              <p>Expanding active customer portfolio</p>
             </div>
             <span className='analytics-kpi-badge kpi-emerald'>
-              Base: 2,482 (+74.8%)
+              {baseCountFormatted}
             </span>
           </div>
-          <InteractiveCustomerGrowthChart data={customerGrowthData} />
+          {liveGrowth.length > 0 ? (
+            <InteractiveCustomerGrowthChart data={liveGrowth} />
+          ) : (
+            <div className='empty-state' style={{ padding: '60px 20px', textAlign: 'center' }}>
+              <p className='muted-text'>No customer records recorded yet. <Link to='/import' className='text-button'>Import CSV Data</Link></p>
+            </div>
+          )}
         </section>
 
         {/* Card 3: Segment Distribution */}
@@ -613,7 +691,13 @@ function Analytics () {
               Explore Cohorts →
             </Link>
           </div>
-          <InteractiveSegmentDistribution segments={segmentData} />
+          {dynamicSegments.length > 0 ? (
+            <InteractiveSegmentDistribution segments={dynamicSegments} />
+          ) : (
+            <div className='empty-state' style={{ padding: '60px 20px', textAlign: 'center' }}>
+              <p className='muted-text'>No cohort segments available yet.</p>
+            </div>
+          )}
         </section>
 
         {/* Card 4: New vs Repeat Customers */}
@@ -624,7 +708,13 @@ function Analytics () {
               <p>Transaction velocity and cohort retention balance</p>
             </div>
           </div>
-          <InteractiveNewVsRepeatChart activity={purchaseActivity} />
+          {liveActivity.length > 0 ? (
+            <InteractiveNewVsRepeatChart activity={liveActivity} />
+          ) : (
+            <div className='empty-state' style={{ padding: '60px 20px', textAlign: 'center' }}>
+              <p className='muted-text'>No transaction history recorded yet.</p>
+            </div>
+          )}
         </section>
       </div>
     </div>

@@ -45,11 +45,11 @@ function Customers () {
   // Add Customer Modal State
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [addForm, setAddForm] = useState({
-    customerId: 'CUST-1042',
+    customerId: '',
     name: '',
     email: '',
-    totalSpent: '15000',
-    totalOrders: '3'
+    totalSpent: '0',
+    totalOrders: '0'
   })
   const [addLoading, setAddLoading] = useState(false)
   const [addError, setAddError] = useState('')
@@ -90,8 +90,8 @@ function Customers () {
       const avgSpend = count ? Math.round(groupRev / count) : 0
       const avgOrders = count ? Math.round(group.reduce((sum, c) => sum + (c.purchaseFrequency || 0), 0) / count) : 0
 
-      // Fallback to demo percentages if customer base is 0
-      if (!allCustomers.length && demoSegments[index]) {
+      // Fallback to demo percentages if customer base is 0 and demo mode is active
+      if (!allCustomers.length && demoMode && demoSegments[index]) {
         return demoSegments[index]
       }
 
@@ -106,7 +106,7 @@ function Customers () {
         purchaseFrequency: avgOrders
       }
     })
-  }, [allCustomers])
+  }, [allCustomers, demoMode])
 
   // Filtered customers for registry table
   const filteredCustomers = useMemo(() => {

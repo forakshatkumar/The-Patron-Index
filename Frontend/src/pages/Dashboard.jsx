@@ -28,15 +28,14 @@ function Dashboard () {
         setSummary(summaryData)
         setCustomers((customerData.customers || []).map(normalizeCustomer))
       })
-      .catch(err => setError(`${err.message}. Showing demo analytics where live data is unavailable.`))
+      .catch(err => setError(err.message))
   }, [demoMode])
 
-  const useDemoFallback = demoMode || Boolean(error)
-  const stats = summary || (useDemoFallback ? demoStats : { totalCustomers: 0, activeCustomers: 0, highValueCustomers: 0, totalRevenue: 0 })
-  const recentCustomers = (useDemoFallback ? demoCustomers : customers).slice(0, 5)
+  const stats = demoMode ? demoStats : (summary || { totalCustomers: 0, activeCustomers: 0, highValueCustomers: 0, totalRevenue: 0 })
+  const recentCustomers = (demoMode ? demoCustomers : customers).slice(0, 5)
 
   const segments = useMemo(() => {
-    if (useDemoFallback) return demoSegments
+    if (demoMode) return demoSegments
     if (!customers.length) return []
     const total = customers.length
     const counts = customers.reduce((acc, customer) => {
@@ -49,7 +48,37 @@ function Dashboard () {
       customers: count,
       percentage: Math.round((count / total) * 100)
     }))
-  }, [customers, useDemoFallback])
+  }, [customers, demoMode])
+
+  const liveRevenueData = useMemo(() => {
+    if (demoMode) return revenueData
+    if (!customers.length) return []
+    const totalRev = customers.reduce((sum, c) => sum + (c.totalSpending || 0), 0)
+    return [{ label: 'Total', value: totalRev }]
+  }, [customers, demoMode])
+
+  const insights = useMemo(() => {
+    if (demoMode) return dashboardInsights
+    if (!summary || summary.totalCustomers === 0) {
+      return [
+        { id: 1, type: 'info', title: 'Customer database is ready. Import a CSV file to generate predictive insights.' },
+        { id: 2, type: 'info', title: 'Machine learning segmentation will activate automatically once data is loaded.' }
+      ]
+    }
+    const list = []
+    if (summary.highValueCustomers > 0) {
+      list.push({ id: 1, type: 'positive', title: `${summary.highValueCustomers} high-value customers identified in VIP and Loyal tiers.` })
+    }
+    if (summary.totalRevenue > 0) {
+      list.push({ id: 2, type: 'positive', title: `Total revenue tracked is ₹${Number(summary.totalRevenue).toLocaleString()}.` })
+    }
+    if (summary.returningCustomers > 0) {
+      list.push({ id: 3, type: 'info', title: `${summary.returningCustomers} returning patrons with multiple recorded purchases.` })
+    }
+    return list.length ? list : [{ id: 1, type: 'info', title: 'Customer records are synchronized with database.' }]
+  }, [demoMode, summary])
+
+  const activityList = demoMode ? purchaseActivity : []
 
   return (
     <div className='page'>
@@ -68,10 +97,10 @@ function Dashboard () {
       {demoMode && <div className='demo-banner'>Demo mode is active. Sign in to use live MongoDB data and secure uploads.</div>}
 
       <div className='stats-grid'>
-        <StatCard title='Total Customers' value={Number(stats.totalCustomers || 0).toLocaleString()} change='Live' description={summary ? 'from database' : 'demo data'} icon='◉' />
-        <StatCard title='Active Customers' value={Number(stats.activeCustomers ?? demoStats.activeCustomers).toLocaleString()} change='Current' description='active customers' icon='●' />
-        <StatCard title='High-Value Customers' value={Number(stats.highValueCustomers ?? demoStats.highValueCustomers).toLocaleString()} change='VIP + Loyal' description='priority segment' icon='★' />
-        <StatCard title='Total Revenue' value={`₹${(Number(stats.totalRevenue ?? demoStats.totalRevenue) / 100000).toFixed(1)}L`} change='Tracked' description='customer value' icon='₹' />
+        <StatCard title='Total Customers' value={Number(stats.totalCustomers || 0).toLocaleString()} change='Live' description={demoMode ? 'demo data' : 'live database'} icon='◉' />
+        <StatCard title='Active Customers' value={Number(stats.activeCustomers || 0).toLocaleString()} change='Current' description='active customers' icon='●' />
+        <StatCard title='High-Value Customers' value={Number(stats.highValueCustomers || 0).toLocaleString()} change='VIP + Loyal' description='priority segment' icon='★' />
+        <StatCard title='Total Revenue' value={`₹${(Number(stats.totalRevenue || 0) / 100000).toFixed(2)}L`} change='Tracked' description='customer value' icon='₹' />
       </div>
 
       <div className='dashboard-grid'>
@@ -79,10 +108,16 @@ function Dashboard () {
           <div className='card-header'>
             <div>
               <h3>Revenue Trend</h3>
-              <p>Revenue performance over the last 6 months</p>
+              <p>Revenue performance across customer base</p>
             </div>
           </div>
-          <RevenueChart data={revenueData} />
+          {liveRevenueData.length > 0 ? (
+            <RevenueChart data={liveRevenueData} />
+          ) : (
+            <div className='empty-state' style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p className='muted-text'>No revenue records found yet. Import customer transactions to view trends.</p>
+            </div>
+          )}
         </section>
         <section className='card'>
           <div className='card-header'>
@@ -93,15 +128,21 @@ function Dashboard () {
             <Link to='/customers' className='text-button'>View all</Link>
           </div>
           <div className='segment-list'>
-            {segments.map(segment => (
-              <div className='segment-summary-row' key={segment.id || segment.name}>
-                <SegmentBadge segment={segment.name} />
-                <div className='segment-summary-right'>
-                  <strong>{Number(segment.customers || 0).toLocaleString()}</strong>
-                  <span>{segment.percentage}%</span>
+            {segments.length > 0 ? (
+              segments.map(segment => (
+                <div className='segment-summary-row' key={segment.id || segment.name}>
+                  <SegmentBadge segment={segment.name} />
+                  <div className='segment-summary-right'>
+                    <strong>{Number(segment.customers || 0).toLocaleString()}</strong>
+                    <span>{segment.percentage}%</span>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div className='empty-state' style={{ padding: '30px 10px', textAlign: 'center' }}>
+                <p className='muted-text'>No segment data available yet.</p>
               </div>
-            ))}
+            )}
           </div>
         </section>
       </div>
@@ -114,35 +155,43 @@ function Dashboard () {
               <p>New and repeat customer purchases</p>
             </div>
           </div>
-          <div className='activity-chart'>
-            {purchaseActivity.map((item, index) => (
-              <div className='activity-column' key={item.month}>
-                <div className='activity-bars'>
-                  <div
-                    className='activity-bar new-bar'
-                    style={{
-                      height: `${item.newCustomers / 2}px`,
-                      '--delay': `${index * 0.08}s`
-                    }}
-                    title={`New Customers: ${item.newCustomers}`}
-                  />
-                  <div
-                    className='activity-bar repeat-bar'
-                    style={{
-                      height: `${item.repeatCustomers / 2}px`,
-                      '--delay': `${index * 0.08 + 0.04}s`
-                    }}
-                    title={`Repeat Customers: ${item.repeatCustomers}`}
-                  />
-                </div>
-                <span>{item.month}</span>
+          {activityList.length > 0 ? (
+            <>
+              <div className='activity-chart'>
+                {activityList.map((item, index) => (
+                  <div className='activity-column' key={item.month}>
+                    <div className='activity-bars'>
+                      <div
+                        className='activity-bar new-bar'
+                        style={{
+                          height: `${item.newCustomers / 2}px`,
+                          '--delay': `${index * 0.08}s`
+                        }}
+                        title={`New Customers: ${item.newCustomers}`}
+                      />
+                      <div
+                        className='activity-bar repeat-bar'
+                        style={{
+                          height: `${item.repeatCustomers / 2}px`,
+                          '--delay': `${index * 0.08 + 0.04}s`
+                        }}
+                        title={`Repeat Customers: ${item.repeatCustomers}`}
+                      />
+                    </div>
+                    <span>{item.month}</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className='chart-legend'>
-            <span><i className='legend-dot new-dot' />New Customers</span>
-            <span><i className='legend-dot repeat-dot' />Repeat Customers</span>
-          </div>
+              <div className='chart-legend'>
+                <span><i className='legend-dot new-dot' />New Customers</span>
+                <span><i className='legend-dot repeat-dot' />Repeat Customers</span>
+              </div>
+            </>
+          ) : (
+            <div className='empty-state' style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p className='muted-text'>No purchase transactions recorded yet. Upload a customer CSV file to track purchase trends.</p>
+            </div>
+          )}
         </section>
 
         <section className='card'>
@@ -153,7 +202,7 @@ function Dashboard () {
             </div>
           </div>
           <div className='insight-list'>
-            {dashboardInsights.map(insight => (
+            {insights.map(insight => (
               <div className={`insight-item ${insight.type}`} key={insight.id}>
                 <span className='insight-icon'>{insight.type === 'warning' ? '!' : '✓'}</span>
                 <p>{insight.title}</p>
@@ -184,25 +233,33 @@ function Dashboard () {
               </tr>
             </thead>
             <tbody>
-              {recentCustomers.map(customer => (
-                <tr key={customer.id}>
-                  <td>
-                    <Link to={`/customers/${customer.id}`} className='customer-link'>
-                      <strong>{customer.name}</strong>
-                      <span>{customer.id}</span>
-                    </Link>
-                  </td>
-                  <td><SegmentBadge segment={customer.segment} /></td>
-                  <td>₹{Number(customer.totalSpending || 0).toLocaleString()}</td>
-                  <td>{customer.totalPurchases}</td>
-                  <td><strong>{customer.patronIndex}</strong></td>
-                  <td>
-                    <span className={`status-badge ${customer.status === 'Active' ? 'status-active' : customer.status === 'At Risk' ? 'status-risk' : 'status-inactive'}`}>
-                      {customer.status}
-                    </span>
+              {recentCustomers.length > 0 ? (
+                recentCustomers.map(customer => (
+                  <tr key={customer.id}>
+                    <td>
+                      <Link to={`/customers/${customer.id}`} className='customer-link'>
+                        <strong>{customer.name}</strong>
+                        <span>{customer.id}</span>
+                      </Link>
+                    </td>
+                    <td><SegmentBadge segment={customer.segment} /></td>
+                    <td>₹{Number(customer.totalSpending || 0).toLocaleString()}</td>
+                    <td>{customer.totalPurchases}</td>
+                    <td><strong>{customer.patronIndex}</strong></td>
+                    <td>
+                      <span className={`status-badge ${customer.status === 'Active' ? 'status-active' : customer.status === 'At Risk' ? 'status-risk' : 'status-inactive'}`}>
+                        {customer.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan='6' style={{ textAlign: 'center', padding: '30px' }} className='muted-text'>
+                    No customers recorded in your database yet. <Link to='/import' className='text-button'>Import CSV Data</Link>
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

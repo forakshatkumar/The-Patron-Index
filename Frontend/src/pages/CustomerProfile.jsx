@@ -22,9 +22,13 @@ function CustomerProfile () {
   if (loading) return <div className='page'><div className='empty-state'><h2>Loading customer...</h2></div></div>
   if (!customer) return <div className='page'><div className='empty-state'><h2>{error || 'Customer not found'}</h2><Link to='/customers' className='primary-button'>Back to Customers</Link></div></div>
 
-  const customerTransactions = transactions.filter(t => t.customerId === customer.id)
-  const insights = customerInsights[customer.id] || [customer.recommendation || 'Monitor this customer and personalize future offers.']
-  const spendingData = customerSpendingHistory[customer.id] || [{ month: 'Current', value: customer.totalSpending }]
+  const customerTransactions = demoMode ? transactions.filter(t => t.customerId === customer.id) : []
+  const insights = demoMode && customerInsights[customer.id]
+    ? customerInsights[customer.id]
+    : [customer.recommendation || 'Monitor this customer and personalize future offers.']
+  const spendingData = demoMode && customerSpendingHistory[customer.id]
+    ? customerSpendingHistory[customer.id]
+    : [{ month: 'Current', value: customer.totalSpending }]
 
   return (
     <div className='page'>

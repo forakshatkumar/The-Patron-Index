@@ -108,7 +108,7 @@ async function enrichCustomer(customer) {
     prediction: {
       segment,
       patronIndex,
-      atRiskProbability: prediction?.atRiskProbability ?? (segment === 'At-Risk' ? 0.75 : 0.1),
+      atRiskProbability: prediction?.atRiskProbability ?? null,
       recommendation: prediction?.recommendation || recommendationFor(segment),
       modelVersion: prediction?.modelVersion || 'rfm-v1'
     },
@@ -176,7 +176,9 @@ const createCustomer = async (req, res, next) => {
 
 const getCustomers = async (req, res, next) => {
   try {
-    const customers = await Customer.find().sort({ updatedAt: -1 }).limit(1000);
+    const isAdmin = req.user?.role === 'admin';
+    const filter = (!isAdmin && req.user?.userId) ? { user: req.user.userId } : {};
+    const customers = await Customer.find(filter).sort({ updatedAt: -1 }).limit(1000);
     const enriched = await Promise.all(customers.map(enrichCustomer));
     res.json({ count: enriched.length, customers: enriched });
   } catch (error) {
@@ -186,7 +188,12 @@ const getCustomers = async (req, res, next) => {
 
 const getCustomer = async (req, res, next) => {
   try {
-    const customer = await Customer.findOne({ customerId: String(req.params.id).trim() });
+    const isAdmin = req.user?.role === 'admin';
+    const filter = { customerId: String(req.params.id).trim() };
+    if (!isAdmin && req.user?.userId) {
+      filter.user = req.user.userId;
+    }
+    const customer = await Customer.findOne(filter);
     if (!customer) return res.status(404).json({ message: 'Customer not found' });
     const enriched = await enrichCustomer(customer);
     res.json(enriched);
@@ -260,7 +267,7 @@ const importCustomers = async (req, res, next) => {
           customer: customer._id,
           segment,
           patronIndex,
-          atRiskProbability: segment === 'At-Risk' ? 0.75 : segment === 'Inactive' ? 0.9 : 0.1,
+          atRiskProbability: null,
           recommendation: recommendationFor(segment),
           modelVersion: 'rfm-v1'
         },

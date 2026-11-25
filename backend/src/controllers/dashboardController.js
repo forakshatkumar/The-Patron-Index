@@ -1,9 +1,24 @@
+const mongoose = require('mongoose');
 const ScanRecord = require('../models/ScanRecord');
 const Customer = require('../models/Customer');
 const CustomerPrediction = require('../models/CustomerPrediction');
 
 const getDashboardSummary = async (req, res, next) => {
   try {
+    const isAdmin = req.user?.role === 'admin';
+    const userId = req.user?.userId;
+
+    let customerFilter = {};
+    let scanFilter = {};
+    if (!isAdmin && userId) {
+      const userObjectId = new mongoose.Types.ObjectId(userId);
+      customerFilter = { user: userObjectId };
+      scanFilter = { uploadedBy: userObjectId };
+    }
+
+    const userCustomers = await Customer.find(customerFilter, '_id').lean();
+    const customerIds = userCustomers.map(c => c._id);
+
     const [
       totalScans,
       completedScans,
@@ -14,12 +29,13 @@ const getDashboardSummary = async (req, res, next) => {
       predictions,
       riskData
     ] = await Promise.all([
-      ScanRecord.countDocuments(),
-      ScanRecord.countDocuments({ status: 'completed' }),
-      ScanRecord.countDocuments({ status: 'pending' }),
-      ScanRecord.countDocuments({ status: 'failed' }),
-      Customer.countDocuments(),
+      ScanRecord.countDocuments(scanFilter),
+      ScanRecord.countDocuments({ ...scanFilter, status: 'completed' }),
+      ScanRecord.countDocuments({ ...scanFilter, status: 'pending' }),
+      ScanRecord.countDocuments({ ...scanFilter, status: 'failed' }),
+      Customer.countDocuments(customerFilter),
       Customer.aggregate([
+        { $match: customerFilter },
         {
           $group: {
             _id: null,
@@ -33,9 +49,9 @@ const getDashboardSummary = async (req, res, next) => {
           }
         }
       ]),
-      CustomerPrediction.find({}, 'segment patronIndex').lean(),
+      CustomerPrediction.find({ customer: { $in: customerIds } }, 'segment patronIndex').lean(),
       ScanRecord.aggregate([
-        { $match: { riskScore: { $ne: null } } },
+        { $match: { ...scanFilter, riskScore: { $ne: null } } },
         { $group: { _id: null, averageRiskScore: { $avg: '$riskScore' } } }
       ])
     ]);

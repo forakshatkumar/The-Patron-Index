@@ -1,15 +1,19 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-
-import { transactions } from '../data/mockData'
+import { useAuth } from '../context/AuthContext'
+import { transactions as demoTransactions } from '../data/mockData'
 
 function Transactions () {
+  const { demoMode } = useAuth()
   const [search, setSearch] = useState('')
-
   const [payment, setPayment] = useState('All')
 
+  const rawTransactions = useMemo(() => {
+    return demoMode ? demoTransactions : []
+  }, [demoMode])
+
   const filteredTransactions = useMemo(() => {
-    return transactions.filter(transaction => {
+    return rawTransactions.filter(transaction => {
       const matchesSearch =
         transaction.customerName.toLowerCase().includes(search.toLowerCase()) ||
         transaction.product.toLowerCase().includes(search.toLowerCase()) ||
@@ -20,7 +24,7 @@ function Transactions () {
 
       return matchesSearch && matchesPayment
     })
-  }, [search, payment])
+  }, [rawTransactions, search, payment])
 
   return (
     <div className='page'>
@@ -69,36 +73,47 @@ function Transactions () {
             </thead>
 
             <tbody>
-              {filteredTransactions.map(transaction => (
-                <tr key={transaction.id}>
-                  <td>{transaction.id}</td>
+              {filteredTransactions.length > 0 ? (
+                filteredTransactions.map(transaction => (
+                  <tr key={transaction.id}>
+                    <td>{transaction.id}</td>
 
-                  <td>
-                    <Link
-                      className='customer-link'
-                      to={`/customers/${transaction.customerId}`}
-                    >
-                      <strong>{transaction.customerName}</strong>
-                    </Link>
-                  </td>
+                    <td>
+                      <Link
+                        className='customer-link'
+                        to={`/customers/${transaction.customerId}`}
+                      >
+                        <strong>{transaction.customerName}</strong>
+                      </Link>
+                    </td>
 
-                  <td>{transaction.product}</td>
+                    <td>{transaction.product}</td>
 
-                  <td>{transaction.category}</td>
+                    <td>{transaction.category}</td>
 
-                  <td>₹{transaction.amount.toLocaleString()}</td>
+                    <td>₹{transaction.amount.toLocaleString()}</td>
 
-                  <td>{transaction.date}</td>
+                    <td>{transaction.date}</td>
 
-                  <td>{transaction.paymentMethod}</td>
+                    <td>{transaction.paymentMethod}</td>
 
-                  <td>
-                    <span className='status-badge status-active'>
-                      {transaction.status}
-                    </span>
+                    <td>
+                      <span className='status-badge status-active'>
+                        {transaction.status}
+                      </span>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan='8' style={{ textAlign: 'center', padding: '40px' }} className='muted-text'>
+                    {demoMode
+                      ? 'No transactions match the selected filter.'
+                      : <span>No transaction records found in your database. <Link to='/import' className='text-button'>Import CSV Data</Link></span>
+                    }
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>

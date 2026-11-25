@@ -113,7 +113,7 @@ const uploadScan = async (req, res, next) => {
         await scan.save();
       } else {
         scan.status = 'completed';
-        scan.riskScore = 5;
+        scan.riskScore = null;
         scan.decision = 'allow';
         await scan.save();
       }
