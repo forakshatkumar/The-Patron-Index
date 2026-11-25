@@ -3,14 +3,14 @@
 
 **The Patron Index** is an enterprise-grade customer intelligence and business analytics platform designed to help modern businesses understand customer behavior and make smarter, data-driven decisions.
 
-The platform analyses historical customer purchase data and transforms it into explainable RFM insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement, and improve customer retention without relying on synthetic or made-up data.
+The platform analyses historical customer purchase data and transforms it into explainable RFM insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement, and improve customer retention without on relying on synthetic or made-up data.
 
 ---
 
 ## 🌐 Live Deployments
 
-- **Frontend Application (Vercel):** [https://the-patron-index.vercel.app/](https://the-patron-index.vercel.app/)
-- **Backend API Service (Render):** [https://the-patron-index-backend.onrender.com/](https://the-patron-index-backend.onrender.com/)
+- **Application (Vercel):** - [Live Demo](https://thepatronindex.vercel.app)
+
 
 ---
 
@@ -40,6 +40,17 @@ The platform analyses historical customer purchase data and transforms it into e
 | **Hosting & CI/CD** | Vercel (Frontend), Render (Backend), Git / GitHub |
 
 ---
+## 📊 RFM Analysis Methodology
+
+The Patron Index uses Recency, Frequency, and Monetary (RFM) analysis to evaluate customer behavior and engagement.
+
+- **Recency (35%):** Measures how recently a customer made a purchase.
+- **Frequency (30%):** Evaluates how often a customer makes purchases.
+- **Monetary (35%):** Measures the total monetary value of a customer's purchases.
+
+These metrics help businesses identify valuable customers, recognize potential customer churn, and develop targeted customer retention strategies.
+
+---git diff README.md
 
 ## 🔌 API Endpoints
 
