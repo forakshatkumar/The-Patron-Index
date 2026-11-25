@@ -9,8 +9,7 @@ The platform analyses historical customer purchase data and transforms it into e
 
 ## 🌐 Live Deployments
 
-- **Frontend Application (Vercel):** [https://the-patron-index.vercel.app/](https://the-patron-index.vercel.app/)
-- **Backend API Service (Render):** [https://the-patron-index-backend.onrender.com/](https://the-patron-index-backend.onrender.com/)
+- **Application (Vercel):** - thepatronindex.vercel.app
 
 ---
 
