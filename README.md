@@ -3,7 +3,7 @@
 
 **The Patron Index** is an enterprise-grade customer intelligence and business analytics platform designed to help modern businesses understand customer behavior and make smarter, data-driven decisions.
 
-The platform analyses historical customer purchase data and transforms it into explainable RFM insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement, and improve customer retention without relying on synthetic or made-up data.
+The platform analyses historical customer purchase data and transforms it into explainable RFM insights. It helps businesses identify their most valuable customers, understand purchasing patterns, track customer engagement, and improve customer retention without on relying on synthetic or made-up data.
 
 ---
 
