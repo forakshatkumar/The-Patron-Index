@@ -140,10 +140,9 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
     }
   }
 
-  // Derive display name, email, and organization dynamically from authenticated user
+  // Derive display name and email dynamically from authenticated user
   const displayName = user?.name || (user?.email ? user.email.split('@')[0] : (demoMode ? 'Demo Account' : 'Authenticated User'))
   const displayEmail = user?.email || (demoMode ? 'demo@patronindex.local' : '')
-  const displayOrganization = user?.organization || (demoMode ? 'Patron Index Demo' : 'Enterprise Workspace')
 
   // Get initials for circular avatar
   const initials = displayName
@@ -285,21 +284,7 @@ function Header ({ onToggleSidebar, sidebarOpen = true }) {
                     <div className='dropdown-user-info'>
                       <strong className='dropdown-user-name'>{displayName}</strong>
                       {displayEmail && <span className='dropdown-user-email'>{displayEmail}</span>}
-                      <div className='dropdown-badge-row'>
-                        <span className={`dropdown-role-pill ${demoMode ? 'role-demo' : 'role-admin'}`}>
-                          {demoMode ? 'Demo Session' : `${user?.role ? user.role.toUpperCase() : 'USER'} • BUSINESS`}
-                        </span>
-                      </div>
                     </div>
-                  </div>
-
-                  {/* Account Workspace Summary */}
-                  <div className='dropdown-tier-card'>
-                    <div className='tier-label-group'>
-                      <span className='tier-name'>{displayOrganization}</span>
-                      <span className='tier-tag'>ENTERPRISE</span>
-                    </div>
-                    <span className='tier-sub'>Active Workspace</span>
                   </div>
 
                   <div className='dropdown-divider' />
