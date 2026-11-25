@@ -19,7 +19,7 @@ function Login () {
 
   useEffect(() => {
     // Pre-warm backend on Render to eliminate cold-start lag
-    const apiBase = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api')
+    const apiBase = '/api'
     fetch(`${apiBase}/health`).catch(() => {})
   }, [])
 
@@ -60,10 +60,11 @@ function Login () {
         const btnEl = document.getElementById('google-btn-login')
         if (btnEl) {
           btnEl.innerHTML = ''
+          const btnWidth = Math.max(220, Math.min(360, (btnEl.parentElement?.clientWidth || window.innerWidth) - 8))
           window.google.accounts.id.renderButton(btnEl, {
             theme: 'outline',
             size: 'large',
-            width: 360,
+            width: btnWidth,
             text: 'signin_with',
             shape: 'rectangular',
             logo_alignment: 'left'

@@ -35,7 +35,7 @@ function InteractiveRevenueChart ({ data = [] }) {
     const normalized = (item.value - minimum) / range
     const y = paddingTop + chartHeight - normalized * chartHeight
     const prevValue = index > 0 ? data[index - 1].value : item.value
-    const growth = index > 0 ? Math.round(((item.value - prevValue) / prevValue) * 100) : 0
+    const growth = index > 0 && prevValue > 0 ? Math.round(((item.value - prevValue) / prevValue) * 100) : 0
     return {
       x,
       y,
@@ -131,6 +131,7 @@ function InteractiveRevenueChart ({ data = [] }) {
             <g
               key={pt.label}
               onMouseEnter={() => setActivePoint(pt)}
+              onClick={() => setActivePoint(pt)}
               className='animated-chart-point'
               style={{
                 cursor: 'pointer',
@@ -499,6 +500,17 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
                     columnIndex: index,
                     isNew: true
                   })}
+                  onClick={() => setHoveredBar(prev => (prev?.columnIndex === index && prev?.isNew) ? null : {
+                    item,
+                    type: 'New',
+                    typeLabel: 'New Customers',
+                    count: item.newCustomers,
+                    total: totalCohort,
+                    sharePct: Math.round((item.newCustomers / totalCohort) * 100),
+                    color: '#10B981',
+                    columnIndex: index,
+                    isNew: true
+                  })}
                   title={`${item.month}: ${item.newCustomers} New Customers`}
                 />
 
@@ -510,6 +522,17 @@ function InteractiveNewVsRepeatChart ({ activity = [] }) {
                     animationDelay: `${index * 0.08 + 0.04}s`
                   }}
                   onMouseEnter={() => setHoveredBar({
+                    item,
+                    type: 'Repeat',
+                    typeLabel: 'Repeat Customers',
+                    count: item.repeatCustomers,
+                    total: totalCohort,
+                    sharePct: Math.round((item.repeatCustomers / totalCohort) * 100),
+                    color: '#118DFF',
+                    columnIndex: index,
+                    isNew: false
+                  })}
+                  onClick={() => setHoveredBar(prev => (prev?.columnIndex === index && !prev?.isNew) ? null : {
                     item,
                     type: 'Repeat',
                     typeLabel: 'Repeat Customers',
@@ -608,24 +631,21 @@ function Analytics () {
 
   const liveRevenue = useMemo(() => {
     if (demoMode) return demoRevenueData
-    if (!customers.length) return []
-    const totalRev = customers.reduce((sum, c) => sum + (c.totalSpending || 0), 0)
-    return [{ label: 'Current', value: totalRev }]
-  }, [customers, demoMode])
+    if (summary?.monthlyRevenue?.length) {
+      return summary.monthlyRevenue.map(item => ({ label: item.label, value: item.value }))
+    }
+    return []
+  }, [demoMode, summary])
 
   const liveGrowth = useMemo(() => {
     if (demoMode) return demoCustomerGrowthData
-    if (!customers.length) return []
-    return [{ label: 'Current', customers: customers.length }]
-  }, [customers, demoMode])
+    return summary?.monthlyGrowth || []
+  }, [demoMode, summary])
 
   const liveActivity = useMemo(() => {
     if (demoMode) return demoPurchaseActivity
-    if (!customers.length) return []
-    const repeatCount = customers.filter(c => (c.purchaseFrequency || c.totalPurchases || 0) > 1).length
-    const newCount = customers.length - repeatCount
-    return [{ month: 'Current', newCustomers: newCount, repeatCustomers: repeatCount }]
-  }, [customers, demoMode])
+    return summary?.monthlyActivity || []
+  }, [demoMode, summary])
 
   const totalRevFormatted = demoMode ? 'Peak: ₹18.4L (+87.8%)' : `Total: ₹${((summary?.totalRevenue || 0) / 100000).toFixed(2)}L`
   const baseCountFormatted = demoMode ? 'Base: 2,482 (+74.8%)' : `Base: ${summary?.totalCustomers || customers.length} patrons`

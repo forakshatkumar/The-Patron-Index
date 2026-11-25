@@ -7,3 +7,5 @@ uploads/
 dist/
 *.log
 .DS_Store
+
+.npmrc

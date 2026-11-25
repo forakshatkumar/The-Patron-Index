@@ -1,98 +1,48 @@
-import { useState, useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useState, useEffect, useRef } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
 import Header from './Header'
 
-function Layout () {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+export default function Layout () {
+  // Start closed on each new workspace visit; keep the choice during navigation.
+  const [desktopOpen, setDesktopOpen] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 900px)').matches)
+  const toggleRef = useRef(null)
+  const sidebarRef = useRef(null)
+  const { pathname } = useLocation()
+  const open = isMobile ? mobileOpen : desktopOpen
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && sidebarOpen) {
-        setSidebarOpen(false)
-      }
+    const media = window.matchMedia('(max-width: 900px)')
+    const change = event => { setIsMobile(event.matches); setMobileOpen(false) }
+    media.addEventListener('change', change)
+    return () => media.removeEventListener('change', change)
+  }, [])
+
+  useEffect(() => { setMobileOpen(false) }, [pathname])
+  const closeMobile = () => { setMobileOpen(false); requestAnimationFrame(() => toggleRef.current?.focus()) }
+  const toggle = () => {
+    if (isMobile) setMobileOpen(value => !value)
+    else setDesktopOpen(value => !value)
+  }
+
+  useEffect(() => {
+    if (!open) return
+    if (isMobile) sidebarRef.current?.querySelector('.mobile-close')?.focus()
+    const close = event => {
+      if (event.key !== 'Escape' || event.defaultPrevented || document.querySelector('dialog[open]')) return
+      if (isMobile) setMobileOpen(false)
+      else setDesktopOpen(false)
+      requestAnimationFrame(() => toggleRef.current?.focus())
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [sidebarOpen])
+    document.addEventListener('keydown', close)
+    return () => document.removeEventListener('keydown', close)
+  }, [open, isMobile])
 
-  const toggleSidebar = () => {
-    setSidebarOpen(prev => !prev)
-  }
-
-  const closeSidebar = () => {
-    setSidebarOpen(false)
-  }
-
-  return (
-    <div className={`app-layout ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-      <Sidebar isOpen={sidebarOpen} onClose={closeSidebar} />
-
-      {sidebarOpen && (
-        <div
-          className='sidebar-backdrop'
-          onClick={closeSidebar}
-          aria-hidden='true'
-        />
-      )}
-
-      <div className='app-content'>
-        {/* Lively Ambient Background of Graphs */}
-        <div className='dashboard-art' aria-hidden='true'>
-          <svg className='dashboard-trend-bg' viewBox='0 0 1200 420' preserveAspectRatio='none'>
-            <defs>
-              <linearGradient id='dash-art-fill' x2='0' y2='1'>
-                <stop stopColor='#0866f5' stopOpacity='0.08' />
-                <stop offset='1' stopColor='#0866f5' stopOpacity='0' />
-              </linearGradient>
-            </defs>
-            <path
-              fill='url(#dash-art-fill)'
-              d='M0 325 C60 325 95 235 155 235 S240 273 300 273 S370 155 450 155 S524 220 595 220 S685 128 750 128 S837 165 905 165 S1000 62 1078 66 S1164 42 1200 25 V420 H0 Z'
-            />
-            <path
-              className='dash-art-line'
-              fill='none'
-              stroke='#0866f5'
-              strokeWidth='1.5'
-              strokeOpacity='0.22'
-              d='M0 325 C60 325 95 235 155 235 S240 273 300 273 S370 155 450 155 S524 220 595 220 S685 128 750 128 S837 165 905 165 S1000 62 1078 66 S1164 42 1200 25'
-            />
-            <path
-              className='dash-art-signal'
-              pathLength='1'
-              fill='none'
-              stroke='#0866f5'
-              strokeWidth='2.5'
-              strokeLinecap='round'
-              d='M0 325 C60 325 95 235 155 235 S240 273 300 273 S370 155 450 155 S524 220 595 220 S685 128 750 128 S837 165 905 165 S1000 62 1078 66 S1164 42 1200 25'
-            />
-            <g fill='#fff' stroke='#0866f5' strokeWidth='2' opacity='0.7'>
-              <circle cx='155' cy='235' r='4' />
-              <circle cx='300' cy='273' r='4' />
-              <circle cx='595' cy='220' r='4' />
-              <circle cx='905' cy='165' r='4' />
-              <circle cx='1078' cy='66' r='4' />
-            </g>
-          </svg>
-          <div className='dashboard-ambient-bars'>
-            <span style={{ '--height': '32%', '--delay': '-1.2s' }} />
-            <span style={{ '--height': '56%', '--delay': '-0.6s' }} />
-            <span style={{ '--height': '44%', '--delay': '-2.4s' }} />
-            <span style={{ '--height': '72%', '--delay': '-1.8s' }} />
-            <span style={{ '--height': '88%', '--delay': '-3s' }} />
-          </div>
-          <div className='dashboard-ambient-ring' />
-        </div>
-
-        <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-
-        <main className='page-content'>
-          <Outlet />
-        </main>
-      </div>
-    </div>
-  )
+  return <div className={`app-layout premium-layout ${desktopOpen ? 'desktop-open' : ''} ${mobileOpen && isMobile ? 'mobile-open' : ''}`}>
+    <Sidebar sidebarRef={sidebarRef} open={open} onClose={closeMobile} onNavigate={() => { if (isMobile) closeMobile() }} />
+    {mobileOpen && isMobile && <button type='button' className='premium-backdrop' aria-label='Close navigation' tabIndex={-1} onClick={closeMobile} />}
+    <div className='app-content' inert={isMobile && mobileOpen}><Header onToggleSidebar={toggle} navigationOpen={open} toggleRef={toggleRef} /><main className='page-content'><Outlet /></main></div>
+  </div>
 }
-
-export default Layout

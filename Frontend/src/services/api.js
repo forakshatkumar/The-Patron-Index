@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? '/api' : 'http://localhost:5000/api')
+// Same-origin proxy is required for reliable first-party session cookies.
+const API_URL = '/api'
 
 export const getToken = () => localStorage.getItem('patron_token')
 export const saveToken = token => localStorage.setItem('patron_token', token)
@@ -16,16 +17,17 @@ export const getUser = () => {
 }
 export const saveUser = user => localStorage.setItem('patron_user', JSON.stringify(user))
 
-async function request(path, options = {}) {
+const inflight = new Map()
+async function performRequest(path, options = {}) {
   const token = getToken()
-  const headers = { ...(options.headers || {}) }
+  const headers = { 'X-Patron-Request': '1', ...(options.headers || {}) }
 
   if (!(options.body instanceof FormData)) {
     headers['Content-Type'] = headers['Content-Type'] || 'application/json'
   }
   if (token) headers.Authorization = `Bearer ${token}`
 
-  const response = await fetch(`${API_URL}${path}`, { ...options, headers })
+  const response = await fetch(`${API_URL}${path}`, { ...options, headers, credentials: 'same-origin' })
   let data
   try {
     data = await response.json()
@@ -33,7 +35,7 @@ async function request(path, options = {}) {
     data = {}
   }
 
-  if (response.status === 401) {
+  if (response.status === 401 && !['/auth/login','/auth/register','/auth/google','/auth/me'].includes(path)) {
     removeToken()
     if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/login') && !window.location.pathname.startsWith('/register')) {
       window.dispatchEvent(new CustomEvent('patron:unauthorized'))
@@ -48,6 +50,14 @@ async function request(path, options = {}) {
   return data
 }
 
+function request(path, options = {}) {
+  if (options.method && options.method !== 'GET') return performRequest(path, options)
+  if (inflight.has(path)) return inflight.get(path)
+  const pending = performRequest(path, options).finally(() => { if (inflight.get(path) === pending) inflight.delete(path) })
+  inflight.set(path, pending)
+  return pending
+}
+
 export const healthCheck = () => request('/health')
 
 export async function loginUser(email, password) {
@@ -55,8 +65,7 @@ export async function loginUser(email, password) {
     method: 'POST',
     body: JSON.stringify({ email, password })
   })
-  if (data.token) saveToken(data.token)
-  if (data.user) saveUser(data.user)
+  removeToken() // Do not store new session credentials in localStorage.
   return data
 }
 
@@ -65,8 +74,7 @@ export async function registerUser(user) {
     method: 'POST',
     body: JSON.stringify(user)
   })
-  if (data.token) saveToken(data.token)
-  if (data.user) saveUser(data.user)
+  removeToken() // Do not store new session credentials in localStorage.
   return data
 }
 
@@ -75,8 +83,7 @@ export async function googleLogin(credential) {
     method: 'POST',
     body: JSON.stringify({ credential })
   })
-  if (data.token) saveToken(data.token)
-  if (data.user) saveUser(data.user)
+  removeToken() // Do not store new session credentials in localStorage.
   return data
 }
 
@@ -100,4 +107,11 @@ export function importCustomerCsv(file) {
   return request('/customers/import', { method: 'POST', body: formData })
 }
 
+export const getTransactions = () => request('/transactions')
+export const getCustomerTransactions = id => request(`/transactions/customer/${encodeURIComponent(id)}`)
+
 export const getScan = id => request(`/scan/${encodeURIComponent(id)}`)
+
+export const getMe = () => request('/auth/me')
+export const updateMe = patch => request('/auth/me', { method: 'PUT', body: JSON.stringify(patch) })
+export const signOut = all => request(all ? '/auth/logout-all' : '/auth/logout', { method: 'POST' })

@@ -1,6 +1,7 @@
 const Customer = require('../models/Customer');
 const CustomerFeature = require('../models/CustomerFeature');
 const CustomerPrediction = require('../models/CustomerPrediction');
+const Transaction = require('../models/Transaction');
 const createAuditLog = require('../utils/auditLogger');
 const {
   calculatePatronIndex,
@@ -127,8 +128,8 @@ const createCustomer = async (req, res, next) => {
     const cleanEmail = String(email).trim().toLowerCase();
     const cleanName = String(name).trim();
 
-    const existingCustomer = await Customer.findOne({ customerId: cleanCustomerId });
-    if (existingCustomer) return res.status(409).json({ message: 'Customer already exists' });
+    const existingCustomer = await Customer.findOne({ customerId: cleanCustomerId, user: req.user?.userId });
+    if (existingCustomer) return res.status(409).json({ message: 'Customer already exists in your registry' });
 
     const customer = await Customer.create({
       customerId: cleanCustomerId,
@@ -138,6 +139,22 @@ const createCustomer = async (req, res, next) => {
       totalOrders: Math.max(0, Number(totalOrders) || 0),
       user: req.user?.userId
     });
+
+    if (customer.totalSpent > 0 && req.user?.userId) {
+      await Transaction.create({
+        transactionId: `TXN-${Math.floor(100000 + Math.random() * 900000)}`,
+        customerId: customer.customerId,
+        customerName: customer.name,
+        amount: customer.totalSpent,
+        date: new Date().toISOString().split('T')[0],
+        source: 'summary',
+        product: 'Direct Order',
+        category: 'Sales',
+        paymentMethod: 'UPI',
+        status: 'Completed',
+        user: req.user.userId
+      }).catch(err => console.error('Failed to create initial transaction:', err.message));
+    }
 
     const features = {
       recency: 0,
@@ -228,12 +245,29 @@ const importCustomers = async (req, res, next) => {
         current.latestPurchase = purchaseDate;
       }
       grouped.set(id, current);
+
+      if (req.user?.userId && row.purchase_date && !Number.isNaN(purchaseDate.getTime()) && Number.isFinite(amount)) {
+        const txnDate = purchaseDate.toISOString().split('T')[0];
+        const txnId = String(row.transaction_id || `TXN-${Math.floor(100000 + Math.random() * 900000)}`);
+        await Transaction.create({
+          transactionId: txnId,
+          customerId: id,
+          customerName: String(row.name || id).trim(),
+          amount: Number.isFinite(amount) ? amount : 0,
+          date: String(txnDate).split('T')[0],
+          product: String(row.product || 'Standard Plan').trim(),
+          category: String(row.category || 'Subscription').trim(),
+          paymentMethod: String(row.payment_method || (amount > 10000 ? 'Card' : 'UPI')).trim(),
+          status: 'Completed',
+          user: req.user.userId
+        }).catch(err => console.error('Transaction creation non-critical error:', err.message));
+      }
     }
 
     let imported = 0;
     for (const item of grouped.values()) {
       const customer = await Customer.findOneAndUpdate(
-        { customerId: item.customerId },
+        { customerId: item.customerId, user: req.user?.userId },
         {
           customerId: item.customerId,
           name: item.name,

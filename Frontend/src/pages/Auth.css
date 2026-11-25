@@ -476,6 +476,10 @@
     min-height: 38px;
     font-size: 13.5px;
   }
+  .account-field-grid {
+    grid-template-columns: 1fr;
+    gap: 11px;
+  }
   .account-submit {
     min-height: 39px;
     font-size: 14px;

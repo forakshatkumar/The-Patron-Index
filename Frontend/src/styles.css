@@ -2133,12 +2133,47 @@ a {
     display: none;
   }
 
-  .stats-grid,
-  .profile-stats-grid,
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .profile-stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
   .segment-card-grid,
   .reports-grid,
   .settings-form {
     grid-template-columns: 1fr;
+  }
+
+  .card-header-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .customer-controls {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .customer-controls input,
+  .customer-controls select {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 130px;
+  }
+
+  .customer-controls .search-input {
+    flex: 1 1 100%;
+  }
+
+  .customer-profile-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
   }
 
   .page-heading {
@@ -2173,6 +2208,67 @@ a {
   .notification-button {
     width: 34px;
     height: 34px;
+  }
+  .sidebar {
+    width: min(290px, 86vw) !important;
+  }
+  .header-notification-dropdown {
+    right: -10px !important;
+    width: min(320px, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+  .header-profile-dropdown {
+    right: -10px !important;
+    width: min(290px, calc(100vw - 24px)) !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  .customer-controls input,
+  .customer-controls select {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+
+  .table-wrapper {
+    box-shadow: inset -8px 0 8px -8px rgba(11, 35, 69, 0.15);
+  }
+
+  .data-table {
+    min-width: 620px;
+  }
+
+  .form-row-2col {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+
+  .modal-container {
+    width: min(480px, calc(100vw - 24px)) !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 400px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .profile-stats-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .page-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .page-actions a,
+  .page-actions button {
+    width: 100%;
+    text-align: center;
   }
 }
 
