@@ -20,7 +20,10 @@ export default function Layout () {
     return () => media.removeEventListener('change', change)
   }, [])
 
-  useEffect(() => { setMobileOpen(false) }, [pathname])
+  useEffect(() => {
+    const timer = setTimeout(() => setMobileOpen(false), 0)
+    return () => clearTimeout(timer)
+  }, [pathname])
   const closeMobile = () => { setMobileOpen(false); requestAnimationFrame(() => toggleRef.current?.focus()) }
   const toggle = () => {
     if (isMobile) setMobileOpen(value => !value)

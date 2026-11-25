@@ -10,16 +10,30 @@ export function AuthProvider ({ children }) {
   const [loading, setLoading] = useState(true)
   const [sessionError, setSessionError] = useState('')
   const restore = useCallback(async () => {
-    setLoading(true); setSessionError('')
+    setLoading(true)
+    setSessionError('')
     try {
-      if (localStorage.getItem('patron_demo') === 'true') return
-      const data = await getMe(); removeToken(); setUser(data.user)
+      if (localStorage.getItem('patron_demo') === 'true') {
+        setLoading(false)
+        return
+      }
+      const data = await getMe()
+      removeToken()
+      setUser(data.user)
     } catch (e) {
       if (e.status === 401) { removeToken(); setUser(null) }
       else setSessionError('Unable to restore your session. Check your connection and try again.')
-    } finally { setLoading(false) }
+    } finally {
+      setLoading(false)
+    }
   }, [])
-  useEffect(() => { restore() }, [restore])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      restore()
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [restore])
   useEffect(() => {
     const expired = () => { setUser(null); setDemoMode(false) }
     window.addEventListener('patron:unauthorized', expired)

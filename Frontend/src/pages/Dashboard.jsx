@@ -55,7 +55,7 @@ function Dashboard () {
     if (demoMode) return revenueData
     if (summary?.monthlyRevenue?.length) return summary.monthlyRevenue
     return []
-  }, [customers, demoMode, summary])
+  }, [demoMode, summary])
 
   const insights = useMemo(() => {
     if (demoMode) return dashboardInsights
