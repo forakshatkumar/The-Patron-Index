@@ -9,7 +9,8 @@ The platform analyses historical customer purchase data and transforms it into e
 
 ## 🌐 Live Deployments
 
-- **Application (Vercel):** - thepatronindex.vercel.app
+- **Application (Vercel):** - [Live Demo](https://thepatronindex.vercel.app)
+
 
 ---
 
